@@ -8,11 +8,6 @@ export default defineConfig({
     include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx'],
     exclude: ['node_modules', '.next'],
     setupFiles: [],
-    coverage: {
-      provider: 'v8',
-      include: ['src/**/*.ts', 'src/**/*.tsx'],
-      exclude: ['node_modules', '.next'],
-    },
   },
   resolve: {
     alias: {
