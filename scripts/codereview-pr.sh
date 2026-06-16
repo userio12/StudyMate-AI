@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# Creates a PR to trigger CodeRabbit full codebase review
+# Creates a PR from dev→main to trigger CodeRabbit review
 # Usage: bash scripts/codereview-pr.sh
+#
+# Workflow:
+#   dev (working branch) → PR → main (protected, org codebase)
+#   CodeRabbit reviews all files on every PR (changed_files_only: false)
 
 set -e
 
-BRANCH="codereview/initial-scan-$(date +%s)"
+BRANCH="dev"
 
-git checkout -b "$BRANCH"
-git commit --allow-empty -m "ci: trigger full codebase review"
-git push origin "$BRANCH"
+echo "Pushing latest dev branch..."
+git push origin dev
 
+echo "Creating PR from dev → main..."
 gh pr create \
   --base main \
-  --head "$BRANCH" \
-  --title "Full codebase review" \
-  --body "Triggering CodeRabbit to review the entire codebase." \
+  --head dev \
+  --title "$1" \
+  --body "$2" \
   --label "review"
 
 echo "PR created! CodeRabbit will review all files."
-echo "After review is done, close the PR without merging:"
-echo "  gh pr close $BRANCH"
-echo "  git checkout main && git branch -D $BRANCH"
