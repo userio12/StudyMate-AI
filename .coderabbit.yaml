@@ -1,0 +1,7 @@
+language: "en"
+changed_files_only: false
+early_access: false
+reviews:
+  path_filters:
+    - "!docs/**"
+    - "!.github/**"
