@@ -6,15 +6,14 @@ import { useDocuments } from '@/hooks/use-documents';
 import { Loader2 } from 'lucide-react';
 import { handleApiError } from '@/lib/error-handler';
 import { toast } from 'sonner';
+import { useApiClient } from '@/lib/api-client';
 
 export default function DocumentsPage() {
   const { documents, isLoading, mutate } = useDocuments();
+  const api = useApiClient();
 
   const handleUpload = async (file: File) => {
     try {
-      const { useApiClient } = await import('@/lib/api-client');
-      const api = useApiClient();
-
       const { id, uploadUrl, s3Key } = await api.post<{
         id: string;
         uploadUrl: string;

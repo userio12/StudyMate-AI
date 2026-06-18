@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn, isActiveRoute } from '@/lib/utils';
 import { useUiStore } from '@/store/ui-store';
 import { Files, MessageSquare, GraduationCap, Users, LayoutDashboard, X } from 'lucide-react';
-import { DashboardShell } from './dashboard-shell';
+import { DashboardSidebar } from './dashboard-shell';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -17,11 +17,10 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const sidebarOpen = useUiStore((s) => s.sidebarOpen);
   const setSidebarOpen = useUiStore((s) => s.setSidebarOpen);
 
   return (
-    <DashboardShell.Sidebar>
+    <DashboardSidebar>
       <div className="flex h-14 items-center justify-between border-b border-parchment-300 px-4 dark:border-navy-700">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="studymate-glow h-6 w-6 rounded-full" />
@@ -60,6 +59,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-    </DashboardShell.Sidebar>
+    </DashboardSidebar>
   );
 }

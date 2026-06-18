@@ -1,9 +1,9 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { TrustLevel as TrustLevelType, Persona } from '@studymate/shared';
-import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS, TrustLevel } from '@studymate/shared';
+import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS } from '@studymate/shared';
 
 const STORAGE_KEY = 'studymate-trust';
 
@@ -40,11 +40,11 @@ function computeTrustLevel(sessionCount: number, lastActiveAt: string | null): {
   let baseLevel: TrustLevelType = 'stranger';
 
   const sorted = Object.entries(SESSION_COUNT_THRESHOLDS).sort(
-    (a, b) => b[1].min - a[1].min,
+    (a, b) => (b[1] as any).min - (a[1] as any).min,
   );
 
-  for (const [level, { min }] of sorted) {
-    if (sessionCount >= min) {
+  for (const [level, config] of sorted) {
+    if (sessionCount >= (config as any).min) {
       baseLevel = level as TrustLevelType;
       break;
     }
@@ -68,17 +68,23 @@ function computeTrustLevel(sessionCount: number, lastActiveAt: string | null): {
     }
   }
 
-  const persona = SESSION_COUNT_THRESHOLDS[effectiveLevel].persona;
+  const persona = (SESSION_COUNT_THRESHOLDS as any)[effectiveLevel].persona;
 
   return { trustLevel: effectiveLevel, persona };
 }
 
 export function useTrustLevel() {
   const { user } = useUser();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return useMemo(() => {
     const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;
-    const lastActiveAt = getLastActive();
+    // During hydration/SSR, assume no lastActiveAt to match server
+    const lastActiveAt = mounted ? getLastActive() : null;
 
     const { trustLevel, persona } = computeTrustLevel(sessionCount, lastActiveAt);
 
@@ -95,5 +101,5 @@ export function useTrustLevel() {
       showBetaFeatures,
       persistActivity,
     } as const;
-  }, [user]);
+  }, [user, mounted]);
 }

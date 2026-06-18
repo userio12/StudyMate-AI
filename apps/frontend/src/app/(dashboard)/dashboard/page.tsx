@@ -17,15 +17,17 @@ export default function DashboardPage() {
   }));
 
   return (
-    <div>
-      <h1 className="font-heading text-2xl font-semibold text-navy-800 dark:text-parchment-100">
-        Overview
-      </h1>
-      <p className="mt-1 text-sm leading-relaxed text-navy-600 dark:text-parchment-400">
-        Welcome back. Here&rsquo;s your study overview.
-      </p>
+    <article>
+      <header>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
+          Overview
+        </h1>
+        <p className="mt-2 text-base text-muted-foreground font-sans">
+          Welcome back. Here&rsquo;s your study overview.
+        </p>
+      </header>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <section className="mt-8 grid gap-6 sm:grid-cols-3" aria-label="Quick statistics">
         <StatsCard
           label="Documents"
           value={isLoading ? '...' : stats?.documents ?? 0}
@@ -44,20 +46,23 @@ export default function DashboardPage() {
           icon={<GraduationCap size={22} />}
           isLoading={isLoading}
         />
-      </div>
+      </section>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-          <h2 className="font-heading text-base font-semibold text-navy-800 dark:text-parchment-100">
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <section className="rounded-none border border-border bg-surface p-8 shadow-warm" aria-labelledby="recent-activity-heading">
+          <h2 id="recent-activity-heading" className="font-heading text-xl font-semibold text-foreground">
             Recent Activity
           </h2>
-          <div className="mt-4">
+          <div className="mt-6">
             <RecentActivity activities={activities} isLoading={isLoading} />
           </div>
-        </div>
+        </section>
 
-        <WeakTopicsChart data={[]} />
+        <section aria-labelledby="weak-topics-heading">
+          <h2 id="weak-topics-heading" className="sr-only">Weak Topics</h2>
+          <WeakTopicsChart data={[]} />
+        </section>
       </div>
-    </div>
+    </article>
   );
 }

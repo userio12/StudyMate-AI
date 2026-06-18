@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { DashboardShell } from '@/components/dashboard-shell';
+import { DashboardShell, DashboardContent, DashboardMain } from '@/components/dashboard-shell';
 import { Sidebar } from '@/components/sidebar';
 import { Navbar } from '@/components/navbar';
 
@@ -9,10 +9,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <DashboardShell>
       <Sidebar />
-      <DashboardShell.Content>
+      <DashboardContent>
         <Navbar />
-        <DashboardShell.Main>{children}</DashboardShell.Main>
-      </DashboardShell.Content>
+        <DashboardMain>{children}</DashboardMain>
+      </DashboardContent>
     </DashboardShell>
   );
 }

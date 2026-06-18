@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { CitationBadge } from './citation-badge';
 import { User, Bot } from 'lucide-react';
@@ -17,7 +18,7 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
-export function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
+export const ChatMessage = React.memo(function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
   const isUser = role === 'user';
 
   return (
@@ -65,4 +66,4 @@ export function ChatMessage({ role, content, citations, isStreaming }: ChatMessa
       )}
     </div>
   );
-}
+});

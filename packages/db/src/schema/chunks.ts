@@ -23,5 +23,9 @@ export const chunks = pgTable(
       'gin',
       sql`to_tsvector('english', ${table.content})`,
     ),
+    embeddingIdx: index('idx_chunks_embedding').using(
+      'hnsw',
+      table.embedding.op('vector_cosine_ops'),
+    ),
   }),
 );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { useApiClient } from '@/lib/api-client';
 import { useChatStore } from '@/store/chat-store';
@@ -12,7 +13,9 @@ export function useConversations() {
     api.get<Array<{ id: string; title: string; lastMessageAt: string | null }>>(url),
   );
 
-  if (data) setConversations(data);
+  useEffect(() => {
+    if (data) setConversations(data);
+  }, [data, setConversations]);
 
   return {
     conversations: data ?? [],

@@ -4,7 +4,7 @@ export const configSchema = z.object({
   PORT: z.coerce.number().default(4000),
   DATABASE_URL: z.string().url(),
   CLERK_SECRET_KEY: z.string().min(1),
-  CLERK_WEBHOOK_SECRET: z.string().min(1),
+  CLERK_WEBHOOK_SECRET: z.string().min(1).optional(),
   GEMINI_API_KEY: z.string().min(1),
   AWS_REGION: z.string().default('us-east-1'),
   AWS_ACCESS_KEY_ID: z.string().optional(),

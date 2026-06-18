@@ -39,8 +39,13 @@ ${contextChunks.join('\n\n')}`;
 
     for await (const chunk of result) {
       if (combinedSignal.aborted) return;
-      const text = chunk.text;
-      if (text) yield text;
+      try {
+        const text = chunk.text;
+        if (text) yield text;
+      } catch (error) {
+        console.error('Gemini safety filter triggered or stream error:', error);
+        yield '\n\n[Content blocked by safety filters]';
+      }
     }
   }
 }

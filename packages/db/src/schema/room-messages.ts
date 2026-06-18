@@ -17,5 +17,6 @@ export const roomMessages = pgTable(
   },
   (table) => ({
     roomIdIdx: index('idx_room_messages_room_id').on(table.roomId),
+    createdAtIdx: index('idx_room_messages_created_at').on(table.createdAt),
   }),
 );

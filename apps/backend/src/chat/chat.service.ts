@@ -82,6 +82,9 @@ export class ChatService {
       content: m.content,
     }));
 
+    // Add current user message to history so the LLM actually sees it!
+    history.push({ role: 'user', content });
+
     const sources = contextChunks.map((c) => ({
       chunkId: c.id,
       documentId: c.documentId,

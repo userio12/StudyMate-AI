@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Menu, Sun, Moon } from 'lucide-react';
 import { useUiStore } from '@/store/ui-store';
-import { DashboardShell } from './dashboard-shell';
+import { DashboardNavbar } from './dashboard-shell';
 
 export function Navbar({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
@@ -15,7 +15,7 @@ export function Navbar({ className }: { className?: string }) {
   useEffect(() => setMounted(true), []);
 
   return (
-    <DashboardShell.Navbar className={className}>
+    <DashboardNavbar className={className}>
       <button
         onClick={toggleSidebar}
         className="rounded-lg p-2 text-navy-500 hover:bg-parchment-200 dark:text-parchment-400 dark:hover:bg-navy-700 min-h-11 min-w-11 flex items-center justify-center"
@@ -39,6 +39,6 @@ export function Navbar({ className }: { className?: string }) {
 
         <UserButton />
       </div>
-    </DashboardShell.Navbar>
+    </DashboardNavbar>
   );
 }

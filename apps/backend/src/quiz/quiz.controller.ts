@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { GenerateQuizSchema, SubmitAttemptSchema } from '@studymate/shared';
+import { Body, Controller, Get, Param, Post, Query, ParseUUIDPipe } from '@nestjs/common';
+import { GenerateQuizSchema, SubmitAttemptSchema, PaginationSchema, type Pagination } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { QuizService } from './quiz.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
@@ -19,15 +19,14 @@ export class QuizController {
   @Get('list')
   listQuizzes(
     @CurrentUser() user: CurrentUserPayload,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
+    @Query(new ZodValidationPipe(PaginationSchema)) query: Pagination,
   ) {
-    return this.quizService.listQuizzes(user.userId, Number(limit) || 20, Number(offset) || 0);
+    return this.quizService.listQuizzes(user.userId, query.limit, query.offset);
   }
 
   @Get(':id')
   getQuiz(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.quizService.getQuiz(id, user.userId);
@@ -35,7 +34,7 @@ export class QuizController {
 
   @Post(':id/attempt')
   startAttempt(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.quizService.startAttempt(id, user.userId);
@@ -43,8 +42,8 @@ export class QuizController {
 
   @Post(':id/attempt/:attemptId/submit')
   submitAttempt(
-    @Param('id') id: string,
-    @Param('attemptId') attemptId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('attemptId', ParseUUIDPipe) attemptId: string,
     @Body(new ZodValidationPipe(SubmitAttemptSchema)) body: { answers: Record<string, string> },
     @CurrentUser() user: CurrentUserPayload,
   ) {

@@ -20,13 +20,21 @@ export class EmbeddingsService {
 
   async embedBatch(texts: string[]): Promise<number[][]> {
     if (texts.length === 0) return [];
-    if (texts.length === 1) return [await this.embed(texts[0]!)];
+    
+    const BATCH_SIZE = 100;
+    const results: number[][] = [];
 
-    const result = await this.ai.client.models.embedContent({
-      model: EMBEDDING_MODEL,
-      contents: texts.map((text) => ({ role: 'user' as const, parts: [{ text }] })),
-    });
+    for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+      const batch = texts.slice(i, i + BATCH_SIZE);
+      const result = await this.ai.client.models.embedContent({
+        model: EMBEDDING_MODEL,
+        contents: batch.map((text) => ({ role: 'user' as const, parts: [{ text }] })),
+      });
 
-    return (result.embeddings ?? []).map((e) => e.values ?? []);
+      const batchEmbeddings = (result.embeddings ?? []).map((e) => e.values ?? []);
+      results.push(...batchEmbeddings);
+    }
+
+    return results;
   }
 }

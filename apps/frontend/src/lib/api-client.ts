@@ -1,4 +1,5 @@
 import { useAuth } from '@clerk/nextjs';
+import { useMemo } from 'react';
 
 export class ApiError extends Error {
   constructor(
@@ -12,22 +13,11 @@ export class ApiError extends Error {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
-async function getToken(): Promise<string | null> {
-  try {
-    const { getToken } = await import('@clerk/nextjs');
-    const token = await getToken({ template: 'studymate-ai' });
-    return token ?? null;
-  } catch {
-    return null;
-  }
-}
-
 async function request<T>(
   path: string,
   options: RequestInit = {},
+  token?: string | null,
 ): Promise<T> {
-  const token = await getToken();
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -47,21 +37,53 @@ async function request<T>(
     throw new ApiError(response.status, body.message ?? 'Request failed');
   }
 
-  return response.json() as Promise<T>;
+  const json = await response.json();
+  return (json.data !== undefined ? json.data : json) as Promise<T>;
 }
 
 export function useApiClient() {
   const { getToken } = useAuth();
 
+  // Cache the token promise to avoid redundant calls within the same hook lifecycle or concurrent requests
+  const getCachedToken = useMemo(() => {
+    let tokenPromise: Promise<string | null> | null = null;
+    let lastFetched = 0;
+    const CACHE_TTL = 5000; // 5 seconds
+
+    return async () => {
+      const now = Date.now();
+      if (tokenPromise && now - lastFetched < CACHE_TTL) {
+        return tokenPromise;
+      }
+
+      lastFetched = now;
+      tokenPromise = getToken({ template: 'studymate-ai' }).then(t => t ?? null);
+      return tokenPromise;
+    };
+  }, [getToken]);
+
+  const getWithAuth = async <T>(path: string) => {
+    const token = await getCachedToken();
+    return request<T>(path, {}, token);
+  };
+
+  const postWithAuth = async <T>(path: string, body?: unknown) => {
+    const token = await getCachedToken();
+    return request<T>(path, {
+      method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+    }, token);
+  };
+
+  const deleteWithAuth = async <T>(path: string) => {
+    const token = await getCachedToken();
+    return request<T>(path, { method: 'DELETE' }, token);
+  };
+
   return {
-    get: <T>(path: string) => request<T>(path),
-    post: <T>(path: string, body?: unknown) =>
-      request<T>(path, {
-        method: 'POST',
-        body: body ? JSON.stringify(body) : undefined,
-      }),
-    delete: <T>(path: string) =>
-      request<T>(path, { method: 'DELETE' }),
+    get: getWithAuth,
+    post: postWithAuth,
+    delete: deleteWithAuth,
 
     async streamPost(
       path: string,
@@ -71,7 +93,7 @@ export function useApiClient() {
       onError?: (error: Error) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const token = await getToken({ template: 'studymate-ai' });
+      const token = await getCachedToken();
 
       const response = await fetch(`${BASE_URL}${path}`, {
         method: 'POST',
@@ -125,12 +147,3 @@ export function useApiClient() {
     },
   };
 }
-
-export const apiServer = {
-  get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body?: unknown) =>
-    request<T>(path, {
-      method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
-    }),
-};

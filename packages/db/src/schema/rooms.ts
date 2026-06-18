@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 
 export const rooms = pgTable('rooms', {
@@ -9,4 +9,6 @@ export const rooms = pgTable('rooms', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  createdByIdx: index('idx_rooms_created_by').on(table.createdBy),
+}));

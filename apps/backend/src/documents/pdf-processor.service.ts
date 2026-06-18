@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { EmbeddingsService } from '../ai/embeddings.service.js';
@@ -8,6 +8,8 @@ import { MAX_CHUNK_LENGTH, CHUNK_OVERLAP } from '@studymate/shared';
 
 @Injectable()
 export class PdfProcessorService {
+  private readonly logger = new Logger(PdfProcessorService.name);
+
   constructor(
     private db: DatabaseService,
     private storage: StorageService,
@@ -15,59 +17,98 @@ export class PdfProcessorService {
   ) {}
 
   async processDocument(docId: string) {
-    const doc = await this.db.db!.query.documents.findFirst({
-      where: eq(documents.id, docId),
-    });
-    if (!doc) throw new Error('Document not found');
+    try {
+      this.logger.log(`Starting processing for document: ${docId}`);
+      
+      await this.db.db!.update(documents).set({ status: 'processing' }).where(eq(documents.id, docId));
 
-    const downloadUrl = await this.storage.generateDownloadUrl(doc.s3Key);
-    const text = await this.extractText(downloadUrl);
-    const textChunks = this.semanticChunk(text);
+      const doc = await this.db.db!.query.documents.findFirst({
+        where: eq(documents.id, docId),
+      });
+      if (!doc) throw new Error('Document not found');
 
-    const embeddingVectors = await this.embeddings.embedBatch(
-      textChunks.map((c) => c.content),
-    );
+      const downloadUrl = await this.storage.generateDownloadUrl(doc.s3Key);
+      const text = await this.extractText(downloadUrl);
+      
+      this.logger.log(`Text extracted, length: ${text.length}. Creating chunks...`);
+      const textChunks = this.semanticChunk(text);
 
-    await this.db.db!.transaction(async (tx) => {
-      for (let i = 0; i < textChunks.length; i++) {
-        const chunk = textChunks[i]!;
-        await tx.insert(chunks).values({
-          id: crypto.randomUUID(),
-          documentId: docId,
-          content: chunk.content,
-          pageNumber: chunk.pageNumber,
-          heading: chunk.heading,
-          chunkIndex: i,
-          tokenCount: chunk.content.split(/\s+/).length,
-          embedding: embeddingVectors[i]!,
-        });
-      }
+      this.logger.log(`Generated ${textChunks.length} chunks. Generating embeddings...`);
+      const embeddingVectors = await this.embeddings.embedBatch(
+        textChunks.map((c) => c.content),
+      );
 
-      await tx
-        .update(documents)
-        .set({ status: 'ready', pageCount: this.estimatedPages(text.length) })
+      await this.db.db!.transaction(async (tx) => {
+        // Clear existing chunks to allow re-processing
+        await tx.delete(chunks).where(eq(chunks.documentId, docId));
+
+        for (let i = 0; i < textChunks.length; i++) {
+          const chunk = textChunks[i]!;
+          await tx.insert(chunks).values({
+            id: crypto.randomUUID(),
+            documentId: docId,
+            content: chunk.content,
+            pageNumber: chunk.pageNumber,
+            heading: chunk.heading,
+            chunkIndex: i,
+            tokenCount: chunk.content.split(/\s+/).length,
+            embedding: embeddingVectors[i]!,
+          });
+        }
+
+        await tx
+          .update(documents)
+          .set({ 
+            status: 'ready', 
+            pageCount: this.estimatedPages(text.length) 
+          })
+          .where(eq(documents.id, docId));
+      });
+
+      this.logger.log(`Document ${docId} processed successfully`);
+    } catch (error) {
+      this.logger.error(`Error processing document ${docId}:`, error);
+      
+      await this.db.db!.update(documents)
+        .set({ status: 'error' })
         .where(eq(documents.id, docId));
-    });
+        
+      throw error;
+    }
   }
 
   private async extractText(url: string): Promise<string> {
     try {
       const pdfjs = await import('pdfjs-dist');
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch PDF from storage: ${response.statusText}`);
+      }
+      
       const buffer = await response.arrayBuffer();
-      const doc = await pdfjs.getDocument({ data: buffer }).promise;
+      const loadingTask = pdfjs.getDocument({ 
+        data: new Uint8Array(buffer),
+        useSystemFonts: true,
+        disableFontFace: true, // Often better for Node.js environments
+      });
+      
+      const doc = await loadingTask.promise;
       let fullText = '';
 
       for (let i = 1; i <= doc.numPages; i++) {
         const page = await doc.getPage(i);
         const content = await page.getTextContent();
-        const pageText = (content.items as Array<{ str: string }>).map((item) => item.str).join(' ');
-        fullText += pageText + '\n\n';
+        const pageText = (content.items as Array<any>)
+          .map((item) => item.str)
+          .join(' ');
+        fullText += `[Page ${i}]\n${pageText}\n\n`;
       }
 
       return fullText.trim();
-    } catch {
-      throw new Error('Failed to extract text from PDF');
+    } catch (error) {
+      this.logger.error('PDF Text Extraction Error:', error);
+      throw new Error(`PDF text extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

@@ -41,6 +41,10 @@ export class QuizGeneratorService {
     }
 
     const context = chunks.map((c) => `[${c.heading ?? 'General'}] ${c.content}`).join('\n\n---\n\n');
+    const headingToIdMap = new Map<string, string>();
+    chunks.forEach((c) => {
+      if (c.heading) headingToIdMap.set(c.heading, c.id);
+    });
 
     const prompt = `You are a quiz generator. Generate exactly ${questionCount} questions based on the provided study material.
 
@@ -51,9 +55,9 @@ Rules:
 - Include a mix of multiple choice, true/false, and short answer questions
 - Each question must have a clear correct answer
 - Provide a brief explanation for each answer
-- Mark which chunk each question refers to using its heading
+- Mark which chunk each question refers to using its exact heading from the context (e.g., "[Heading Name]")
 
-Return valid JSON only with this structure:
+Return a JSON object with this structure:
 {
   "questions": [
     {
@@ -81,6 +85,9 @@ ${context}`;
         const result = await this.ai.client.models.generateContent({
           model: CHAT_MODEL,
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            responseMimeType: 'application/json',
+          },
         });
 
         const text = result.text;
@@ -89,15 +96,9 @@ ${context}`;
           continue;
         }
 
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          lastError = new Error('Failed to extract JSON from Gemini response');
-          continue;
-        }
-
-        let parsed: { questions: Record<string, unknown>[] };
+        let parsed: { questions: any[] };
         try {
-          parsed = JSON.parse(jsonMatch[0]);
+          parsed = JSON.parse(text);
         } catch {
           lastError = new Error('Gemini returned malformed JSON');
           continue;
@@ -108,13 +109,13 @@ ${context}`;
           continue;
         }
 
-        return parsed.questions.map((q: Record<string, unknown>) => ({
+        return parsed.questions.map((q: any) => ({
           question: q.question as string,
           questionType: q.questionType as string,
           options: q.options as string[] | undefined,
           correctAnswer: q.correctAnswer as string,
           explanation: q.explanation as string | undefined,
-          sourceChunkId: undefined,
+          sourceChunkId: q.sourceHeading ? headingToIdMap.get(q.sourceHeading) : undefined,
         }));
       } catch (err) {
         lastError = err instanceof Error ? err : new Error('Unknown error during quiz generation');

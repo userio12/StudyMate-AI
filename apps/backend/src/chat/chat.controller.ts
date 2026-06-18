@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, Res, ParseUUIDPipe } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { CreateConversationSchema, SendMessageSchema } from '@studymate/shared';
+import { CreateConversationSchema, SendMessageSchema, PaginationSchema, type Pagination } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { ChatService } from './chat.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
@@ -20,15 +20,14 @@ export class ChatController {
   @Get('conversations')
   listConversations(
     @CurrentUser() user: CurrentUserPayload,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
+    @Query(new ZodValidationPipe(PaginationSchema)) query: Pagination,
   ) {
-    return this.chatService.listConversations(user.userId, Number(limit) || 20, Number(offset) || 0);
+    return this.chatService.listConversations(user.userId, query.limit, query.offset);
   }
 
   @Get('conversations/:id')
   getConversation(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.chatService.getConversation(id, user.userId);
@@ -36,7 +35,7 @@ export class ChatController {
 
   @Delete('conversations/:id')
   deleteConversation(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.chatService.deleteConversation(id, user.userId);
@@ -44,7 +43,7 @@ export class ChatController {
 
   @Post('conversations/:id/message')
   async streamMessage(
-    @Param('id') conversationId: string,
+    @Param('id', ParseUUIDPipe) conversationId: string,
     @Body(new ZodValidationPipe(SendMessageSchema)) body: { content: string },
     @CurrentUser() user: CurrentUserPayload,
     @Res() res: Response,

@@ -30,6 +30,7 @@ interface ChatInterfaceProps {
 
 export function ChatInterface({ conversationId, initialMessages, continuity }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
+  const [streamingContent, setStreamingContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = useApiClient();
@@ -39,7 +40,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, streamingContent]);
 
   useEffect(() => {
     return () => abortRef.current?.abort();
@@ -56,30 +57,26 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
       content,
     };
 
-    const assistantMessage: Message = {
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: '',
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setMessages((prev) => [...prev, userMessage]);
+    setStreamingContent('');
     setIsStreaming(true);
     setError(null);
+    
+    let currentStream = '';
 
     await api.streamPost(
       `/chat/conversations/${conversationId}/message`,
       { content },
       (token) => {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
-          if (last && last.role === 'assistant') {
-            updated[updated.length - 1] = { ...last, content: last.content + token };
-          }
-          return updated;
-        });
+        currentStream += token;
+        setStreamingContent(currentStream);
       },
       () => {
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), role: 'assistant', content: currentStream },
+        ]);
+        setStreamingContent('');
         setIsStreaming(false);
         abortRef.current = null;
       },
@@ -92,7 +89,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
     );
   }, [conversationId, api]);
 
-  if (messages.length === 0 && !error) {
+  if (messages.length === 0 && !error && !isStreaming) {
     return (
       <div className="flex h-full flex-col">
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
@@ -141,9 +138,16 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
             role={msg.role}
             content={msg.content}
             citations={msg.citations}
-            isStreaming={isStreaming && msg === messages[messages.length - 1] && msg.role === 'assistant'}
           />
         ))}
+        
+        {isStreaming && (
+          <ChatMessage
+            role="assistant"
+            content={streamingContent}
+            isStreaming={true}
+          />
+        )}
 
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">

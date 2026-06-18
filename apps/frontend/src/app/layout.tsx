@@ -44,7 +44,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light dark" />
-        <meta name="theme-color" content="#f0ede6" />
+        <meta name="theme-color" content="#fcfaf8" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1a1f36" media="(prefers-color-scheme: dark)" />
       </head>
       <body
         className={`${fraunces.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}

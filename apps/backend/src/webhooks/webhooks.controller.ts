@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Headers, UnauthorizedException, OnApplicationShutdown } from '@nestjs/common';
+import { Body, Controller, Post, Headers, UnauthorizedException, OnApplicationShutdown, Req } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service.js';
@@ -6,6 +6,7 @@ import { Public } from '../auth/guards/public.decorator.js';
 import { users } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import type { Request } from 'express';
 
 const REPLAY_TTL = 300_000;
 const processedIds = new Map<string, number>();
@@ -31,6 +32,7 @@ export class WebhooksController implements OnApplicationShutdown {
 
   @Post()
   async handleClerkWebhook(
+    @Req() req: Request,
     @Headers('svix-id') svixId: string | undefined,
     @Headers('svix-timestamp') svixTimestamp: string | undefined,
     @Headers('svix-signature') svixSignature: string | undefined,
@@ -52,7 +54,8 @@ export class WebhooksController implements OnApplicationShutdown {
       return { received: true };
     }
 
-    const signedContent = `${svixId}.${svixTimestamp}.${JSON.stringify(body)}`;
+    const rawBody = (req as any).rawBody?.toString() || JSON.stringify(body);
+    const signedContent = `${svixId}.${svixTimestamp}.${rawBody}`;
     const computed = createHmac('sha256', secret)
       .update(signedContent)
       .digest('base64');
@@ -85,25 +88,29 @@ export class WebhooksController implements OnApplicationShutdown {
       const email = emailAddresses?.[0]?.email_address ?? '';
       const name = `${data?.first_name ?? ''} ${data?.last_name ?? ''}`.trim() || null;
       const avatarUrl = data?.image_url as string | undefined;
+      const sessionCount = (data?.public_metadata as Record<string, unknown> | undefined)?.sessionCount as number ?? 0;
 
-      const existing = await this.db.db!.query.users.findFirst({
-        where: eq(users.clerkId, clerkId),
-      });
-
-      if (existing) {
-        await this.db.db!
-          .update(users)
-          .set({ email, name, avatarUrl })
-          .where(eq(users.clerkId, clerkId));
-      } else {
-        await this.db.db!.insert(users).values({
+      await this.db.db!
+        .insert(users)
+        .values({
           id: crypto.randomUUID(),
           clerkId,
           email,
           name,
           avatarUrl,
+          sessionCount,
+          lastActiveAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: users.clerkId,
+          set: {
+            email,
+            name,
+            avatarUrl,
+            sessionCount,
+            updatedAt: new Date(),
+          },
         });
-      }
     }
 
     if (type === 'user.deleted') {

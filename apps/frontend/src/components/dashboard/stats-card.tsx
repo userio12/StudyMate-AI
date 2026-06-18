@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface StatsCardProps {
   label: string;
@@ -14,38 +15,43 @@ interface StatsCardProps {
 export function StatsCard({ label, value, icon, trend, isLoading }: StatsCardProps) {
   if (isLoading) {
     return (
-      <div className="animate-pulse rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-        <div className="h-10 w-10 rounded-lg bg-parchment-300 dark:bg-navy-700" />
-        <div className="mt-3 h-4 w-24 rounded bg-parchment-300 dark:bg-navy-700" />
-        <div className="mt-2 h-8 w-16 rounded bg-parchment-300 dark:bg-navy-700" />
-      </div>
+      <Card className="animate-pulse">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="h-4 w-24 rounded bg-border" />
+          <div className="h-8 w-8 rounded-lg bg-border" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-8 w-16 rounded bg-border" />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-      <div className="flex items-center justify-between">
-        <div className="rounded-lg bg-terracotta-100 p-2.5 text-terracotta-600 dark:bg-navy-700 dark:text-terracotta-400">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground font-mono uppercase tracking-wider">
+          {label}
+        </CardTitle>
+        <div className="text-primary">
           {icon}
         </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold">{value}</div>
         {trend && (
-          <span
+          <p
             className={cn(
-              'text-xs font-medium',
+              'mt-1 font-mono text-xs',
               trend.direction === 'up'
                 ? 'text-green-600 dark:text-green-400'
                 : 'text-red-600 dark:text-red-400',
             )}
           >
-            {trend.direction === 'up' ? '+' : '-'}
-            {trend.value}
-          </span>
+            {trend.direction === 'up' ? '↑' : '↓'} {trend.value}
+          </p>
         )}
-      </div>
-      <p className="mt-3 text-sm text-navy-600 dark:text-parchment-400">{label}</p>
-      <p className="mt-1 font-heading text-2xl font-semibold text-navy-800 dark:text-parchment-100">
-        {value}
-      </p>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

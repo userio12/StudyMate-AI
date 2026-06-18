@@ -1,7 +1,15 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex h-14 items-center justify-between border-b border-parchment-300 px-6 dark:border-navy-700">
