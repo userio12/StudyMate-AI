@@ -41,7 +41,7 @@ export class HealthController {
       checks.storage = 'error';
     }
 
-    checks.gemini = this.ai.client ? 'ok' : 'error';
+    checks.gemini = this.ai.geminiClient ? 'ok' : 'error';
 
     const allOk = Object.values(checks).every((s) => s === 'ok');
 

@@ -4,6 +4,8 @@ packages:
 allowBuilds:
   '@clerk/shared': true
   '@google/genai': true
+  canvas: set this to true or false
   esbuild: true
   protobufjs: true
   sharp: true
+  unrs-resolver: false

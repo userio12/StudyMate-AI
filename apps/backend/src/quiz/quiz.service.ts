@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { DatabaseService } from '../database/database.service.js';
 import { QuizGeneratorService } from './quiz-generator.service.js';
 import { QuizScorerService } from './quiz-scorer.service.js';
-import { quizzes, quizQuestions, quizAttempts } from '@studymate/db';
+import { quizzes, quizQuestions, quizAttempts, users } from '@studymate/db';
 import { eq, and } from 'drizzle-orm';
 
 @Injectable()
@@ -14,7 +14,12 @@ export class QuizService {
   ) {}
 
   async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = 5) {
-    const questions = await this.generator.generate(documentIds, difficulty, questionCount);
+    const userRecord = await this.db.db!.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+    const preferredModel = (userRecord?.metadata as any)?.preferredModel as string | undefined;
+
+    const questions = await this.generator.generate(documentIds, difficulty, preferredModel, questionCount);
 
     const quizId = crypto.randomUUID();
 
@@ -33,12 +38,11 @@ export class QuizService {
         await tx.insert(quizQuestions).values({
           id: crypto.randomUUID(),
           quizId,
-          questionType: q.questionType as 'multiple_choice' | 'true_false' | 'short_answer',
+          questionType: 'multiple_choice',
           question: q.question,
           options: q.options ?? [],
-          correctAnswer: q.correctAnswer,
+          correctAnswer: q.options[q.correctOptionIndex] ?? '',
           explanation: q.explanation,
-          sourceChunkId: q.sourceChunkId,
           order: i,
         });
       }

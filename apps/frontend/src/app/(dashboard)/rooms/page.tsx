@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { RoomCard } from '@/components/rooms/room-card';
 import { useRooms } from '@/hooks/use-rooms';
 import { useApiClient } from '@/lib/api-client';
-import { Users, Loader2, Plus, LogIn } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faSpinner, faPlus, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
 
@@ -50,67 +51,67 @@ export default function RoomsPage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-semibold text-navy-800 dark:text-parchment-100">
+          <h1 className="font-heading text-2xl font-bold text-foreground">
             Study Rooms
           </h1>
-          <p className="mt-1 text-sm leading-relaxed text-navy-600 dark:text-parchment-400">
+          <p className="mt-1 text-sm text-muted">
             Study together with friends in real-time.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowJoin(!showJoin)}
-            className="inline-flex items-center gap-2 rounded-lg border border-parchment-300 px-4 py-2 text-sm font-medium text-navy-600 transition-colors hover:bg-parchment-100 dark:border-navy-600 dark:text-parchment-300"
+            className="glass-card inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-surface-2 active:scale-95"
           >
-            <LogIn size={16} />
+            <FontAwesomeIcon icon={faRightToBracket} className="w-4 h-4" />
             Join
           </button>
           <button
             onClick={() => setShowCreate(!showCreate)}
-            className="inline-flex items-center gap-2 rounded-lg bg-terracotta-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-terracotta-600"
+            className="inline-flex items-center gap-2 rounded-lg brand-gradient px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 brand-glow hover:scale-[1.02] active:scale-95"
           >
-            <Plus size={16} />
+            <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
             Create room
           </button>
         </div>
       </div>
 
       {showCreate && (
-        <div className="mt-4 flex items-center gap-2">
+        <div className="glass mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
           <input
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
             placeholder="Room name"
             aria-label="Room name"
             autoComplete="off"
-            className="flex-1 rounded-lg border border-parchment-300 bg-white px-3 py-2 text-sm text-navy-800 placeholder:text-navy-400 focus:border-terracotta-500 focus:outline-none dark:border-navy-600 dark:bg-navy-900 dark:text-parchment-100"
+            className="flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none"
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
           <button
             onClick={handleCreate}
             disabled={creating || !roomName.trim()}
-            className="rounded-lg bg-terracotta-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-terracotta-600 disabled:opacity-50"
+            className="flex h-9 min-w-20 items-center justify-center rounded-xl brand-gradient text-sm font-medium text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.05] disabled:opacity-40 disabled:pointer-events-none"
           >
-            {creating ? <Loader2 size={16} className="animate-spin" /> : 'Create'}
+            {creating ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : 'Create'}
           </button>
         </div>
       )}
 
       {showJoin && (
-        <div className="mt-4 flex items-center gap-2">
+        <div className="glass mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
           <input
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
             placeholder="Enter invite code"
             aria-label="Invite code"
             autoComplete="off"
-            className="flex-1 rounded-lg border border-parchment-300 bg-white px-3 py-2 text-sm font-mono text-navy-800 placeholder:text-navy-400 focus:border-terracotta-500 focus:outline-none dark:border-navy-600 dark:bg-navy-900 dark:text-parchment-100"
+            className="flex-1 bg-transparent px-3 text-sm font-mono text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none uppercase"
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
           />
           <button
             onClick={handleJoin}
             disabled={!inviteCode.trim()}
-            className="rounded-lg bg-terracotta-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-terracotta-600 disabled:opacity-50"
+            className="flex h-9 min-w-20 items-center justify-center rounded-xl brand-gradient text-sm font-medium text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.05] disabled:opacity-40 disabled:pointer-events-none"
           >
             Join
           </button>
@@ -122,16 +123,16 @@ export default function RoomsPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-28 animate-pulse rounded-xl bg-parchment-200 dark:bg-navy-800"
+              className="h-28 animate-pulse rounded-xl bg-white/30 dark:bg-white/5"
             />
           ))}
         </div>
       ) : rooms.length === 0 ? (
-        <div className="mt-12 flex flex-col items-center gap-3 text-center">
+        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center border-brand-500/20 max-w-2xl mx-auto">
           <div className="studymate-glow rounded-full p-4">
-            <Users size={24} className="text-white" />
+            <FontAwesomeIcon icon={faUsers} className="text-white w-6 h-6" />
           </div>
-          <p className="text-sm leading-relaxed text-navy-600 dark:text-parchment-400">
+          <p className="text-sm font-medium text-muted">
             No rooms yet. Create or join one.
           </p>
         </div>

@@ -1,11 +1,15 @@
-﻿import { SignUp } from '@clerk/nextjs';
+import { SignUp } from '@clerk/nextjs';
+
 
 export default function SignUpPage() {
   return (
     <SignUp
-      routing="path"
-      path="/sign-up"
-      signInUrl="/sign-in"
+      appearance={{
+        elements: {
+          rootBox: 'w-full',
+          card: 'w-full max-w-full'
+        }
+      }}
     />
   );
 }

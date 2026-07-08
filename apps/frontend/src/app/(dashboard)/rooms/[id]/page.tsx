@@ -6,7 +6,8 @@ import { useRoom } from '@/hooks/use-rooms';
 import { RoomChat } from '@/components/rooms/room-chat';
 import { InviteCodeDisplay } from '@/components/rooms/invite-code-display';
 import { OnlineUsers } from '@/components/rooms/online-users';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 export default function RoomDetailPage({
@@ -21,7 +22,7 @@ export default function RoomDetailPage({
   if (isLoading || !isLoaded) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-terracotta-500" />
+        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-brand-500 dark:text-brand-300 w-6 h-6" />
       </div>
     );
   }
@@ -29,7 +30,7 @@ export default function RoomDetailPage({
   if (!room || !user) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-navy-600 dark:text-parchment-400">
+        <p className="text-sm text-ink-400 dark:text-ink-200">
           Room not found
         </p>
       </div>
@@ -40,15 +41,15 @@ export default function RoomDetailPage({
     <div>
       <Link
         href="/rooms"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-navy-600 hover:text-navy-800 dark:text-parchment-400"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-ink-400 hover:text-ink-600 dark:text-ink-200"
       >
-        <ArrowLeft size={16} />
+        <FontAwesomeIcon icon={faArrowLeft} className="w-4 h-4" />
         Back to rooms
       </Link>
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-xl font-semibold text-navy-800 dark:text-parchment-100">
+          <h1 className="font-heading text-xl font-bold text-ink-600 dark:text-cream-100">
             {room.name}
           </h1>
           <div className="mt-2">
@@ -57,7 +58,7 @@ export default function RoomDetailPage({
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-navy-500 dark:text-parchment-400">
+          <span className="text-xs text-ink-400 dark:text-ink-200">
             {room.members.length} online
           </span>
           <OnlineUsers

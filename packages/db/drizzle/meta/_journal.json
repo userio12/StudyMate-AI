@@ -5,29 +5,36 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1781421527476,
-      "tag": "0000_dark_siren",
+      "when": 1783303919155,
+      "tag": "0000_initial",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1781521527476,
-      "tag": "0001_vector_index",
+      "when": 1783305511603,
+      "tag": "0001_add_conversation_pinned",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1781621527476,
-      "tag": "0002_room_messages",
+      "when": 1783313908436,
+      "tag": "0002_melted_puppet_master",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
-      "when": 1781594359324,
-      "tag": "0003_public_energizer",
+      "when": 1783349635223,
+      "tag": "0003_lethal_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783524508139,
+      "tag": "0004_red_slapstick",
       "breakpoints": true
     }
   ]

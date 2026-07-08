@@ -2,9 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { EmbeddingsService } from '../ai/embeddings.service.js';
+import { AiService } from '../ai/ai.service.js';
 import { chunks, documents } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import { MAX_CHUNK_LENGTH, CHUNK_OVERLAP } from '@studymate/shared';
+// @ts-ignore
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 @Injectable()
 export class PdfProcessorService {
@@ -14,30 +17,43 @@ export class PdfProcessorService {
     private db: DatabaseService,
     private storage: StorageService,
     private embeddings: EmbeddingsService,
+    private ai: AiService,
   ) {}
 
   async processDocument(docId: string) {
     try {
-      this.logger.log(`Starting processing for document: ${docId}`);
+      this.logger.log(`[PdfProcessorService] Starting processing for document ID: ${docId}`);
       
       await this.db.db!.update(documents).set({ status: 'processing' }).where(eq(documents.id, docId));
+      this.logger.debug(`[PdfProcessorService] Document ${docId} status updated to 'processing'`);
 
       const doc = await this.db.db!.query.documents.findFirst({
         where: eq(documents.id, docId),
       });
-      if (!doc) throw new Error('Document not found');
+      if (!doc) throw new Error(`[PdfProcessorService] Document not found in database: ${docId}`);
 
+      this.logger.debug(`[PdfProcessorService] Fetching signed download URL for S3 Key: ${doc.s3Key}`);
       const downloadUrl = await this.storage.generateDownloadUrl(doc.s3Key);
+      
+      this.logger.log(`[PdfProcessorService] Extracting text from PDF (using pdf-parse)`);
       const text = await this.extractText(downloadUrl);
       
-      this.logger.log(`Text extracted, length: ${text.length}. Creating chunks...`);
+      this.logger.log(`[PdfProcessorService] Text extracted successfully. Extracted length: ${text.length} characters.`);
+      
+      if (text.length === 0) {
+        this.logger.warn(`[PdfProcessorService] Warning: Extracted text length is 0! This might be an image-based PDF requiring OCR.`);
+      }
+
+      this.logger.log(`[PdfProcessorService] Creating semantic chunks...`);
       const textChunks = this.semanticChunk(text);
 
-      this.logger.log(`Generated ${textChunks.length} chunks. Generating embeddings...`);
+      this.logger.log(`[PdfProcessorService] Generated ${textChunks.length} chunks. Fetching embeddings...`);
       const embeddingVectors = await this.embeddings.embedBatch(
         textChunks.map((c) => c.content),
       );
+      this.logger.debug(`[PdfProcessorService] Embeddings generated successfully for ${embeddingVectors.length} chunks.`);
 
+      this.logger.log(`[PdfProcessorService] Starting database transaction to insert chunks...`);
       await this.db.db!.transaction(async (tx) => {
         // Clear existing chunks to allow re-processing
         await tx.delete(chunks).where(eq(chunks.documentId, docId));
@@ -79,7 +95,6 @@ export class PdfProcessorService {
 
   private async extractText(url: string): Promise<string> {
     try {
-      const pdfjs = await import('pdfjs-dist');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -87,28 +102,109 @@ export class PdfProcessorService {
       }
       
       const buffer = await response.arrayBuffer();
-      const loadingTask = pdfjs.getDocument({ 
-        data: new Uint8Array(buffer),
-        useSystemFonts: true,
-        disableFontFace: true, // Often better for Node.js environments
-      });
       
-      const doc = await loadingTask.promise;
-      let fullText = '';
-
-      for (let i = 1; i <= doc.numPages; i++) {
-        const page = await doc.getPage(i);
-        const content = await page.getTextContent();
-        const pageText = (content.items as Array<any>)
-          .map((item) => item.str)
-          .join(' ');
-        fullText += `[Page ${i}]\n${pageText}\n\n`;
+      // Try extracting text using pdf-parse first as it's much faster
+      const data = await pdfParse(Buffer.from(buffer));
+      let text = data.text.trim();
+      
+      // If pdf-parse failed to extract meaningful text, it's likely an image-based PDF
+      // Fallback to OCR using NVIDIA's Llama 3.2 90B Vision Instruct
+      if (text.length < 50) {
+         this.logger.warn(`[PdfProcessorService] Extracted text is too short or empty. Falling back to OCR using LLaMA Vision via NVIDIA...`);
+         text = await this.performOCR(Buffer.from(buffer));
       }
-
-      return fullText.trim();
+      
+      return text;
     } catch (error) {
       this.logger.error('PDF Text Extraction Error:', error);
       throw new Error(`PDF text extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private async performOCR(buffer: Buffer): Promise<string> {
+    try {
+      this.logger.log(`[PdfProcessorService] Rendering PDF to images for OCR...`);
+      const { createCanvas } = await import('@napi-rs/canvas');
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      
+      function NodeCanvasFactory() {}
+      NodeCanvasFactory.prototype = {
+        create: function (width: number, height: number) {
+          const canvas = createCanvas(width, height);
+          const context = canvas.getContext('2d');
+          return { canvas, context };
+        },
+        reset: function (canvasAndContext: any, width: number, height: number) {
+          canvasAndContext.canvas.width = width;
+          canvasAndContext.canvas.height = height;
+        },
+        destroy: function (canvasAndContext: any) {
+          canvasAndContext.canvas.width = 0;
+          canvasAndContext.canvas.height = 0;
+          canvasAndContext.canvas = null;
+          canvasAndContext.context = null;
+        },
+      };
+
+      const loadingTask = pdfjs.getDocument({
+        data: new Uint8Array(buffer),
+        disableFontFace: true,
+      });
+      const pdfDocument = await loadingTask.promise;
+      const numPages = pdfDocument.numPages;
+      let fullText = '';
+
+      // Process each page sequentially to avoid memory overload and API rate limits
+      for (let i = 1; i <= numPages; i++) {
+        this.logger.log(`[PdfProcessorService] OCR Processing Page ${i} of ${numPages}...`);
+        const page = await pdfDocument.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvasFactory = new (NodeCanvasFactory as any)();
+        const canvasAndContext = canvasFactory.create(viewport.width, viewport.height);
+
+        await page.render({
+          canvasContext: canvasAndContext.context,
+          viewport: viewport,
+          // @ts-ignore - canvasFactory is an internal property used for Node.js rendering
+          canvasFactory: canvasFactory,
+        }).promise;
+
+        const base64Image = canvasAndContext.canvas.toDataURL('image/jpeg');
+        
+        // Call Nvidia Llama 3.2 90B Vision Instruct
+        const pageText = await this.ai.executeWithFallback(async (client, providerName) => {
+           // We explicitly want to use NVIDIA for OCR. If the fallback hits OpenRouter, we can try its 11B version.
+           let visionModel = 'meta/llama-3.2-90b-vision-instruct'; // NVIDIA's default
+           if (providerName === 'OpenRouter') {
+             visionModel = 'meta-llama/llama-3.2-11b-vision-instruct'; 
+           } else if (providerName === 'Gemini') {
+             visionModel = 'gemini-2.5-flash';
+           }
+           
+           this.logger.debug(`[PdfProcessorService] Requesting OCR from ${providerName} using model ${visionModel}`);
+           const response = await client.chat.completions.create({
+             model: visionModel,
+             messages: [
+               {
+                 role: 'user',
+                 content: [
+                   { type: 'text', text: 'Extract all the text from this image exactly as it appears. Do not summarize or add conversational filler. If there is no text, return an empty string.' },
+                   { type: 'image_url', image_url: { url: base64Image } }
+                 ]
+               }
+             ]
+           });
+           return response.choices[0]?.message?.content || '';
+        }, 'OCR Extraction', 'NVIDIA');
+        
+        fullText += `\n\n[Page ${i}]\n${pageText}\n`;
+      }
+      
+      this.logger.log(`[PdfProcessorService] OCR completed for all ${numPages} pages.`);
+      return fullText.trim();
+    } catch (error) {
+      this.logger.error(`[PdfProcessorService] OCR failed:`, error);
+      throw error;
     }
   }
 

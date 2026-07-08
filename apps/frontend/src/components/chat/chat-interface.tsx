@@ -6,7 +6,8 @@ import { ChatInput } from './chat-input';
 import { PersonaBadge } from './persona-badge';
 import { useApiClient } from '@/lib/api-client';
 import { useRelationship } from '@/hooks/use-relationship';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import type { ContinuityContext, Persona } from '@studymate/shared';
 
 interface Citation {
@@ -94,15 +95,15 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
       <div className="flex h-full flex-col">
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div className="studymate-glow rounded-full p-4">
-            <Sparkles size={32} className="text-white" />
+            <FontAwesomeIcon icon={faWandMagicSparkles} className="text-white w-8 h-8" />
           </div>
-          <p className="text-center text-base leading-relaxed font-medium text-navy-800 dark:text-parchment-100">
+          <p className="text-center text-base font-medium text-foreground">
             {greeting}
           </p>
           {continuity && (
             <div className="flex flex-wrap items-center justify-center gap-2">
               {continuity.weakAreas.length > 0 && (
-                <p className="text-center text-xs leading-relaxed text-navy-500 dark:text-parchment-400">
+                <p className="text-center text-xs text-muted">
                   Weak areas: {continuity.weakAreas.slice(0, 3).join(', ')}
                 </p>
               )}
@@ -123,7 +124,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-parchment-300 px-4 py-3 dark:border-navy-700">
+      <div className="flex items-center justify-between border-b border-glass-border px-4 py-3">
         <PersonaBadge
           persona={persona}
           label={personaLabel}
@@ -150,7 +151,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         )}
 
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+          <div className="glass rounded-lg p-3 text-sm text-error">
             {error}
             <button
               onClick={() => setError(null)}
@@ -164,7 +165,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-parchment-300 p-4 dark:border-navy-700">
+      <div className="border-t border-glass-border p-4">
         <ChatInput onSend={handleSend} isLoading={isStreaming} />
       </div>
     </div>

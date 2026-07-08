@@ -2,7 +2,8 @@
 
 import { useState, useRef, type KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
-import { Send, Loader2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 interface ChatInputProps {
   onSend: (content: string) => void;
@@ -40,7 +41,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
   };
 
   return (
-    <div className="flex items-end gap-2 rounded-2xl border border-parchment-300 bg-parchment-50 p-3 focus-within:border-terracotta-500 dark:border-navy-700 dark:bg-navy-800">
+    <div className="glass flex items-end gap-2 rounded-2xl p-3 transition-all duration-200 focus-within:shadow-glow focus-within:ring-2 focus-within:ring-brand-500/50 border border-transparent focus-within:border-brand-500">
       <textarea
         ref={textareaRef}
         value={value}
@@ -50,7 +51,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
         placeholder={placeholder}
         rows={1}
         disabled={isLoading}
-        className="max-h-[200px] min-h-[24px] flex-1 resize-none bg-transparent text-sm text-navy-800 placeholder:text-navy-400 focus:outline-none dark:text-parchment-100 dark:placeholder:text-parchment-500"
+        className="max-h-[200px] min-h-[24px] flex-1 resize-none bg-transparent text-sm text-foreground placeholder:text-muted/50 border-none outline-none focus:outline-none focus:ring-0"
         aria-label="Chat input"
       />
 
@@ -58,14 +59,14 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
         onClick={handleSend}
         disabled={!value.trim() || isLoading}
         className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-all duration-200',
           value.trim() && !isLoading
-            ? 'bg-terracotta-500 text-white hover:bg-terracotta-600'
-            : 'bg-parchment-200 text-navy-400 dark:bg-navy-700 dark:text-parchment-500',
+            ? 'bg-brand-500 text-white shadow-sm hover:bg-brand-600'
+            : 'bg-surface-2 text-muted cursor-not-allowed',
         )}
         aria-label="Send message"
       >
-        {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+        {isLoading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : <FontAwesomeIcon icon={faPaperPlane} className="w-4 h-4" />}
       </button>
     </div>
   );

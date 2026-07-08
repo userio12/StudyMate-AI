@@ -13,6 +13,11 @@ export class ApiError extends Error {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
+// FIX BUG-26: Extract the Clerk JWT template name as a shared constant so it
+// cannot be accidentally mistyped in different files (previously hardcoded in
+// both api-client.ts and use-room-chat.ts independently).
+export const CLERK_JWT_TEMPLATE = 'studymate-ai';
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -28,6 +33,7 @@ async function request<T>(
   }
 
   const response = await fetch(`${BASE_URL}${path}`, {
+    cache: 'no-store', // Prevent browser caching of API responses
     ...options,
     headers,
   });
@@ -44,45 +50,91 @@ async function request<T>(
 export function useApiClient() {
   const { getToken } = useAuth();
 
-  // Cache the token promise to avoid redundant calls within the same hook lifecycle or concurrent requests
+  // FIX BUG-28: Cache the resolved token value (not the Promise) with a short TTL.
+  // The previous implementation cached the Promise which could hold a reference
+  // to a token that expired mid-cache-window. By re-fetching on TTL expiry and
+  // invalidating on auth errors, we ensure stale tokens are not reused.
   const getCachedToken = useMemo(() => {
-    let tokenPromise: Promise<string | null> | null = null;
+    let cachedToken: string | null = null;
     let lastFetched = 0;
-    const CACHE_TTL = 5000; // 5 seconds
+    const CACHE_TTL = 4_000; // 4 seconds — well under typical JWT expiry
 
-    return async () => {
-      const now = Date.now();
-      if (tokenPromise && now - lastFetched < CACHE_TTL) {
-        return tokenPromise;
-      }
-
-      lastFetched = now;
-      tokenPromise = getToken({ template: 'studymate-ai' }).then(t => t ?? null);
-      return tokenPromise;
+    const invalidate = () => {
+      cachedToken = null;
+      lastFetched = 0;
     };
+
+    const get = async (): Promise<string | null> => {
+      const now = Date.now();
+      if (cachedToken !== null && now - lastFetched < CACHE_TTL) {
+        return cachedToken;
+      }
+      lastFetched = now;
+      cachedToken = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+      return cachedToken;
+    };
+
+    return { get, invalidate };
   }, [getToken]);
 
   const getWithAuth = async <T>(path: string) => {
-    const token = await getCachedToken();
-    return request<T>(path, {}, token);
+    const token = await getCachedToken.get();
+    try {
+      return await request<T>(path, {}, token);
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        getCachedToken.invalidate();
+      }
+      throw err;
+    }
   };
 
   const postWithAuth = async <T>(path: string, body?: unknown) => {
-    const token = await getCachedToken();
-    return request<T>(path, {
-      method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
-    }, token);
+    const token = await getCachedToken.get();
+    try {
+      return await request<T>(path, {
+        method: 'POST',
+        body: body ? JSON.stringify(body) : undefined,
+      }, token);
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        getCachedToken.invalidate();
+      }
+      throw err;
+    }
+  };
+
+  const patchWithAuth = async <T>(path: string, body?: unknown) => {
+    const token = await getCachedToken.get();
+    try {
+      return await request<T>(path, {
+        method: 'PATCH',
+        body: body ? JSON.stringify(body) : undefined,
+      }, token);
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        getCachedToken.invalidate();
+      }
+      throw err;
+    }
   };
 
   const deleteWithAuth = async <T>(path: string) => {
-    const token = await getCachedToken();
-    return request<T>(path, { method: 'DELETE' }, token);
+    const token = await getCachedToken.get();
+    try {
+      return await request<T>(path, { method: 'DELETE' }, token);
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        getCachedToken.invalidate();
+      }
+      throw err;
+    }
   };
 
   return {
     get: getWithAuth,
     post: postWithAuth,
+    patch: patchWithAuth,
     delete: deleteWithAuth,
 
     async streamPost(
@@ -93,7 +145,7 @@ export function useApiClient() {
       onError?: (error: Error) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const token = await getCachedToken();
+      const token = await getCachedToken.get();
 
       const response = await fetch(`${BASE_URL}${path}`, {
         method: 'POST',
@@ -106,6 +158,7 @@ export function useApiClient() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) getCachedToken.invalidate();
         const errBody = await response.json().catch(() => ({ message: 'Stream failed' }));
         onError?.(new ApiError(response.status, errBody.message ?? 'Stream failed'));
         return;
@@ -132,11 +185,28 @@ export function useApiClient() {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6);
+
               if (data === '[DONE]') {
                 onComplete?.();
                 return;
               }
-              onToken(data);
+
+              // FIX BUG-29: Handle [ERROR] frames sent by the backend on stream failure.
+              // Previously these were passed to onToken() and displayed as chat content.
+              if (data.startsWith('[ERROR]')) {
+                onError?.(new Error(data.slice(7).trim()));
+                return;
+              }
+
+              // FIX BUG-03 (frontend side): The backend now JSON.stringify()s each token
+              // before sending, so we JSON.parse() here to recover the original string
+              // including any embedded newlines.
+              try {
+                onToken(JSON.parse(data) as string);
+              } catch {
+                // Fallback for any non-JSON frames
+                onToken(data);
+              }
             }
           }
         }

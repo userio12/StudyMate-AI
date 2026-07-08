@@ -2,15 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { AiService } from '../ai/ai.service.js';
 import { DatabaseService } from '../database/database.service.js';
 import { CHAT_MODEL, DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
-import { sql } from 'drizzle-orm';
 
 interface GeneratedQuestion {
   question: string;
-  questionType: string;
-  options?: string[];
-  correctAnswer: string;
-  explanation?: string;
-  sourceChunkId?: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
 }
 
 @Injectable()
@@ -22,106 +19,94 @@ export class QuizGeneratorService {
 
   async generate(
     documentIds: string[],
-    difficulty: string,
-    questionCount = DEFAULT_QUIZ_QUESTION_COUNT as number,
-  ): Promise<GeneratedQuestion[]> {
-    const chunks = await this.db.db!.execute<{
-      content: string;
-      heading: string | null;
-      id: string;
-    }>(sql`
-      SELECT content, heading, id FROM chunks
-      WHERE document_id IN (${sql.join(documentIds.map((id) => sql`${id}`), sql`, `)})
-      ORDER BY random()
-      LIMIT 15
-    `);
-
-    if (chunks.length === 0) {
-      throw new Error('No content available to generate quiz');
+    difficulty: string = 'intermediate',
+    preferredModel: string = CHAT_MODEL,
+    count: number = DEFAULT_QUIZ_QUESTION_COUNT,
+  ) {
+    if (documentIds.length === 0) {
+      throw new Error('At least one document ID is required to generate a quiz.');
     }
 
-    const context = chunks.map((c) => `[${c.heading ?? 'General'}] ${c.content}`).join('\n\n---\n\n');
-    const headingToIdMap = new Map<string, string>();
-    chunks.forEach((c) => {
-      if (c.heading) headingToIdMap.set(c.heading, c.id);
+    const chunksResult = await this.db.db!.query.chunks.findMany({
+      where: (chunks, { inArray }) => inArray(chunks.documentId, documentIds),
+      limit: 20, 
     });
 
-    const prompt = `You are a quiz generator. Generate exactly ${questionCount} questions based on the provided study material.
+    if (chunksResult.length === 0) {
+      throw new Error('No content found in the specified documents.');
+    }
 
-Difficulty level: ${difficulty}
+    const context = chunksResult.map((c) => c.content).join('\n\n');
+
+    const prompt = `You are an expert tutor creating a quiz to test a student's comprehension.
+Using ONLY the following context from the user's documents, generate ${count} multiple-choice questions.
+The difficulty level should be: ${difficulty.toUpperCase()}.
+
+Context:
+${context}
 
 Rules:
-- Questions must be answerable from the provided material
-- Include a mix of multiple choice, true/false, and short answer questions
-- Each question must have a clear correct answer
-- Provide a brief explanation for each answer
-- Mark which chunk each question refers to using its exact heading from the context (e.g., "[Heading Name]")
+1. Questions must be strictly based on the provided context.
+2. Each question must have exactly 4 options.
+3. Only one option can be correct.
+4. Provide a brief explanation for why the answer is correct based on the text.
+5. You MUST return ONLY a valid JSON array of objects, with no markdown formatting, no code blocks, and no extra text.
 
-Return a JSON object with this structure:
-{
-  "questions": [
-    {
-      "question": "string",
-      "questionType": "multiple_choice | true_false | short_answer",
-      "options": ["string"] (only for multiple_choice),
-      "correctAnswer": "string",
-      "explanation": "string",
-      "sourceHeading": "string"
-    }
-  ]
-}
+Format:
+[
+  {
+    "question": "What is the main concept?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctOptionIndex": 1,
+    "explanation": "Option B is correct because the text states..."
+  }
+]`;
 
-Study material:
-${context}`;
+    let retries = 2;
 
-    let lastError: Error | null = null;
-
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) {
-        await new Promise((r) => setTimeout(r, 1000 * attempt));
-      }
-
+    while (retries >= 0) {
       try {
-        const result = await this.ai.client.models.generateContent({
-          model: CHAT_MODEL,
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: {
-            responseMimeType: 'application/json',
-          },
+        console.log(`[QuizGeneratorService] Generating quiz using Gemini... (retries left: ${retries})`);
+        
+        if (!this.ai.geminiClient) {
+           throw new Error('Gemini API key is not configured!');
+        }
+
+        const response = await this.ai.geminiClient.chat.completions.create({
+          model: 'gemini-2.5-flash',
+          messages: [{ role: 'user', content: prompt }],
         });
 
-        const text = result.text;
+        const text = response.choices[0]?.message?.content;
         if (!text) {
-          lastError = new Error('No response from Gemini');
-          continue;
+          throw new Error('No response from AI');
         }
 
-        let parsed: { questions: any[] };
-        try {
-          parsed = JSON.parse(text);
-        } catch {
-          lastError = new Error('Gemini returned malformed JSON');
-          continue;
+        console.log(`[QuizGeneratorService] Received response from Gemini. Parsing JSON...`);
+        const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleanedText) as GeneratedQuestion[];
+        
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          throw new Error('AI returned empty or invalid question array');
         }
 
-        if (!Array.isArray(parsed?.questions)) {
-          lastError = new Error('Gemini response missing questions array');
-          continue;
+        for (const q of parsed) {
+          if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+              typeof q.correctOptionIndex !== 'number' || !q.explanation) {
+            throw new Error('Invalid question format returned by AI');
+          }
         }
 
-        return parsed.questions.map((q: any) => ({
-          question: q.question as string,
-          questionType: q.questionType as string,
-          options: q.options as string[] | undefined,
-          correctAnswer: q.correctAnswer as string,
-          explanation: q.explanation as string | undefined,
-          sourceChunkId: q.sourceHeading ? headingToIdMap.get(q.sourceHeading) : undefined,
-        }));
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error('Unknown error during quiz generation');
+        return parsed.slice(0, count);
+
+      } catch (error: any) {
+        retries--;
+        if (retries < 0) {
+          throw new Error(`Failed to generate valid quiz questions: ${error.message}`);
+        }
       }
     }
-
-    throw lastError ?? new Error('Quiz generation failed after 3 attempts');
+    
+    return [];
   }
 }

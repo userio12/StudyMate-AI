@@ -6,7 +6,8 @@ import { useQuiz } from '@/hooks/use-quiz';
 import { useApiClient } from '@/lib/api-client';
 import { QuestionCard } from '@/components/quiz/question-card';
 import { DifficultyBadge } from '@/components/quiz/difficulty-badge';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { handleApiError } from '@/lib/error-handler';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -26,7 +27,7 @@ export default function QuizDetailPage({
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-terracotta-500" />
+        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-brand-500 dark:text-brand-300 w-6 h-6" />
       </div>
     );
   }
@@ -34,7 +35,7 @@ export default function QuizDetailPage({
   if (!quiz) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-navy-600 dark:text-parchment-400">
+        <p className="text-sm text-ink-400 dark:text-ink-200">
           Quiz not found
         </p>
       </div>
@@ -48,7 +49,7 @@ export default function QuizDetailPage({
   const handleSubmit = async () => {
     const unanswered = quiz.questions.filter((q) => !answers[q.id]);
     if (unanswered.length > 0) {
-      toast.error(`Answer all questions before submitting`);
+      toast.error('Answer all questions before submitting');
       return;
     }
 
@@ -73,15 +74,15 @@ export default function QuizDetailPage({
     <div>
       <Link
         href="/quiz"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-navy-600 hover:text-navy-800 dark:text-parchment-400"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-ink-400 hover:text-ink-600 dark:text-ink-200"
       >
-        <ArrowLeft size={16} />
+        <FontAwesomeIcon icon={faArrowLeft} className="w-4 h-4" />
         Back to quizzes
       </Link>
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-xl font-semibold text-navy-800 dark:text-parchment-100">
+          <h1 className="font-heading text-xl font-bold text-ink-600 dark:text-cream-100">
             {quiz.title}
           </h1>
           <div className="mt-2">
@@ -107,9 +108,9 @@ export default function QuizDetailPage({
         <button
           onClick={handleSubmit}
           disabled={!allAnswered || submitting}
-          className="inline-flex items-center gap-2 rounded-lg bg-terracotta-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-terracotta-600 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700 disabled:opacity-50"
         >
-          {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+          {submitting ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : null}
           Submit all answers
         </button>
       </div>

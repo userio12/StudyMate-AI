@@ -3,7 +3,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { CitationBadge } from './citation-badge';
-import { User, Bot } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
 
 interface Citation {
   chunkId: string;
@@ -24,8 +25,8 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
   return (
     <div className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}>
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-terracotta-100 text-terracotta-600 dark:bg-navy-700 dark:text-terracotta-400">
-          <Bot size={18} />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
+          <FontAwesomeIcon icon={faRobot} className="w-[18px] h-[18px]" />
         </div>
       )}
 
@@ -34,14 +35,14 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
           className={cn(
             'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
             isUser
-              ? 'bg-terracotta-500 text-white'
-              : 'bg-parchment-200 text-navy-800 dark:bg-navy-700 dark:text-parchment-100',
+              ? 'bg-brand-500 text-white'
+              : 'glass',
           )}
         >
           <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
 
           {citations && citations.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-parchment-300 pt-2 dark:border-navy-600">
+            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-glass-border pt-2">
               {citations.map((c, i) => (
                 <CitationBadge
                   key={c.chunkId}
@@ -54,14 +55,14 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
           )}
 
           {isStreaming && (
-            <span className="ml-0.5 inline-block h-4 w-2 animate-pulse bg-current" />
+            <span className="ml-0.5 inline-block h-4 w-2 animate-pulse rounded-sm bg-brand-500 dark:bg-brand-300" />
           )}
         </div>
       </div>
 
       {isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy-100 text-navy-600 dark:bg-navy-700 dark:text-parchment-300">
-          <User size={18} />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-foreground">
+          <FontAwesomeIcon icon={faUser} className="w-[18px] h-[18px]" />
         </div>
       )}
     </div>

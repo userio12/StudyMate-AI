@@ -2,7 +2,8 @@
 
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faCircleXmark, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 
 interface QuestionCardContext {
   questionId: string;
@@ -26,6 +27,7 @@ function QuestionCardRoot({
   onAnswer,
   showResult,
   showExplanation,
+  questionNumber,
 }: {
   children?: ReactNode;
   questionId: string;
@@ -35,6 +37,7 @@ function QuestionCardRoot({
   onAnswer: (questionId: string, answer: string) => void;
   showResult?: boolean;
   showExplanation?: boolean;
+  questionNumber?: number;
 }) {
   const [selected, setSelected] = useState<string>();
   const [submitted, setSubmitted] = useState(false);
@@ -50,89 +53,103 @@ function QuestionCardRoot({
     setSubmitted(true);
   };
 
+  const typeLabel = questionType.replace(/_/g, ' ');
+
   return (
-    <div className="rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-      <div className="flex items-start gap-2">
-        <HelpCircle size={18} className="mt-0.5 shrink-0 text-terracotta-500" />
-        <div>
-          <p className="text-sm leading-relaxed font-medium text-navy-800 dark:text-parchment-100">
-            {question}
-          </p>
-          <span className="mt-1 inline-block text-xs text-navy-500 dark:text-parchment-500">
-            {questionType.replace('_', ' ')}
-          </span>
+    <div className="glass-card overflow-hidden">
+      {/* Header */}
+      <div className="flex items-start gap-4 border-b border-border p-6">
+        {questionNumber != null && (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl brand-gradient text-sm font-bold text-white brand-glow">
+            {questionNumber}
+          </div>
+        )}
+        <div className="flex-1">
+          <span className="label-caps text-brand-400 mb-2 block">{typeLabel}</span>
+          <p className="text-base font-semibold leading-snug text-slate-100">{question}</p>
         </div>
       </div>
 
-      {options && (
-        <div className="mt-3 space-y-2">
-          {options.map((option, i) => {
-            const isSelected = selected === option;
-            const optionLabel = String.fromCharCode(65 + i);
+      <div className="p-6 space-y-4">
+        {/* Multiple choice options */}
+        {options && (
+          <div className="space-y-2.5">
+            {options.map((option, i) => {
+              const isSelected = selected === option;
+              const optionLabel = String.fromCharCode(65 + i);
 
-            return (
-              <button
-                key={i}
-                onClick={() => handleSelect(option)}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-lg border px-4 py-2.5 text-left text-sm transition-colors',
-                  'min-h-[44px]',
-                  isSelected
-                    ? 'border-terracotta-500 bg-terracotta-50 text-terracotta-700 dark:bg-navy-700 dark:text-terracotta-300'
-                    : 'border-parchment-300 text-navy-700 hover:bg-parchment-100 dark:border-navy-600 dark:text-parchment-300 dark:hover:bg-navy-700',
-                )}
-                disabled={submitted}
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-current text-xs font-medium">
-                  {optionLabel}
-                </span>
-                {option}
-              </button>
-            );
-          })}
-        </div>
-      )}
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleSelect(option)}
+                  disabled={submitted}
+                  className={cn(
+                    'flex w-full items-center gap-3.5 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-all duration-200',
+                    'min-h-[52px]',
+                    isSelected
+                      ? 'brand-gradient border-transparent text-white brand-glow'
+                      : 'border-border bg-surface-1 text-slate-300 hover:border-border-bright hover:bg-surface-2 hover:text-slate-100',
+                    submitted && !isSelected && 'opacity-50',
+                  )}
+                >
+                  <span className={cn(
+                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors',
+                    isSelected ? 'bg-white/20 text-white' : 'bg-surface-2 text-slate-500',
+                  )}>
+                    {optionLabel}
+                  </span>
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-      {questionType === 'short_answer' && (
-        <div className="mt-3">
+        {/* Short answer */}
+        {questionType === 'short_answer' && (
           <textarea
             value={selected ?? ''}
             onChange={(e) => handleSelect(e.target.value)}
             placeholder="Type your answer..."
             aria-label="Your answer"
             disabled={submitted}
-            rows={2}
-            className="w-full resize-none rounded-lg border border-parchment-300 bg-white p-3 text-sm text-navy-800 placeholder:text-navy-400 focus:border-terracotta-500 focus:outline-none dark:border-navy-600 dark:bg-navy-900 dark:text-parchment-100"
+            rows={3}
+            className={cn(
+              'w-full resize-none rounded-xl bg-surface-1 border border-border px-4 py-3',
+              'text-sm text-slate-200 placeholder:text-slate-600',
+              'focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/20 focus:outline-none',
+              'transition-all duration-200',
+            )}
           />
-        </div>
-      )}
+        )}
 
-      {!submitted && selected && (
-        <button
-          onClick={handleSubmit}
-          className="mt-3 rounded-lg bg-terracotta-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-terracotta-600"
-        >
-          Submit answer
-        </button>
-      )}
+        {/* Submit button */}
+        {!submitted && selected && (
+          <button
+            onClick={handleSubmit}
+            className="flex items-center gap-2 rounded-xl brand-gradient px-5 py-2.5 text-sm font-semibold text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+          >
+            <FontAwesomeIcon icon={faWandMagicSparkles} className="w-3.5 h-3.5" /> Submit answer
+          </button>
+        )}
 
-      {children}
+        {children}
 
-      {submitted && showExplanation && selected && (
-        <div className="mt-3">
-          {showResult !== false ? (
-            <div className="flex items-start gap-2 text-sm text-green-600 dark:text-green-400">
-              <CheckCircle2 size={16} className="mt-0.5" />
-              <span>Correct!</span>
-            </div>
-          ) : (
-            <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400">
-              <XCircle size={16} className="mt-0.5" />
-              <span>Incorrect</span>
-            </div>
-          )}
-        </div>
-      )}
+        {/* Feedback */}
+        {submitted && showExplanation && selected && (
+          <div className={cn(
+            'flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium',
+            showResult !== false
+              ? 'bg-success/10 border border-success/25 text-emerald-300'
+              : 'bg-error-dim border border-error/25 text-red-300',
+          )}>
+            {showResult !== false
+              ? <FontAwesomeIcon icon={faCircleCheck} className="shrink-0 mt-0.5 w-[17px] h-[17px]" />
+              : <FontAwesomeIcon icon={faCircleXmark} className="shrink-0 mt-0.5 w-[17px] h-[17px]" />}
+            {showResult !== false ? 'Correct!' : 'Incorrect'}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -147,21 +164,20 @@ function Feedback({
   explanation?: string;
 }) {
   return (
-    <div className="mt-3 space-y-2">
+    <div className="space-y-2 mt-2">
       {!isCorrect && correctAnswer && (
-        <p className="text-sm text-navy-700 dark:text-parchment-300">
-          Correct answer: <span className="font-medium">{correctAnswer}</span>
-        </p>
+        <div className="rounded-xl bg-surface-2 border border-border px-4 py-3 text-sm">
+          <span className="text-slate-500">Correct answer: </span>
+          <span className="font-semibold text-slate-200">{correctAnswer}</span>
+        </div>
       )}
       {explanation && (
-        <p className="text-sm leading-relaxed text-navy-600 dark:text-parchment-400">
-          {explanation}
-        </p>
+        <div className="rounded-xl bg-brand-500/5 border border-brand-500/15 px-4 py-3 text-sm leading-relaxed text-slate-400">
+          💡 {explanation}
+        </div>
       )}
     </div>
   );
 }
 
-export const QuestionCard = Object.assign(QuestionCardRoot, {
-  Feedback,
-});
+export const QuestionCard = Object.assign(QuestionCardRoot, { Feedback });

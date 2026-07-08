@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useRoomChat } from '@/hooks/use-room-chat';
 import { cn, formatRelativeTime } from '@/lib/utils';
-import { Send, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane, faWifi } from '@fortawesome/free-solid-svg-icons';
 
 interface RoomChatProps {
   roomId: string;
@@ -11,15 +12,8 @@ interface RoomChatProps {
 }
 
 export function RoomChat({ roomId, currentUserId }: RoomChatProps) {
-  const {
-    messages,
-    onlineUsers,
-    isConnected,
-    typingUsers,
-    sendMessage,
-    handleInputChange,
-  } = useRoomChat(roomId);
-
+  const { messages, onlineUsers, isConnected, typingUsers, sendMessage, handleInputChange } =
+    useRoomChat(roomId);
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -36,88 +30,127 @@ export function RoomChat({ roomId, currentUserId }: RoomChatProps) {
   }
 
   return (
-    <div className="flex h-96 flex-col rounded-xl border border-parchment-300 bg-parchment-50 dark:border-navy-700 dark:bg-navy-800">
-      <div className="flex items-center justify-between border-b border-parchment-300 px-4 py-2 dark:border-navy-700">
-        <span className="text-xs text-navy-500 dark:text-parchment-400">
-          {onlineUsers.length} online
-        </span>
-        {isConnected ? (
-          <Wifi size={14} className="text-green-500" />
-        ) : (
-          <WifiOff size={14} className="text-red-500" />
-        )}
+    <div className="glass-card flex flex-col overflow-hidden" style={{ height: '480px' }}>
+      {/* ── Header ────── */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2">
+          {isConnected ? (
+            <span className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-ring" />
+              <span className="text-xs font-medium text-emerald-400">Live</span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faWifi} className="text-red-400 w-3 h-3 opacity-50" />
+              <span className="text-xs text-red-400">Offline</span>
+            </span>
+          )}
+          <span className="text-xs text-slate-600">·</span>
+          <span className="text-xs text-slate-500">{onlineUsers.length} online</span>
+        </div>
+        <div className="flex -space-x-1.5">
+          {onlineUsers.slice(0, 4).map((uid) => (
+            <div
+              key={uid}
+              className="h-6 w-6 rounded-full brand-gradient border border-space-900 flex items-center justify-center"
+              title={uid}
+            >
+              <span className="text-[10px] font-bold text-white">
+                {uid.slice(0, 1).toUpperCase()}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      {/* ── Messages ──── */}
+      <div className="flex-1 space-y-2 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-navy-500 dark:text-parchment-400">
-              No messages yet. Start the conversation!
-            </p>
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-2 text-2xl">
+              💬
+            </div>
+            <p className="text-sm font-medium text-slate-400">No messages yet</p>
+            <p className="text-xs text-slate-600">Start the conversation!</p>
           </div>
         )}
+
         {messages.map((msg) => {
           const isOwn = msg.userId === currentUserId;
           return (
-            <div
-              key={msg.id}
-              className={cn('flex', isOwn ? 'justify-end' : 'justify-start')}
-            >
-              <div
-                className={cn(
-                  'max-w-xs rounded-xl px-3 py-2 text-sm',
+            <div key={msg.id} className={cn('flex gap-2', isOwn ? 'flex-row-reverse' : 'flex-row')}>
+              {/* Avatar */}
+              <div className={cn(
+                'h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-[11px] font-bold mt-0.5',
+                isOwn ? 'brand-gradient text-white' : 'bg-surface-3 text-slate-400',
+              )}>
+                {msg.userId.slice(0, 1).toUpperCase()}
+              </div>
+
+              <div className={cn('flex flex-col gap-0.5', isOwn ? 'items-end' : 'items-start', 'max-w-[70%]')}>
+                <div className={cn(
+                  'rounded-2xl px-3.5 py-2.5 text-sm leading-snug',
                   isOwn
-                    ? 'bg-terracotta-500 text-white'
-                    : 'bg-parchment-200 text-navy-800 dark:bg-navy-700 dark:text-parchment-200',
-                )}
-              >
-                <p>{msg.content}</p>
-                <p
-                  className={cn(
-                    'mt-1 text-right text-[10px]',
-                    isOwn ? 'text-terracotta-100' : 'text-navy-500 dark:text-parchment-400',
-                  )}
-                >
+                    ? 'brand-gradient text-white rounded-tr-sm'
+                    : 'bg-surface-2 border border-border text-slate-200 rounded-tl-sm',
+                )}>
+                  {msg.content}
+                </div>
+                <span className="text-[10px] text-slate-700 px-1">
                   {formatRelativeTime(msg.timestamp)}
-                </p>
+                </span>
               </div>
             </div>
           );
         })}
 
+        {/* Typing indicator */}
         {typingUsers.length > 0 && (
-          <div className="flex items-center gap-2 text-xs text-navy-500 dark:text-parchment-400">
-            <Loader2 size={12} className="animate-spin" />
-            Someone is typing...
+          <div className="flex items-center gap-2 px-2">
+            <div className="flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-slate-600 animate-bounce"
+                  style={{ animationDelay: `${i * 150}ms` }}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-slate-600">
+              {typingUsers.length === 1 ? 'Someone is' : `${typingUsers.length} people are`} typing...
+            </span>
           </div>
         )}
-
         <div ref={bottomRef} />
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-center gap-2 border-t border-parchment-300 p-3 dark:border-navy-700"
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            handleInputChange();
-          }}
-          placeholder="Type a message..."
-          className="flex-1 rounded-lg border border-parchment-300 bg-parchment-100 px-3 py-2 text-sm text-navy-800 placeholder:text-parchment-400 focus:outline-none focus:ring-2 focus:ring-terracotta-500 dark:border-navy-600 dark:bg-navy-900 dark:text-parchment-100 dark:placeholder:text-navy-500"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || !isConnected}
-          className="rounded-lg bg-terracotta-500 p-2 text-white transition-colors hover:bg-terracotta-600 disabled:opacity-50"
-          aria-label="Send message"
+      {/* ── Input ─────── */}
+      <div className="border-t border-border p-3">
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center gap-2 rounded-2xl bg-surface-1 border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200"
         >
-          <Send size={16} />
-        </button>
-      </form>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              handleInputChange();
+            }}
+            placeholder="Type a message..."
+            disabled={!isConnected}
+            className="flex-1 bg-transparent px-3 text-sm text-slate-200 placeholder:text-slate-600 outline-none border-none focus:ring-0 focus:outline-none disabled:opacity-50"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || !isConnected}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl brand-gradient text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.05] disabled:opacity-40 disabled:pointer-events-none"
+            aria-label="Send message"
+          >
+            <FontAwesomeIcon icon={faPaperPlane} className="w-[14px] h-[14px]" />
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -22,17 +22,23 @@ export function Providers({ children }: { children: ReactNode }) {
         }}
       >
         <ThemeProvider
-          attribute="class"
+          attribute="data-theme"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
         >
           <SkipLink />
           {children}
           <Toaster
             position="bottom-right"
             toastOptions={{
-              className: 'font-ui text-sm',
+              className: 'text-sm',
+              style: {
+                background: 'rgba(255,255,255,0.85)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255,255,255,0.8)',
+                borderRadius: '12px',
+                color: '#1a1a2e',
+              },
             }}
           />
         </ThemeProvider>

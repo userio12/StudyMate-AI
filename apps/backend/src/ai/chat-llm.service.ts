@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AiService } from './ai.service.js';
 import { CHAT_MODEL } from '@studymate/shared';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const DEFAULT_TIMEOUT = 60_000;
 
@@ -25,27 +26,50 @@ ${contextChunks.join('\n\n')}`;
       ? AbortSignal.any([signal, timeoutSignal])
       : timeoutSignal;
 
-    const result = await this.ai.client.models.generateContentStream({
-      model: CHAT_MODEL,
-      contents: messages.map((m) => ({
-        role: m.role === 'assistant' ? 'model' as const : 'user' as const,
-        parts: [{ text: m.content }],
-      })),
-      config: {
-        systemInstruction: systemPrompt,
-        abortSignal: combinedSignal,
-      },
-    });
+    const payloadMessages: ChatCompletionMessageParam[] = [
+      { role: 'system', content: systemPrompt },
+      ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+    ];
 
-    for await (const chunk of result) {
+    // Fallback logic implemented via AiService
+    const stream = await this.ai.executeWithFallback(async (client, providerName) => {
+      let modelToUse: string = CHAT_MODEL;
+      if (providerName === 'OpenRouter') {
+        modelToUse = CHAT_MODEL;
+      } else if (providerName === 'Gemini') {
+        modelToUse = 'gemini-2.5-flash'; // fallback specific model for gemini
+      } else if (providerName === 'NVIDIA') {
+        modelToUse = 'meta/llama-3.1-8b-instruct'; // fallback specific model for nvidia
+      }
+
+      console.log(`[ChatLlmService] Starting chat stream using provider: ${providerName}, model: ${modelToUse}`);
+
+      return client.chat.completions.create(
+        {
+          model: modelToUse,
+          messages: payloadMessages,
+          stream: true,
+        },
+        { signal: combinedSignal }
+      );
+    }, 'Stream Chat', 'OpenRouter');
+
+    let streamYielded = false;
+    for await (const chunk of stream) {
       if (combinedSignal.aborted) return;
       try {
-        const text = chunk.text;
-        if (text) yield text;
+        const text = chunk.choices[0]?.delta?.content;
+        if (text) {
+          if (!streamYielded) {
+             console.log(`[ChatLlmService] Successfully receiving first chunk from stream`);
+             streamYielded = true;
+          }
+          yield text;
+        }
       } catch (error) {
-        console.error('Gemini safety filter triggered or stream error:', error);
-        yield '\n\n[Content blocked by safety filters]';
+        console.error('[ChatLlmService] Stream error:', error);
       }
     }
+    console.log(`[ChatLlmService] Chat stream completed successfully.`);
   }
 }

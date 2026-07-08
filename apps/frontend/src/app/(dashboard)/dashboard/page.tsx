@@ -1,13 +1,28 @@
 'use client';
 
+import { useUser } from '@clerk/nextjs';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { WeakTopicsChart } from '@/components/dashboard/weak-topics-chart';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
-import { Files, MessageSquare, GraduationCap } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileLines, faCommentDots, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import NextLink from 'next/link';
+import { Button } from '@/components/ui/button';
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
 
 export default function DashboardPage() {
   const { stats, isLoading } = useAnalytics();
+  const { user } = useUser();
+
+  const firstName = user?.firstName ?? 'there';
+  const greeting = getGreeting();
 
   const activities = (stats?.recentActivity ?? []).map((entry, i) => ({
     id: `activity-${i}`,
@@ -17,51 +32,109 @@ export default function DashboardPage() {
   }));
 
   return (
-    <article>
-      <header>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
-          Overview
-        </h1>
-        <p className="mt-2 text-base text-muted-foreground font-sans">
-          Welcome back. Here&rsquo;s your study overview.
-        </p>
+    <article className="space-y-8">
+      {/* ── Header ────────────────────────────────────────────── */}
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <p className="label-caps text-brand-400 mb-1">{greeting}</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            Welcome back, {firstName}
+          </h1>
+          <p className="mt-1.5 text-muted">
+            Here&apos;s your study overview for today.
+          </p>
+        </div>
+        <div className="hidden sm:flex items-center gap-2 shrink-0">
+          <NextLink href="/documents">
+            <Button variant="secondary" size="md">
+              <FontAwesomeIcon icon={faFileLines} className="w-[15px] h-[15px]" /> Upload PDF
+            </Button>
+          </NextLink>
+          <NextLink href="/chat">
+            <Button size="md">
+              <FontAwesomeIcon icon={faCommentDots} className="w-[15px] h-[15px]" /> New Chat
+            </Button>
+          </NextLink>
+        </div>
       </header>
 
-      <section className="mt-8 grid gap-6 sm:grid-cols-3" aria-label="Quick statistics">
-        <StatsCard
-          label="Documents"
-          value={isLoading ? '...' : stats?.documents ?? 0}
-          icon={<Files size={22} />}
-          isLoading={isLoading}
-        />
-        <StatsCard
-          label="Conversations"
-          value={isLoading ? '...' : stats?.conversations ?? 0}
-          icon={<MessageSquare size={22} />}
-          isLoading={isLoading}
-        />
-        <StatsCard
-          label="Quizzes Taken"
-          value={isLoading ? '...' : stats?.quizzes ?? 0}
-          icon={<GraduationCap size={22} />}
-          isLoading={isLoading}
-        />
-      </section>
-
-      <div className="mt-8 grid gap-8 lg:grid-cols-2">
-        <section className="rounded-none border border-border bg-surface p-8 shadow-warm" aria-labelledby="recent-activity-heading">
-          <h2 id="recent-activity-heading" className="font-heading text-xl font-semibold text-foreground">
-            Recent Activity
-          </h2>
-          <div className="mt-6">
-            <RecentActivity activities={activities} isLoading={isLoading} />
+      {/* ── Bento Grid ─────────────────────────────────────────────── */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(180px,auto)]">
+        {/* Quick Actions - Spans 2 columns */}
+        <section className="md:col-span-2 glass-card p-6 flex flex-col justify-between border-brand-500/20" aria-label="Quick actions">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">Get Started</h2>
+            <p className="text-xs text-muted mt-0.5">Jump right back into your workflow</p>
+          </div>
+          <div className="grid gap-3 mt-6 sm:grid-cols-3">
+            {[
+              {
+                href: '/documents', icon: '📄', title: 'Upload PDF',
+                desc: 'Add material', color: 'hover:border-cyan-500/40 hover:bg-cyan-500/5',
+              },
+              {
+                href: '/chat', icon: '💬', title: 'Start Chat',
+                desc: 'Ask questions', color: 'hover:border-brand-500/40 hover:bg-brand-500/5',
+              },
+              {
+                href: '/quiz', icon: '🎯', title: 'Take Quiz',
+                desc: 'Test knowledge', color: 'hover:border-violet-500/40 hover:bg-violet-500/5',
+              },
+            ].map(({ href, icon, title, desc, color }) => (
+              <NextLink
+                key={href}
+                href={href}
+                className={`flex flex-col gap-2 p-4 rounded-xl border border-border/50 bg-surface-1/50 transition-all duration-200 cursor-pointer ${color}`}
+              >
+                <span className="text-2xl">{icon}</span>
+                <div>
+                  <p className="text-sm font-bold text-foreground">{title}</p>
+                  <p className="text-[10px] text-muted mt-0.5">{desc}</p>
+                </div>
+              </NextLink>
+            ))}
           </div>
         </section>
 
-        <section aria-labelledby="weak-topics-heading">
-          <h2 id="weak-topics-heading" className="sr-only">Weak Topics</h2>
-          <WeakTopicsChart data={[]} />
+        {/* Stats Cards - Span 1 column each */}
+        <div className="md:col-span-1">
+          <StatsCard
+            label="Documents"
+            value={isLoading ? '—' : (stats?.documents ?? 0)}
+            icon={<FontAwesomeIcon icon={faFileLines} className="w-5 h-5" />}
+            isLoading={isLoading}
+            accentColor="cyan"
+            className="h-full"
+          />
+        </div>
+        <div className="md:col-span-1">
+          <StatsCard
+            label="Conversations"
+            value={isLoading ? '—' : (stats?.conversations ?? 0)}
+            icon={<FontAwesomeIcon icon={faCommentDots} className="w-5 h-5" />}
+            isLoading={isLoading}
+            accentColor="brand"
+            className="h-full"
+          />
+        </div>
+
+        {/* Recent Activity - Spans 2 columns */}
+        <section className="md:col-span-2 glass-card p-6 border-brand-500/10" aria-labelledby="recent-activity-heading">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 id="recent-activity-heading" className="text-lg font-bold text-foreground">
+                Recent Activity
+              </h2>
+              <p className="text-xs text-muted mt-0.5">Your study sessions this week</p>
+            </div>
+          </div>
+          <RecentActivity activities={activities} isLoading={isLoading} />
         </section>
+
+        {/* Weak Topics - Spans 2 columns */}
+        <div className="md:col-span-2">
+          <WeakTopicsChart data={[]} />
+        </div>
       </div>
     </article>
   );
