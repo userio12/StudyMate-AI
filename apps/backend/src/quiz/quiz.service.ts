@@ -19,7 +19,39 @@ export class QuizService {
     });
     const preferredModel = (userRecord?.metadata as any)?.preferredModel as string | undefined;
 
-    const questions = await this.generator.generate(documentIds, difficulty, preferredModel, questionCount);
+    let resolvedDifficulty = difficulty;
+    let adaptiveContext: string | undefined = undefined;
+
+    if (difficulty === 'adaptive') {
+      const pastAttempts = await this.db.db!.query.quizAttempts.findMany({
+        where: eq(quizAttempts.userId, userId),
+        orderBy: (a, { desc }) => [desc(a.completedAt)],
+        limit: 5,
+      });
+
+      const completedAttempts = pastAttempts.filter(a => a.score !== null && a.score !== undefined);
+      
+      if (completedAttempts.length > 0) {
+        const avgScore = completedAttempts.reduce((acc, a) => acc + (a.score ?? 0), 0) / completedAttempts.length;
+        
+        if (avgScore >= 80) {
+          resolvedDifficulty = 'advanced';
+          adaptiveContext = "The user has shown high proficiency (average score > 80%). Focus on nuanced edge-cases, synthesis of multiple concepts, and complex application scenarios.";
+        } else if (avgScore >= 60) {
+          resolvedDifficulty = 'intermediate';
+          adaptiveContext = "The user has a solid grasp of the basics (average score ~70%). Provide a balanced mix of fundamental and applied questions.";
+        } else {
+          resolvedDifficulty = 'beginner';
+          adaptiveContext = "The user is currently building foundational knowledge (average score < 60%). Focus heavily on fundamental definitions, core concepts, and straightforward applications.";
+        }
+      } else {
+        // No past data, default to intermediate
+        resolvedDifficulty = 'intermediate';
+        adaptiveContext = "This is the user's first quiz. Provide a balanced, intermediate-level set of questions to establish a baseline.";
+      }
+    }
+
+    const questions = await this.generator.generate(documentIds, resolvedDifficulty, preferredModel, questionCount, adaptiveContext);
 
     const quizId = crypto.randomUUID();
 
@@ -27,9 +59,9 @@ export class QuizService {
       await tx.insert(quizzes).values({
         id: quizId,
         userId,
-        title: `Quiz on ${difficulty} difficulty`,
+        title: `Quiz on ${resolvedDifficulty} difficulty`,
         documentIds,
-        difficulty: difficulty as 'beginner' | 'intermediate' | 'advanced',
+        difficulty: resolvedDifficulty as 'beginner' | 'intermediate' | 'advanced',
         questionCount: questions.length,
       });
 
@@ -73,6 +105,36 @@ export class QuizService {
     });
 
     return { ...quiz, questions };
+  }
+
+  async updateQuiz(id: string, userId: string, data: { title?: string; isPinned?: boolean }) {
+    const quiz = await this.db.db!.query.quizzes.findFirst({
+      where: and(eq(quizzes.id, id), eq(quizzes.userId, userId)),
+    });
+    if (!quiz) throw new NotFoundException('Quiz not found');
+
+    const updateData: any = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.isPinned !== undefined) updateData.isPinned = data.isPinned;
+
+    if (Object.keys(updateData).length > 0) {
+      await this.db.db!
+        .update(quizzes)
+        .set(updateData)
+        .where(eq(quizzes.id, id));
+    }
+
+    return { ...quiz, ...updateData };
+  }
+
+  async deleteQuiz(id: string, userId: string) {
+    const quiz = await this.db.db!.query.quizzes.findFirst({
+      where: and(eq(quizzes.id, id), eq(quizzes.userId, userId)),
+    });
+    if (!quiz) throw new NotFoundException('Quiz not found');
+
+    await this.db.db!.delete(quizzes).where(eq(quizzes.id, id));
+    return { success: true };
   }
 
   async startAttempt(quizId: string, userId: string) {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ParseUUIDPipe, Patch, Delete } from '@nestjs/common';
 import { GenerateQuizSchema, SubmitAttemptSchema, PaginationSchema, type Pagination } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { QuizService } from './quiz.service.js';
@@ -22,6 +22,23 @@ export class QuizController {
     @Query(new ZodValidationPipe(PaginationSchema)) query: Pagination,
   ) {
     return this.quizService.listQuizzes(user.userId, query.limit, query.offset);
+  }
+
+  @Patch(':id')
+  updateQuiz(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: { title?: string; isPinned?: boolean },
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.quizService.updateQuiz(id, user.userId, body);
+  }
+
+  @Delete(':id')
+  deleteQuiz(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.quizService.deleteQuiz(id, user.userId);
   }
 
   @Get(':id')

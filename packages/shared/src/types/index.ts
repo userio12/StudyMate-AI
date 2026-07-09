@@ -20,6 +20,8 @@ export const DocumentSchema = z.object({
   s3Key: z.string(),
   status: z.nativeEnum(DocumentStatus),
   pageCount: z.number().int().nonnegative().optional(),
+  progress: z.number().min(0).max(100).optional(),
+  isPinned: z.boolean().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -89,6 +91,7 @@ export const DifficultyLevel = {
   BEGINNER: 'beginner',
   INTERMEDIATE: 'intermediate',
   ADVANCED: 'advanced',
+  ADAPTIVE: 'adaptive',
 } as const;
 
 export type DifficultyLevel = (typeof DifficultyLevel)[keyof typeof DifficultyLevel];
@@ -123,6 +126,7 @@ export const QuizSchema = z.object({
   difficulty: z.nativeEnum(DifficultyLevel),
   questionCount: z.number().int().positive(),
   timeLimit: z.number().int().nonnegative().optional(),
+  isPinned: z.boolean().optional(),
   createdAt: z.string().datetime(),
 });
 
@@ -163,12 +167,13 @@ export type CreateConversationDto = z.infer<typeof CreateConversationSchema>;
 
 export const SendMessageSchema = z.object({
   content: z.string().min(1).max(10000),
+  searchProvider: z.enum(['duckduckgo', 'tavily', 'off']).optional(),
 });
 export type SendMessageDto = z.infer<typeof SendMessageSchema>;
 
 export const GenerateQuizSchema = z.object({
   documentIds: z.array(z.string().uuid()).min(1, 'At least one document is required'),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'adaptive']),
   questionCount: z.number().int().positive().max(50).optional(),
 });
 export type GenerateQuizDto = z.infer<typeof GenerateQuizSchema>;

@@ -7,7 +7,7 @@ export const CHUNK_OVERLAP = 128 as const;
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 export const ALLOWED_MIME_TYPES = ['application/pdf'];
 
-export const DEFAULT_QUIZ_QUESTION_COUNT = 5;
+export const DEFAULT_QUIZ_QUESTION_COUNT = 10;
 export const MAX_CONVERSATION_TITLE_LENGTH = 300;
 
 // ── Trust & Persona ──────────────────────────────────────
@@ -20,11 +20,15 @@ export const TrustLevel = {
   MENTOR: 'mentor',
 } as const;
 
+export type TrustLevel = (typeof TrustLevel)[keyof typeof TrustLevel];
+
 export const Persona = {
   GUIDE: 'guide',
   TUTOR: 'tutor',
   PARTNER: 'partner',
 } as const;
+
+export type Persona = (typeof Persona)[keyof typeof Persona];
 
 export const SESSION_COUNT_THRESHOLDS = {
   stranger: { min: 0, persona: 'guide' },

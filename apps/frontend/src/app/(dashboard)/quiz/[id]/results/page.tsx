@@ -37,13 +37,37 @@ function ResultsContent({ quizId }: { quizId: string }) {
         </p>
       </div>
 
-      <Link
-        href="/quiz"
-        className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700"
-      >
-        <FontAwesomeIcon icon={faRotateLeft} className="w-4 h-4" />
-        Try another quiz
-      </Link>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => {
+            const data = sessionStorage.getItem(`quizResult_${quizId}`);
+            if (!data) return;
+            const result = JSON.parse(data);
+            const text = `Quiz Report\nScore: ${result.score}%\n\n` + result.details.map((d: any, i: number) => 
+              `Q${i + 1}: ${d.question}\nYour Answer: ${d.userAnswer}\nCorrect Answer: ${d.correctAnswer}\nResult: ${d.correct ? 'Correct' : 'Incorrect'}\n`
+            ).join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quiz-report-${quizId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }}
+          className="inline-flex items-center gap-2 rounded-lg bg-surface-2 border border-border px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:bg-surface-3"
+        >
+          Download Report
+        </button>
+        <Link
+          href="/quiz"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700"
+        >
+          <FontAwesomeIcon icon={faRotateLeft} className="w-4 h-4" />
+          Try another quiz
+        </Link>
+      </div>
     </div>
   );
 }

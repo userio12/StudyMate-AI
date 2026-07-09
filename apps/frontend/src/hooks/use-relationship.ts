@@ -21,8 +21,8 @@ export function useRelationship(
   const { trustLevel, persona, showOnboarding } = useTrustLevel();
 
   return useMemo(() => {
-    const personaLabel = PERSONA_LABELS[persona];
-    const personaDescription = PERSONA_DESCRIPTIONS[persona];
+    const personaLabel = PERSONA_LABELS[persona] || '';
+    const personaDescription = PERSONA_DESCRIPTIONS[persona] || '';
 
     let greeting: string;
 

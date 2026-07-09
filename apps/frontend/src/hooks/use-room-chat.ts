@@ -95,6 +95,10 @@ export function useRoomChat(roomId: string) {
       socket.on('error', ({ message }: { message: string }) => {
         console.error('Socket error:', message);
       });
+
+      socket.on('connect_error', (err) => {
+        console.error('Socket connection error:', err.message);
+      });
     }
 
     connect();

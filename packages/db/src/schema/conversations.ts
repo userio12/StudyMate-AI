@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 
 export const conversations = pgTable(
@@ -11,6 +11,7 @@ export const conversations = pgTable(
     title: text('title').notNull(),
     documentIds: jsonb('document_ids').default([]),
     lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
+    isPinned: boolean('is_pinned').default(false).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

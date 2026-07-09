@@ -56,10 +56,11 @@ export default function QuizDetailPage({
     setSubmitting(true);
     try {
       const { id: attemptId } = await api.post<{ id: string }>(`/quiz/${quiz.id}/attempt`);
-      const result = await api.post<{ score: number; weakTopics: string[] }>(
+      const result = await api.post<{ score: number; weakTopics: string[]; details: any }>(
         `/quiz/${quiz.id}/attempt/${attemptId}/submit`,
         { answers },
       );
+      sessionStorage.setItem(`quizResult_${quiz.id}`, JSON.stringify(result));
       router.push(`/quiz/${quiz.id}/results?score=${result.score}`);
     } catch (err) {
       toast.error(handleApiError(err));

@@ -49,14 +49,22 @@ export function GenerateQuizModal({
               <SelectValue placeholder="Select difficulty" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="adaptive">
+                <span className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faWandMagicSparkles} className="text-brand-500 w-3 h-3" />
+                  Adaptive (AI-Powered)
+                </span>
+              </SelectItem>
               <SelectItem value="beginner">Beginner</SelectItem>
               <SelectItem value="intermediate">Intermediate</SelectItem>
               <SelectItem value="advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-fg mt-1">
-            {selectedDifficulty === defaultDifficulty && (
-              <span className="text-brand-500 font-medium">Recommended for you</span>
+            {selectedDifficulty === 'adaptive' ? (
+              <span className="text-brand-500 font-medium">Dynamically adjusts based on your past quiz performance</span>
+            ) : selectedDifficulty === defaultDifficulty && (
+              <span className="text-brand-500 font-medium">Recommended based on your Trust Level</span>
             )}
           </p>
         </div>

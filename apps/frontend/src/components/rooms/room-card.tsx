@@ -31,7 +31,7 @@ export function RoomCard({ id, name, inviteCode, createdAt }: RoomCardProps) {
   return (
     <Link
       href={`/rooms/${id}`}
-      className="glass-card group block px-6 py-5 hover:-translate-y-1 hover:border-brand-500/40 hover:bg-surface-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] transition-all duration-300"
+      className="glass-card group block px-6 py-5 hover:border-border-bright hover:bg-surface-2 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1 min-w-0">

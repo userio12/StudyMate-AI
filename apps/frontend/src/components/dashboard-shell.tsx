@@ -7,7 +7,7 @@ import { useUiStore } from '@/store/ui-store';
 /** Root shell — full-height dark flex container with animated mesh background */
 export function DashboardShell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-background mesh-bg text-foreground transition-colors duration-200">
+    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-200">
       {children}
     </div>
   );
@@ -40,7 +40,7 @@ export function DashboardSidebar({ children, className }: { children: ReactNode;
           className,
         )}
       >
-        <div className="flex-1 rounded-2xl glass border border-brand-500/20 shadow-lg flex flex-col overflow-hidden">
+        <div className="flex-1 rounded-2xl bg-surface-1 border border-border/50 shadow-sm flex flex-col overflow-hidden">
           {children}
         </div>
       </aside>

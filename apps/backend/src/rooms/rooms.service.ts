@@ -69,10 +69,16 @@ export class RoomsService {
   }
 
   async getMessages(roomId: string) {
-    return this.db.db!.query.roomMessages.findMany({
+    const messages = await this.db.db!.query.roomMessages.findMany({
       where: eq(roomMessages.roomId, roomId),
       orderBy: desc(roomMessages.createdAt),
       limit: 50,
     });
+    return messages.map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      content: m.content,
+      timestamp: m.createdAt,
+    }));
   }
 }

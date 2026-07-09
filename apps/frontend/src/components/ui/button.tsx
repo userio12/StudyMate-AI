@@ -9,12 +9,12 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 
 type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | 'icon';
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary:   'brand-gradient text-white brand-glow hover:opacity-90 hover:scale-[1.02] hover:shadow-[0_0_28px_rgba(99,102,241,0.45)] active:scale-[0.98]',
-  secondary: 'bg-[rgba(255,255,255,0.07)] border border-[rgba(255,255,255,0.08)] text-slate-200 hover:bg-[rgba(255,255,255,0.11)] hover:border-[rgba(255,255,255,0.16)] hover:text-white active:scale-[0.98]',
-  ghost:     'text-slate-400 hover:bg-[rgba(255,255,255,0.07)] hover:text-slate-200 active:bg-[rgba(255,255,255,0.11)]',
-  outline:   'border border-[rgba(99,102,241,0.4)] text-brand-300 bg-brand-500/5 hover:bg-brand-500/10 hover:border-brand-500/60 active:scale-[0.98]',
-  danger:    'bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-red-300 hover:bg-[rgba(239,68,68,0.2)] hover:border-[rgba(239,68,68,0.5)] active:scale-[0.98]',
-  success:   'bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)] text-emerald-300 hover:bg-[rgba(16,185,129,0.2)] active:scale-[0.98]',
+  primary:   'bg-brand-500 text-white hover:bg-brand-600 active:scale-[0.98]',
+  secondary: 'bg-surface-2 border border-border/50 text-foreground hover:bg-surface-hover hover:border-border-bright active:scale-[0.98]',
+  ghost:     'text-muted-fg hover:bg-surface-hover hover:text-foreground active:bg-surface-2',
+  outline:   'border border-brand-500/40 text-brand-400 bg-transparent hover:bg-brand-500/10 hover:border-brand-500/60 active:scale-[0.98]',
+  danger:    'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 hover:border-red-500/50 active:scale-[0.98]',
+  success:   'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 active:scale-[0.98]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

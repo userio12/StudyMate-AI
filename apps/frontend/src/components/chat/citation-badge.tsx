@@ -28,7 +28,7 @@ export function CitationBadge({ number, title, snippet }: CitationBadgeProps) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 z-50 mb-2 w-72 rounded-xl border border-glass-border glass p-3 shadow-lg">
+        <div className="absolute bottom-full left-0 z-50 mb-2 w-72 rounded-xl border border-border/50 bg-surface-1 p-3 shadow-md">
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs font-medium text-foreground">
               {title}

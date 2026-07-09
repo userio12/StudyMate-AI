@@ -95,8 +95,7 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
       >
         <div className={cn(
           'glass-card relative overflow-hidden px-6 py-5 transition-all duration-300',
-          isReady && 'hover:-translate-y-1 hover:border-brand-500/40 hover:bg-surface-2',
-          isReady && 'hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]',
+          isReady && 'hover:bg-surface-2 hover:border-border-bright hover:shadow-md',
         )}>
           {/* Progress Bar */}
           {isProcessing && (

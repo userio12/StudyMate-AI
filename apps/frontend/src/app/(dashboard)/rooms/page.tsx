@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faSpinner, faPlus, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
+import { Button } from '@/components/ui/button';
 
 export default function RoomsPage() {
   const { rooms, isLoading, mutate } = useRooms();
@@ -59,25 +60,24 @@ export default function RoomsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setShowJoin(!showJoin)}
-            className="glass-card inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-surface-2 active:scale-95"
           >
-            <FontAwesomeIcon icon={faRightToBracket} className="w-4 h-4" />
+            <FontAwesomeIcon icon={faRightToBracket} className="w-4 h-4 mr-2" />
             Join
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setShowCreate(!showCreate)}
-            className="inline-flex items-center gap-2 rounded-lg brand-gradient px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 brand-glow hover:scale-[1.02] active:scale-95"
           >
-            <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+            <FontAwesomeIcon icon={faPlus} className="w-4 h-4 mr-2" />
             Create room
-          </button>
+          </Button>
         </div>
       </div>
 
       {showCreate && (
-        <div className="glass mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
+        <div className="bg-surface-1 mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
           <input
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
@@ -87,18 +87,17 @@ export default function RoomsPage() {
             className="flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none"
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
-          <button
+          <Button
             onClick={handleCreate}
             disabled={creating || !roomName.trim()}
-            className="flex h-9 min-w-20 items-center justify-center rounded-xl brand-gradient text-sm font-medium text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.05] disabled:opacity-40 disabled:pointer-events-none"
           >
             {creating ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : 'Create'}
-          </button>
+          </Button>
         </div>
       )}
 
       {showJoin && (
-        <div className="glass mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
+        <div className="bg-surface-1 mt-4 flex items-center gap-2 rounded-2xl border border-border p-1.5 focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200">
           <input
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
@@ -108,13 +107,12 @@ export default function RoomsPage() {
             className="flex-1 bg-transparent px-3 text-sm font-mono text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none uppercase"
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
           />
-          <button
+          <Button
             onClick={handleJoin}
             disabled={!inviteCode.trim()}
-            className="flex h-9 min-w-20 items-center justify-center rounded-xl brand-gradient text-sm font-medium text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.05] disabled:opacity-40 disabled:pointer-events-none"
           >
             Join
-          </button>
+          </Button>
         </div>
       )}
 
@@ -128,9 +126,9 @@ export default function RoomsPage() {
           ))}
         </div>
       ) : rooms.length === 0 ? (
-        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center border-brand-500/20 max-w-2xl mx-auto">
-          <div className="studymate-glow rounded-full p-4">
-            <FontAwesomeIcon icon={faUsers} className="text-white w-6 h-6" />
+        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center max-w-2xl mx-auto">
+          <div className="rounded-full bg-surface-2 p-4 border border-border/50">
+            <FontAwesomeIcon icon={faUsers} className="text-muted w-6 h-6" />
           </div>
           <p className="text-sm font-medium text-muted">
             No rooms yet. Create or join one.

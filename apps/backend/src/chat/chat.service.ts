@@ -63,6 +63,7 @@ export class ChatService {
     conversationId: string,
     content: string,
     userId: string,
+    searchProvider: 'duckduckgo' | 'tavily' | 'off' | undefined,
     onToken: (token: string) => void,
     signal?: AbortSignal,
   ): Promise<string> {
@@ -97,6 +98,7 @@ export class ChatService {
     for await (const token of this.llm.streamChat(
       history,
       contextChunks.map((c) => c.content),
+      searchProvider,
       signal,
     )) {
       fullResponse.push(token);

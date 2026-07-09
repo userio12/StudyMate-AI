@@ -7,14 +7,26 @@ export function useQuizzes() {
   const api = useApiClient();
 
   const { data, error, isLoading, mutate } = useSWR('/quiz/list', (url) =>
-    api.get<Array<{ id: string; title: string; difficulty: string; questionCount: number; createdAt: string }>>(url),
+    api.get<Array<{ id: string; title: string; difficulty: string; questionCount: number; isPinned: boolean; createdAt: string }>>(url),
   );
+
+  const updateQuiz = async (id: string, updates: { title?: string; isPinned?: boolean }) => {
+    await api.patch(`/quiz/${id}`, updates);
+    mutate();
+  };
+
+  const deleteQuiz = async (id: string) => {
+    await api.delete(`/quiz/${id}`);
+    mutate();
+  };
 
   return {
     quizzes: data ?? [],
     isLoading,
     error,
     mutate,
+    updateQuiz,
+    deleteQuiz,
   };
 }
 

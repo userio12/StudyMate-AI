@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
+import { Button } from '@/components/ui/button';
 
 export default function ChatPage() {
   const router = useRouter();
@@ -37,19 +38,16 @@ export default function ChatPage() {
 
   if (conversations.length === 0) {
     return (
-      <div className="glass-card mt-12 flex flex-col items-center gap-4 py-16 text-center border-brand-500/20 max-w-2xl mx-auto">
-        <div className="studymate-glow rounded-full p-4">
-          <FontAwesomeIcon icon={faCommentDots} className="text-white w-8 h-8" />
+      <div className="glass-card mt-12 flex flex-col items-center gap-4 py-16 text-center max-w-2xl mx-auto">
+        <div className="rounded-full bg-surface-2 p-4 border border-border/50">
+          <FontAwesomeIcon icon={faCommentDots} className="text-muted w-8 h-8" />
         </div>
         <p className="text-sm font-medium text-muted">
           No conversations yet. Start a new one.
         </p>
-        <button
-          onClick={handleCreate}
-          className="rounded-lg brand-gradient px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 brand-glow hover:scale-105 active:scale-95 mt-2"
-        >
+        <Button onClick={handleCreate} className="mt-2">
           New conversation
-        </button>
+        </Button>
       </div>
     );
   }

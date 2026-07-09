@@ -24,38 +24,38 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     private clerkAuth: ClerkAuthService,
   ) {}
 
-  afterInit() {
-    console.log('Socket.IO gateway initialized');
-  }
+  afterInit(server: Server) {
+    server.use(async (socket, next) => {
+      const token = socket.handshake.auth?.token as string | undefined;
 
-  async handleConnection(client: Socket) {
-    const token = client.handshake.auth?.token as string | undefined;
-
-    if (!token) {
-      client.emit('error', { message: 'Authentication required' });
-      client.disconnect();
-      return;
-    }
-
-    try {
-      const payload = await this.clerkAuth.verifyToken(token);
-      const clerkId = payload.sub;
-
-      if (!clerkId) {
-        client.emit('error', { message: 'Invalid token' });
-        client.disconnect();
-        return;
+      if (!token) {
+        return next(new Error('Authentication required'));
       }
 
-      const user = await this.clerkAuth.getOrCreateUser(clerkId);
-      
-      client.data.userId = user.id;
-      client.data.rooms = new Set<string>();
-      client.data.typingRooms = new Set<string>();
-      console.log(`Client connected: ${client.id} (user: ${user.id})`);
-    } catch {
-      client.emit('error', { message: 'Invalid or expired token' });
-      client.disconnect();
+      try {
+        const payload = await this.clerkAuth.verifyToken(token);
+        const clerkId = payload.sub;
+
+        if (!clerkId) {
+          return next(new Error('Invalid token'));
+        }
+
+        const user = await this.clerkAuth.getOrCreateUser(clerkId);
+        
+        socket.data.userId = user.id;
+        socket.data.rooms = new Set<string>();
+        socket.data.typingRooms = new Set<string>();
+        next();
+      } catch {
+        next(new Error('Invalid or expired token'));
+      }
+    });
+    console.log('Socket.IO gateway initialized with auth middleware');
+  }
+
+  handleConnection(client: Socket) {
+    if (client.data.userId) {
+      console.log(`Client connected: ${client.id} (user: ${client.data.userId})`);
     }
   }
 

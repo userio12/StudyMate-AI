@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
 import { useDocuments } from '@/hooks/use-documents';
+import { Button } from '@/components/ui/button';
 
 const trustToDifficulty: Record<string, DifficultyLevel> = {
   stranger: 'beginner',
@@ -24,7 +25,7 @@ const trustToDifficulty: Record<string, DifficultyLevel> = {
 };
 
 export default function QuizPage() {
-  const { quizzes, isLoading, mutate } = useQuizzes();
+  const { quizzes, isLoading, mutate, updateQuiz, deleteQuiz } = useQuizzes();
   const { documents } = useDocuments();
   const { trustLevel, persona } = useTrustLevel();
   const api = useApiClient();
@@ -38,6 +39,7 @@ export default function QuizPage() {
     beginner: 'Beginner',
     intermediate: 'Intermediate',
     advanced: 'Advanced',
+    adaptive: 'Adaptive',
   };
 
   const handleGenerate = async (difficulty: DifficultyLevel) => {
@@ -74,21 +76,20 @@ export default function QuizPage() {
             </h1>
             <PersonaBadge
               persona={persona}
-              label={PERSONA_LABELS[persona]}
-              description={PERSONA_DESCRIPTIONS[persona]}
+              label={PERSONA_LABELS[persona] || ''}
+              description={PERSONA_DESCRIPTIONS[persona] || ''}
             />
           </div>
           <p className="mt-1 text-sm text-muted">
             Generate and take adaptive quizzes from your documents.
           </p>
         </div>
-        <button
+        <Button
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg brand-gradient px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 brand-glow hover:scale-[1.02] active:scale-95"
         >
-          <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+          <FontAwesomeIcon icon={faPlus} className="w-4 h-4 mr-2" />
           Generate quiz
-        </button>
+        </Button>
       </div>
 
       <GenerateQuizModal 
@@ -109,9 +110,9 @@ export default function QuizPage() {
           ))}
         </div>
       ) : quizzes.length === 0 ? (
-        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center border-brand-500/20 max-w-2xl mx-auto">
-          <div className="studymate-glow rounded-full p-4">
-            <FontAwesomeIcon icon={faGraduationCap} className="text-white w-6 h-6" />
+        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center max-w-2xl mx-auto">
+          <div className="rounded-full bg-surface-2 p-4 border border-border/50">
+            <FontAwesomeIcon icon={faGraduationCap} className="text-muted w-6 h-6" />
           </div>
           <p className="text-sm font-medium text-muted">
             No quizzes yet. Generate one from your documents.
@@ -119,14 +120,21 @@ export default function QuizPage() {
         </div>
       ) : (
         <div className="mt-6 space-y-3">
-          {quizzes.map((quiz) => (
+          {quizzes.slice().sort((a, b) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }).map((quiz) => (
             <QuizCard
               key={quiz.id}
               id={quiz.id}
               title={quiz.title}
               difficulty={quiz.difficulty}
               questionCount={quiz.questionCount}
+              isPinned={quiz.isPinned}
               createdAt={quiz.createdAt}
+              onUpdate={updateQuiz}
+              onDelete={deleteQuiz}
             />
           ))}
         </div>

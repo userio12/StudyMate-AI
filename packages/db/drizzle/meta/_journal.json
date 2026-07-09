@@ -36,6 +36,13 @@
       "when": 1783524508139,
       "tag": "0004_red_slapstick",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783616034804,
+      "tag": "0005_nasty_wraith",
+      "breakpoints": true
     }
   ]
 }

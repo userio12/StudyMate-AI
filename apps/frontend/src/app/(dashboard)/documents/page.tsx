@@ -85,9 +85,9 @@ export default function DocumentsPage() {
           ))}
         </div>
       ) : documents.length === 0 ? (
-        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center border-brand-500/20">
-          <div className="studymate-glow rounded-full p-4">
-            <FontAwesomeIcon icon={faUpload} className="text-white w-6 h-6" />
+        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center">
+          <div className="rounded-full bg-surface-2 p-4 border border-border/50">
+            <FontAwesomeIcon icon={faUpload} className="text-muted w-6 h-6" />
           </div>
           <p className="text-sm font-medium text-muted">
             No documents yet. Upload your first PDF above.

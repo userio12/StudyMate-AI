@@ -8,6 +8,7 @@ import { useApiClient } from '@/lib/api-client';
 import { useRelationship } from '@/hooks/use-relationship';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
+import { useSearchPreference } from '@/hooks/use-search-preference';
 import type { ContinuityContext, Persona } from '@studymate/shared';
 
 interface Citation {
@@ -38,6 +39,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const { personaLabel, personaDescription, greeting, persona } = useRelationship(continuity);
+  const { searchProvider } = useSearchPreference();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,7 +69,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
 
     await api.streamPost(
       `/chat/conversations/${conversationId}/message`,
-      { content },
+      { content, searchProvider },
       (token) => {
         currentStream += token;
         setStreamingContent(currentStream);
@@ -88,7 +90,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
       },
       controller.signal,
     );
-  }, [conversationId, api]);
+  }, [conversationId, api, searchProvider]);
 
   if (messages.length === 0 && !error && !isStreaming) {
     return (

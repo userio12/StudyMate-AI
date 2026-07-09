@@ -36,13 +36,13 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
             'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
             isUser
               ? 'bg-brand-500 text-white'
-              : 'glass',
+              : 'bg-surface-2 border border-border/50 text-foreground',
           )}
         >
           <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
 
           {citations && citations.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-glass-border pt-2">
+            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-border/50 pt-2">
               {citations.map((c, i) => (
                 <CitationBadge
                   key={c.chunkId}

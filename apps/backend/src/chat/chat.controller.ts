@@ -44,7 +44,7 @@ export class ChatController {
   @Post('conversations/:id/message')
   async streamMessage(
     @Param('id', ParseUUIDPipe) conversationId: string,
-    @Body(new ZodValidationPipe(SendMessageSchema)) body: { content: string },
+    @Body(new ZodValidationPipe(SendMessageSchema)) body: { content: string; searchProvider?: 'duckduckgo' | 'tavily' | 'off' },
     @CurrentUser() user: CurrentUserPayload,
     @Res() res: Response,
     @Req() req: Request,
@@ -64,6 +64,7 @@ export class ChatController {
         conversationId,
         body.content,
         user.userId,
+        body.searchProvider,
         (token: string) => {
           res.write(encoder.encode(`data: ${token}\n\n`));
         },

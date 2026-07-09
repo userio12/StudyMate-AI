@@ -16,10 +16,10 @@ interface StatsCardProps {
 }
 
 const accentMap = {
-  brand:   { icon: 'text-brand-300',   bg: 'from-brand-500/15 to-brand-600/5',   border: 'group-hover:border-brand-500/30',   iconBg: 'bg-brand-500/15' },
-  violet:  { icon: 'text-violet-300',  bg: 'from-violet-500/15 to-violet-600/5', border: 'group-hover:border-violet-500/30', iconBg: 'bg-violet-500/15' },
-  cyan:    { icon: 'text-cyan-300',    bg: 'from-cyan-500/15 to-cyan-600/5',     border: 'group-hover:border-cyan-500/30',   iconBg: 'bg-cyan-500/15' },
-  success: { icon: 'text-emerald-300', bg: 'from-success/15 to-success/5',       border: 'group-hover:border-success/30',    iconBg: 'bg-success/15' },
+  brand:   { icon: 'text-brand-300',   border: 'group-hover:border-brand-500/30',   iconBg: 'bg-brand-500/15' },
+  violet:  { icon: 'text-violet-300',  border: 'group-hover:border-violet-500/30', iconBg: 'bg-violet-500/15' },
+  cyan:    { icon: 'text-cyan-300',    border: 'group-hover:border-cyan-500/30',   iconBg: 'bg-cyan-500/15' },
+  success: { icon: 'text-emerald-300', border: 'group-hover:border-success/30',    iconBg: 'bg-success/15' },
 };
 
 function AnimatedNumber({ value }: { value: number }) {
@@ -67,12 +67,10 @@ export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 
 
   return (
     <div className={cn(
-      'group glass-card relative overflow-hidden p-6 cursor-default transition-all duration-300 hover:-translate-y-1',
+      'group glass-card relative overflow-hidden p-6 cursor-default transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
       accent.border,
       className
     )}>
-      {/* Subtle gradient tint */}
-      <div className={cn('absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none', accent.bg)} />
 
       <div className="relative flex items-start justify-between gap-4">
         <div className="space-y-1">

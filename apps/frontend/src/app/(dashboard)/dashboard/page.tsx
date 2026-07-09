@@ -61,7 +61,7 @@ export default function DashboardPage() {
       {/* ── Bento Grid ─────────────────────────────────────────────── */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(180px,auto)]">
         {/* Quick Actions - Spans 2 columns */}
-        <section className="md:col-span-2 glass-card p-6 flex flex-col justify-between border-brand-500/20" aria-label="Quick actions">
+        <section className="md:col-span-2 glass-card p-6 flex flex-col justify-between" aria-label="Quick actions">
           <div>
             <h2 className="text-lg font-bold text-foreground">Get Started</h2>
             <p className="text-xs text-muted mt-0.5">Jump right back into your workflow</p>
@@ -69,25 +69,28 @@ export default function DashboardPage() {
           <div className="grid gap-3 mt-6 sm:grid-cols-3">
             {[
               {
-                href: '/documents', icon: '📄', title: 'Upload PDF',
-                desc: 'Add material', color: 'hover:border-cyan-500/40 hover:bg-cyan-500/5',
+                href: '/documents', icon: faFileLines, title: 'Upload PDF',
+                desc: 'Add material', color: 'hover:border-border/80 hover:bg-surface-hover',
+                iconColor: 'text-cyan-400'
               },
               {
-                href: '/chat', icon: '💬', title: 'Start Chat',
-                desc: 'Ask questions', color: 'hover:border-brand-500/40 hover:bg-brand-500/5',
+                href: '/chat', icon: faCommentDots, title: 'Start Chat',
+                desc: 'Ask questions', color: 'hover:border-border/80 hover:bg-surface-hover',
+                iconColor: 'text-brand-400'
               },
               {
-                href: '/quiz', icon: '🎯', title: 'Take Quiz',
-                desc: 'Test knowledge', color: 'hover:border-violet-500/40 hover:bg-violet-500/5',
+                href: '/quiz', icon: faGraduationCap, title: 'Take Quiz',
+                desc: 'Test knowledge', color: 'hover:border-border/80 hover:bg-surface-hover',
+                iconColor: 'text-violet-400'
               },
-            ].map(({ href, icon, title, desc, color }) => (
+            ].map(({ href, icon, title, desc, color, iconColor }) => (
               <NextLink
                 key={href}
                 href={href}
                 className={`flex flex-col gap-2 p-4 rounded-xl border border-border/50 bg-surface-1/50 transition-all duration-200 cursor-pointer ${color}`}
               >
-                <span className="text-2xl">{icon}</span>
-                <div>
+                <FontAwesomeIcon icon={icon} className={`text-xl ${iconColor}`} />
+                <div className="mt-2">
                   <p className="text-sm font-bold text-foreground">{title}</p>
                   <p className="text-[10px] text-muted mt-0.5">{desc}</p>
                 </div>
@@ -119,7 +122,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Activity - Spans 2 columns */}
-        <section className="md:col-span-2 glass-card p-6 border-brand-500/10" aria-labelledby="recent-activity-heading">
+        <section className="md:col-span-2 glass-card p-6" aria-labelledby="recent-activity-heading">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 id="recent-activity-heading" className="text-lg font-bold text-foreground">

@@ -27,7 +27,7 @@ export function Sidebar() {
       {/* ── Logo ─── */}
       <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/50 px-6">
         <Link href="/dashboard" className="group flex items-center gap-2.5">
-          <div className="relative h-8 w-8 rounded-lg brand-gradient flex items-center justify-center brand-glow transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(99,102,241,0.5)]">
+          <div className="relative h-8 w-8 rounded-lg brand-gradient flex items-center justify-center transition-all duration-300 group-hover:scale-105">
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <span className="font-bold text-foreground tracking-tight">StudyMate</span>
@@ -53,8 +53,8 @@ export function Sidebar() {
               className={cn(
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px]',
                 active
-                  ? 'nav-active shadow-[0_0_12px_rgba(99,102,241,0.2)]'
-                  : 'text-muted hover:bg-surface-hover hover:text-foreground',
+                  ? 'nav-active'
+                  : 'text-muted hover:bg-surface-hover hover:text-foreground border border-transparent',
               )}
             >
               <FontAwesomeIcon
@@ -74,11 +74,11 @@ export function Sidebar() {
       {/* ── Bottom strip ─── */}
       <div className="border-t border-border/50 p-4 space-y-4 bg-surface-1/50">
         {/* AI badge */}
-        <div className="flex items-center gap-2 rounded-xl bg-brand-500/10 border border-brand-500/20 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-xl bg-surface-2 border border-border/50 px-3 py-2">
           <FontAwesomeIcon icon={faWandMagicSparkles} className="text-brand-400 w-3.5 h-3.5 shrink-0" />
           <div>
-            <p className="text-[11px] font-semibold text-brand-300">NVIDIA NIM</p>
-            <p className="text-[10px] text-muted">AI engine</p>
+            <p className="text-[11px] font-semibold text-foreground">Google Gemini</p>
+            <p className="text-[10px] text-muted">Intelligence engine</p>
           </div>
         </div>
         {/* User */}
