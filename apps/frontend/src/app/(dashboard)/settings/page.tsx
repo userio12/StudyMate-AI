@@ -5,6 +5,13 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { useSearchPreference } from '@/hooks/use-search-preference';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faRobot, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function SettingsPage() {
   const { isLoaded, user } = useUser();
@@ -52,15 +59,21 @@ export default function SettingsPage() {
           <p className="text-sm text-muted leading-relaxed">
             Choose which search engine the AI should use to retrieve real-time information for your questions.
           </p>
-          <select
-            value={searchProvider}
-            onChange={(e) => setSearchProvider(e.target.value as any)}
-            className="w-full max-w-sm rounded-lg border border-border/50 bg-surface-2 px-3 py-2.5 text-sm text-foreground focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-colors"
-          >
-            <option value="duckduckgo">DuckDuckGo (Free, Default)</option>
-            <option value="tavily">Tavily (Requires API Key in Backend)</option>
-            <option value="off">Off (Disable Web Search)</option>
-          </select>
+          <div className="w-full max-w-sm">
+            <Select
+              value={searchProvider}
+              onValueChange={(value) => setSearchProvider(value as any)}
+            >
+              <SelectTrigger className="w-full bg-surface-2 border-border/50 transition-colors focus:ring-brand-500">
+                <SelectValue placeholder="Select a search provider" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="duckduckgo">DuckDuckGo (Free, Default)</SelectItem>
+                <SelectItem value="tavily">Tavily (Requires API Key in Backend)</SelectItem>
+                <SelectItem value="off">Off (Disable Web Search)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
