@@ -1,5 +1,45 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPersonChalkboard, faUpload, faCommentDots, faGraduationCap, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faUpload, faCommentDots, faGraduationCap, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
+
+const coreFeatures = [
+  {
+    icon: faUpload,
+    title: 'Document Processing',
+    description: 'Drag and drop your PDFs. We automatically extract, chunk, and embed every single page into a semantic vector store for instant retrieval.',
+    metric: 'Instant Indexing',
+    color: 'text-blue-500',
+    bg: 'bg-blue-500/10',
+    border: 'group-hover:border-blue-500/30'
+  },
+  {
+    icon: faCommentDots,
+    title: 'AI Chat with Citations',
+    description: 'Ask complex questions and get answers firmly grounded in your own materials, complete with precise page-level source citations.',
+    metric: 'Zero Hallucinations',
+    color: 'text-brand-500',
+    bg: 'bg-brand-500/10',
+    border: 'group-hover:border-brand-500/30'
+  },
+  {
+    icon: faGraduationCap,
+    title: 'Adaptive Quizzes',
+    description: 'Automatically generate rigorous multiple-choice, true/false, and short-answer quizzes. Download beautiful PDF reports of your results.',
+    metric: 'Auto-Grading',
+    color: 'text-violet-500',
+    bg: 'bg-violet-500/10',
+    border: 'group-hover:border-violet-500/30'
+  },
+  {
+    icon: faUsers,
+    title: 'Real-Time Study Rooms',
+    description: 'Collaborate with peers in low-latency live workspaces. Share documents, chat, and tackle complex study materials together.',
+    metric: 'Live Sync',
+    color: 'text-emerald-500',
+    bg: 'bg-emerald-500/10',
+    border: 'group-hover:border-emerald-500/30'
+  }
+];
 
 export function Features() {
   return (
@@ -26,108 +66,38 @@ export function Features() {
           </p>
         </div>
 
-        {/* Clean Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* Feature 1: Upload & Index (Spans 1 col) */}
-          <div className="glass bg-surface-1/40 rounded-3xl border border-border p-6 md:p-8 group hover:border-brand-500/30 transition-all duration-300 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-            <div className="mb-5 inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-surface-2 border border-border text-brand-500 group-hover:scale-110 transition-transform duration-300 group-hover:bg-brand-500/10 group-hover:border-brand-500/20">
-              <FontAwesomeIcon icon={faUpload} className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">Upload & Index</h3>
-            <p className="text-sm md:text-base text-muted leading-relaxed flex-1">
-              Drag and drop PDFs. We extract, chunk, and embed every page into a semantic vector store instantly.
-            </p>
-            <div className="mt-8">
-              <div className="h-1.5 w-full bg-surface-3 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-500 w-3/4 rounded-full relative">
-                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+        {/* Clean 2x2 Card Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {coreFeatures.map((feature, idx) => (
+            <div 
+              key={idx} 
+              className={`glass bg-surface-1/40 rounded-3xl border border-border p-8 group transition-all duration-300 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] ${feature.border} hover:-translate-y-1`}
+            >
+              <div className="flex items-start justify-between mb-6">
+                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-2 border border-border ${feature.color} group-hover:scale-110 transition-transform duration-300 ${feature.bg}`}>
+                  <FontAwesomeIcon icon={feature.icon} className="w-6 h-6" />
+                </div>
+                <div className="inline-flex items-center rounded-full bg-surface-3 px-3 py-1 text-[10px] font-bold tracking-widest text-muted-fg uppercase">
+                  {feature.metric}
                 </div>
               </div>
-              <p className="text-xs text-muted-fg mt-3 font-mono text-right">Processing 124 pages...</p>
-            </div>
-          </div>
-
-          {/* Feature 2: Smart Flashcards (Large, spans 2 cols) */}
-          <div className="glass bg-surface-1/40 rounded-3xl border border-border p-6 md:p-8 lg:col-span-2 group hover:border-brand-500/30 transition-all duration-300 flex flex-col sm:flex-row gap-6 md:gap-8 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <div className="mb-5 inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-surface-2 border border-border text-brand-500 group-hover:scale-110 transition-transform duration-300 group-hover:bg-brand-500/10 group-hover:border-brand-500/20">
-                  <FontAwesomeIcon icon={faPersonChalkboard} className="w-5 h-5" />
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">Smart Flashcards</h3>
-                <p className="text-sm md:text-base text-muted max-w-lg leading-relaxed">
-                  Upload your notes — AI auto-generates cards and spaced repetition sends them to you right when you&apos;re about to forget. Zero manual setup required.
-                </p>
-              </div>
-            </div>
-            
-            <div className="shrink-0 flex items-end">
-              <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
-                <div className="bg-surface-2 border border-border rounded-xl md:rounded-2xl p-4 text-center group-hover:border-border-bright transition-colors duration-300">
-                  <p className="text-2xl md:text-3xl font-bold text-foreground mb-1">247</p>
-                  <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">Cards</p>
-                </div>
-                <div className="bg-surface-2 border border-border rounded-xl md:rounded-2xl p-4 text-center group-hover:border-border-bright transition-colors duration-300">
-                  <p className="text-2xl md:text-3xl font-bold text-brand-400 mb-1">94%</p>
-                  <p className="text-[10px] font-bold text-brand-500/70 uppercase tracking-widest">Retention</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3: Adaptive Quizzes (Large, spans 2 cols) */}
-          <div className="glass bg-surface-1/40 rounded-3xl border border-border p-6 md:p-8 lg:col-span-2 group hover:border-brand-500/30 transition-all duration-300 flex flex-col sm:flex-row gap-6 md:gap-8 items-center hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-            <div className="flex-1">
-              <div className="mb-5 inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-surface-2 border border-border text-brand-500 group-hover:scale-110 transition-transform duration-300 group-hover:bg-brand-500/10 group-hover:border-brand-500/20">
-                <FontAwesomeIcon icon={faGraduationCap} className="w-5 h-5" />
-              </div>
-              <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">Adaptive Quizzes</h3>
-              <p className="text-sm md:text-base text-muted leading-relaxed">
-                Generate multiple-choice, true/false, and short-answer quizzes from your materials. Our AI tracks your weak areas and dynamically adjusts difficulty to reinforce learning automatically.
+              
+              <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">
+                {feature.title}
+              </h3>
+              
+              <p className="text-base text-muted leading-relaxed flex-1">
+                {feature.description}
               </p>
-            </div>
-            
-            <div className="w-full sm:w-64 shrink-0 bg-surface-2 border border-border rounded-xl md:rounded-2xl p-4 md:p-5 group-hover:border-border-bright transition-colors duration-300">
-              <div className="space-y-3 md:space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="h-2 w-16 bg-surface-3 rounded-full"></div>
-                  <div className="h-7 w-7 rounded-full bg-brand-500/20 text-brand-400 text-xs font-bold flex items-center justify-center border border-brand-500/30">
-                    <FontAwesomeIcon icon={faCheck} className="w-3 h-3" />
-                  </div>
-                </div>
-                <div className="h-px w-full bg-border"></div>
-                <div className="flex items-center justify-between">
-                  <div className="h-2 w-24 bg-surface-3 rounded-full"></div>
-                  <div className="h-7 w-7 rounded-full bg-surface-3 text-muted-fg text-xs font-bold flex items-center justify-center border border-border">B</div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="h-2 w-20 bg-surface-3 rounded-full"></div>
-                  <div className="h-7 w-7 rounded-full bg-surface-3 text-muted-fg text-xs font-bold flex items-center justify-center border border-border">C</div>
-                </div>
+              
+              <div className="mt-8 pt-6 border-t border-border/50">
+                <Link href="/sign-up" className={`inline-flex items-center gap-2 text-sm font-semibold ${feature.color} hover:opacity-80 transition-opacity`}>
+                  Try it now
+                  <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </div>
             </div>
-          </div>
-
-          {/* Feature 4: Chat with Citations (Small, spans 1 col) */}
-          <div className="glass bg-surface-1/40 rounded-3xl border border-border p-6 md:p-8 group hover:border-brand-500/30 transition-all duration-300 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-            <div className="mb-5 inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-surface-2 border border-border text-brand-500 group-hover:scale-110 transition-transform duration-300 group-hover:bg-brand-500/10 group-hover:border-brand-500/20">
-              <FontAwesomeIcon icon={faCommentDots} className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">Chat with Citations</h3>
-            <p className="text-sm md:text-base text-muted leading-relaxed">
-              Ask questions and get answers grounded in your own documents with precise page-level citations.
-            </p>
-            <div className="mt-6 md:mt-8 pt-4">
-              <div className="bg-surface-2 border border-border rounded-xl p-3 md:p-4 relative group-hover:border-border-bright transition-colors">
-                <p className="text-xs md:text-sm text-foreground">The mitochondria is the powerhouse of the cell.</p>
-                <div className="absolute -bottom-3 right-4 bg-brand-500/10 border border-brand-500/20 text-brand-400 text-[10px] px-3 py-1 rounded-full font-bold tracking-wider">
-                  Pg. 42
-                </div>
-              </div>
-            </div>
-          </div>
-
+          ))}
         </div>
       </div>
     </section>

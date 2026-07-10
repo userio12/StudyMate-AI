@@ -2,18 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useApiClient } from '@/lib/api-client';
-import { useConversations } from '@/hooks/use-chat';
-import { ConversationList } from '@/components/chat/conversation-list';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faPlus, faComments } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
-import { Button } from '@/components/ui/button';
 
 export default function ChatPage() {
   const router = useRouter();
   const api = useApiClient();
-  const { conversations, isLoading } = useConversations();
 
   const handleCreate = async () => {
     try {
@@ -26,31 +22,52 @@ export default function ChatPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="animate-pulse space-y-2">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-12 rounded-lg bg-white/30 dark:bg-white/5" />
-        ))}
-      </div>
-    );
-  }
+  return (
+    <div className="flex h-full min-h-[80vh] flex-col items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="relative overflow-hidden rounded-[3rem] border border-border/50 bg-surface-1/40 p-8 sm:p-12 md:p-20 text-center shadow-2xl glass group">
+          {/* Animated Background Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-500/10 via-transparent to-transparent opacity-70" />
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none transition-opacity duration-1000 group-hover:opacity-100 opacity-50" />
+          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-violet-500/10 blur-[120px] rounded-full pointer-events-none transition-opacity duration-1000 group-hover:opacity-100 opacity-50" />
 
-  if (conversations.length === 0) {
-    return (
-      <div className="glass-card mt-12 flex flex-col items-center gap-4 py-16 text-center max-w-2xl mx-auto">
-        <div className="rounded-full bg-surface-2 p-4 border border-border/50">
-          <FontAwesomeIcon icon={faCommentDots} className="text-muted w-8 h-8" />
+          {/* Decorative floating watermark */}
+          <div className="absolute top-10 left-10 opacity-5">
+             <FontAwesomeIcon icon={faComments} className="w-24 h-24" />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center">
+            {/* Massive Glowing Icon */}
+            <div className="mb-10 inline-flex h-28 w-28 items-center justify-center rounded-[2.5rem] bg-brand-500/10 border border-brand-500/20 shadow-[inset_0_0_30px_rgba(99,102,241,0.1)] transition-transform duration-700 ease-out group-hover:scale-110 group-hover:shadow-[inset_0_0_50px_rgba(99,102,241,0.2)]">
+              <FontAwesomeIcon icon={faCommentDots} className="text-brand-400 w-12 h-12" />
+            </div>
+            
+            {/* Cinematic Typography */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground mb-6 leading-tight">
+              Start a New <br className="hidden sm:block" />
+              <span className="bg-gradient-to-r from-brand-400 to-violet-400 bg-clip-text text-transparent">
+                Conversation
+              </span>
+            </h1>
+            
+            <p className="text-lg sm:text-xl text-muted max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+              Ask questions about your study materials, generate automated summaries, and get exact page citations powered by our advanced AI engine.
+            </p>
+            
+            {/* Massive Primary Action Button */}
+            <button 
+              onClick={handleCreate} 
+              className="group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl brand-gradient px-10 py-5 text-lg font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] overflow-hidden"
+            >
+              {/* Shine effect across the button */}
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+              
+              <FontAwesomeIcon icon={faPlus} className="w-5 h-5 transition-transform duration-300 group-hover/btn:rotate-90" /> 
+              Create New Chat
+            </button>
+          </div>
         </div>
-        <p className="text-sm font-medium text-muted">
-          No conversations yet. Start a new one.
-        </p>
-        <Button onClick={handleCreate} className="mt-2">
-          New conversation
-        </Button>
       </div>
-    );
-  }
-
-  return <ConversationList conversations={conversations} onCreate={handleCreate} />;
+    </div>
+  );
 }

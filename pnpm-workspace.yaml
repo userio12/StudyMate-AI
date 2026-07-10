@@ -5,6 +5,7 @@ allowBuilds:
   '@clerk/shared': true
   '@google/genai': true
   canvas: set this to true or false
+  core-js: set this to true or false
   esbuild: true
   protobufjs: true
   sharp: true

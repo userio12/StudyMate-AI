@@ -49,9 +49,11 @@ export class ChatController {
     @Res() res: Response,
     @Req() req: Request,
   ) {
+    res.status(200);
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
     const encoder = new TextEncoder();
@@ -66,7 +68,7 @@ export class ChatController {
         user.userId,
         body.searchProvider,
         (token: string) => {
-          res.write(encoder.encode(`data: ${token}\n\n`));
+          res.write(encoder.encode(`data: ${JSON.stringify(token)}\n\n`));
         },
         abortController.signal,
       );

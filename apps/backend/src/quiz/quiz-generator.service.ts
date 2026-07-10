@@ -42,6 +42,7 @@ export class QuizGeneratorService {
     const prompt = `You are an expert tutor creating a quiz to test a student's comprehension.
 Using ONLY the following context from the user's documents, generate ${count} multiple-choice questions.
 The difficulty level should be: ${difficulty.toUpperCase()}.
+${difficulty === 'advanced' ? 'CRITICAL: Since this is an ADVANCED quiz, questions must be highly challenging, focusing on deep synthesis, edge cases, and complex applications of the material. Do not ask simple definitional questions.' : ''}
 ${adaptiveContext ? `\nADAPTIVE INSTRUCTION based on user's past performance:\n${adaptiveContext}\n` : ''}
 Context:
 ${context}
@@ -51,7 +52,7 @@ Rules:
 2. Each question must have exactly 4 options.
 3. Only one option can be correct.
 4. Provide a brief explanation for why the answer is correct based on the text.
-5. NO REPETITIVE QUESTIONS: Ensure questions cover a diverse range of topics from across the entire provided context. Do not ask multiple questions about the same specific fact or concept.
+5. STRICTLY NO REPETITION: Every single question MUST cover a completely different topic, concept, or section of the text. Do not ask about the same fact twice. If you cannot find ${count} unique topics, combine concepts.
 6. You MUST return ONLY a valid JSON array of objects, with no markdown formatting, no code blocks, and no extra text.
 
 Format:

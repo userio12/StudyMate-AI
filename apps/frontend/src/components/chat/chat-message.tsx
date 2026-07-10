@@ -33,16 +33,24 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
       <div className={cn('max-w-[75%]', isUser && 'order-first')}>
         <div
           className={cn(
-            'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+            'rounded-2xl px-5 py-3.5 text-[15px] leading-relaxed shadow-sm',
             isUser
               ? 'bg-brand-500 text-white'
-              : 'bg-surface-2 border border-border/50 text-foreground',
+              : 'bg-surface-2 border border-border/40 text-foreground',
           )}
         >
-          <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
+          {isStreaming && !content ? (
+            <div className="flex items-center gap-1.5 h-6 px-1">
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          ) : (
+            <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
+          )}
 
           {citations && citations.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-border/50 pt-2">
+            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border/50 pt-3">
               {citations.map((c, i) => (
                 <CitationBadge
                   key={c.chunkId}
@@ -54,8 +62,8 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
             </div>
           )}
 
-          {isStreaming && (
-            <span className="ml-0.5 inline-block h-4 w-2 animate-pulse rounded-sm bg-brand-500 dark:bg-brand-300" />
+          {isStreaming && content && (
+            <span className="ml-1 inline-block h-4 w-2 animate-pulse rounded-sm bg-brand-500 dark:bg-brand-300 align-middle" />
           )}
         </div>
       </div>

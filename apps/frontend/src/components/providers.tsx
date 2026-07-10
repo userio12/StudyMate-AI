@@ -8,6 +8,7 @@ import { type ReactNode } from 'react';
 import { SkipLink } from './skip-link';
 import { handleApiError } from '@/lib/error-handler';
 import { toast } from 'sonner';
+import { SessionManager } from './session-manager';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -43,6 +44,7 @@ export function Providers({ children }: { children: ReactNode }) {
           />
         </ThemeProvider>
       </SWRConfig>
+      <SessionManager />
     </ClerkProvider>
   );
 }

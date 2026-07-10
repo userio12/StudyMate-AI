@@ -4,6 +4,7 @@ import { QuizGeneratorService } from './quiz-generator.service.js';
 import { QuizScorerService } from './quiz-scorer.service.js';
 import { quizzes, quizQuestions, quizAttempts, users } from '@studymate/db';
 import { eq, and } from 'drizzle-orm';
+import { DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
 
 @Injectable()
 export class QuizService {
@@ -13,7 +14,7 @@ export class QuizService {
     private scorer: QuizScorerService,
   ) {}
 
-  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = 5) {
+  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = DEFAULT_QUIZ_QUESTION_COUNT) {
     const userRecord = await this.db.db!.query.users.findFirst({
       where: eq(users.id, userId),
     });
@@ -104,7 +105,12 @@ export class QuizService {
       orderBy: (q, { asc }) => [asc(q.order)],
     });
 
-    return { ...quiz, questions };
+    const attempts = await this.db.db!.query.quizAttempts.findMany({
+      where: and(eq(quizAttempts.quizId, id), eq(quizAttempts.userId, userId)),
+      orderBy: (a, { desc }) => [desc(a.completedAt)],
+    });
+
+    return { ...quiz, questions, attempts };
   }
 
   async updateQuiz(id: string, userId: string, data: { title?: string; isPinned?: boolean }) {

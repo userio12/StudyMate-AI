@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuiz } from '@/hooks/use-quiz';
 import { useApiClient } from '@/lib/api-client';
@@ -24,6 +24,14 @@ export default function QuizDetailPage({
   const [submitting, setSubmitting] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
+  const completedAttempt = (quiz as any)?.attempts?.find((a: any) => a.score !== null);
+  
+  useEffect(() => {
+    if (completedAttempt && router) {
+      router.replace(`/quiz/${quiz?.id}/results?score=${completedAttempt.score}`);
+    }
+  }, [completedAttempt, router, quiz?.id]);
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -40,6 +48,10 @@ export default function QuizDetailPage({
         </p>
       </div>
     );
+  }
+
+  if (completedAttempt) {
+    return null; // Return null while redirecting
   }
 
   const handleAnswer = (questionId: string, answer: string) => {

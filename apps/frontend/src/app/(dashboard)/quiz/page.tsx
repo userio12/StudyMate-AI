@@ -9,12 +9,11 @@ import { useApiClient } from '@/lib/api-client';
 import { PERSONA_LABELS, PERSONA_DESCRIPTIONS } from '@studymate/shared';
 import type { DifficultyLevel } from '@studymate/shared';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGraduationCap, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faGraduationCap, faPlus, faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
 import { useDocuments } from '@/hooks/use-documents';
-import { Button } from '@/components/ui/button';
 
 const trustToDifficulty: Record<string, DifficultyLevel> = {
   stranger: 'beginner',
@@ -67,30 +66,48 @@ export default function QuizPage() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-heading text-2xl font-bold text-foreground">
-              Quiz
-            </h1>
-            <PersonaBadge
-              persona={persona}
-              label={PERSONA_LABELS[persona] || ''}
-              description={PERSONA_DESCRIPTIONS[persona] || ''}
-            />
+    <div className="pb-10">
+      
+      {/* ── Hero Control Panel ────────────────────────────────────────────── */}
+      <header className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1/40 p-6 sm:p-10 mb-10 shadow-lg glass group">
+        {/* Animated Background Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-brand-500/10 opacity-70" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
+          <div className="flex-1 w-full text-center lg:text-left">
+            <div className="inline-flex items-center justify-center rounded-2xl bg-violet-500/10 border border-violet-500/20 p-4 mb-6">
+              <FontAwesomeIcon icon={faGraduationCap} className="w-8 h-8 text-violet-400" />
+            </div>
+            <div className="flex flex-col lg:flex-row items-center gap-4 mb-4 justify-center lg:justify-start">
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+                Adaptive Quizzes
+              </h1>
+              <div className="hidden lg:block">
+                <PersonaBadge
+                  persona={persona}
+                  label={PERSONA_LABELS[persona] || ''}
+                  description={PERSONA_DESCRIPTIONS[persona] || ''}
+                />
+              </div>
+            </div>
+            <p className="text-base sm:text-lg text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Test your knowledge. Our AI dynamically generates challenging, adaptive quizzes directly from your uploaded study materials.
+            </p>
           </div>
-          <p className="mt-1 text-sm text-muted">
-            Generate and take adaptive quizzes from your documents.
-          </p>
+          
+          <div className="w-full lg:w-auto shrink-0">
+            <button 
+              onClick={() => setModalOpen(true)}
+              className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-10 py-5 text-lg font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] overflow-hidden border-0"
+            >
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+              <FontAwesomeIcon icon={faPlus} className="w-5 h-5 transition-transform duration-300 group-hover/btn:rotate-90" />
+              Generate New Quiz
+            </button>
+          </div>
         </div>
-        <Button
-          onClick={() => setModalOpen(true)}
-        >
-          <FontAwesomeIcon icon={faPlus} className="w-4 h-4 mr-2" />
-          Generate quiz
-        </Button>
-      </div>
+      </header>
 
       <GenerateQuizModal 
         open={modalOpen} 
@@ -100,45 +117,64 @@ export default function QuizPage() {
         generating={generating} 
       />
 
-      {isLoading ? (
-        <div className="mt-6 space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-24 animate-pulse rounded-xl bg-white/30 dark:bg-white/5"
-            />
-          ))}
+      {/* ── Quizzes List ────────────────────────────────────────────── */}
+      <section>
+        <div className="flex items-center justify-between px-1 mb-6">
+          <h2 className="text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
+            <FontAwesomeIcon icon={faListCheck} className="w-4 h-4 text-violet-500" /> Your Quizzes
+          </h2>
+          {!isLoading && quizzes.length > 0 && (
+            <span className="inline-flex items-center rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-bold text-muted-fg border border-border">
+              {quizzes.length} Quiz{quizzes.length === 1 ? '' : 'zes'}
+            </span>
+          )}
         </div>
-      ) : quizzes.length === 0 ? (
-        <div className="glass-card mt-12 flex flex-col items-center gap-3 py-16 text-center max-w-2xl mx-auto">
-          <div className="rounded-full bg-surface-2 p-4 border border-border/50">
-            <FontAwesomeIcon icon={faGraduationCap} className="text-muted w-6 h-6" />
+
+        {isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-[120px] animate-pulse rounded-[1.5rem] bg-surface-2/50 border border-border/50"
+              />
+            ))}
           </div>
-          <p className="text-sm font-medium text-muted">
-            No quizzes yet. Generate one from your documents.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-6 space-y-3">
-          {quizzes.slice().sort((a, b) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          }).map((quiz) => (
-            <QuizCard
-              key={quiz.id}
-              id={quiz.id}
-              title={quiz.title}
-              difficulty={quiz.difficulty}
-              questionCount={quiz.questionCount}
-              isPinned={quiz.isPinned}
-              createdAt={quiz.createdAt}
-              onUpdate={updateQuiz}
-              onDelete={deleteQuiz}
-            />
-          ))}
-        </div>
-      )}
+        ) : quizzes.length === 0 ? (
+          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onClick={() => setModalOpen(true)}>
+            <div className="rounded-2xl bg-violet-500/10 p-5 border border-violet-500/20">
+              <FontAwesomeIcon icon={faGraduationCap} className="text-violet-400 w-8 h-8" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">
+                No quizzes yet
+              </p>
+              <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
+                Click here or use the button above to generate your first adaptive quiz from your documents.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {quizzes.slice().sort((a, b) => {
+              if (a.isPinned && !b.isPinned) return -1;
+              if (!a.isPinned && b.isPinned) return 1;
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }).map((quiz) => (
+              <QuizCard
+                key={quiz.id}
+                id={quiz.id}
+                title={quiz.title}
+                difficulty={quiz.difficulty}
+                questionCount={quiz.questionCount}
+                isPinned={quiz.isPinned}
+                createdAt={quiz.createdAt}
+                onUpdate={updateQuiz}
+                onDelete={deleteQuiz}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
