@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { CreateRoomSchema } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { RoomsService } from './rooms.service.js';
@@ -35,6 +35,14 @@ export class RoomsController {
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.roomsService.getRoom(id, user.userId);
+  }
+
+  @Delete(':id')
+  deleteRoom(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.roomsService.deleteRoom(id, user.userId);
   }
 
   @Get(':id/messages')

@@ -76,10 +76,10 @@ export function ConversationList({
     <div className="space-y-1">
       <button
         onClick={onCreate}
-        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-surface-hover"
+        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] text-muted hover:bg-surface-hover hover:text-foreground border border-transparent"
       >
-        <FontAwesomeIcon icon={faPlus} className="w-[18px] h-[18px]" />
-        New conversation
+        <FontAwesomeIcon icon={faPlus} className="shrink-0 w-[18px] h-[18px] text-brand-300" />
+        New chat
       </button>
 
       <div className="mt-2 space-y-0.5">

@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { SkeletonRow } from '../ui/skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots, faFileLines, faGraduationCap, faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faFileLines, faGraduationCap, faBookOpen, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 interface Activity {
   id: string;
@@ -27,10 +27,9 @@ const activityConfig = {
 export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
   if (isLoading) {
     return (
-      <div className="space-y-1 divide-y divide-border">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <SkeletonRow key={i} />
-        ))}
+      <div className="flex flex-col items-center justify-center py-12 space-y-3">
+        <FontAwesomeIcon icon={faSpinner} className="w-6 h-6 text-brand-500 animate-spin" />
+        <span className="text-sm font-medium text-muted tracking-wide animate-pulse">Loading activity...</span>
       </div>
     );
   }

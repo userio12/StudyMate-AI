@@ -9,7 +9,7 @@ import { useApiClient } from '@/lib/api-client';
 import { PERSONA_LABELS, PERSONA_DESCRIPTIONS } from '@studymate/shared';
 import type { DifficultyLevel } from '@studymate/shared';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGraduationCap, faPlus, faListCheck } from '@fortawesome/free-solid-svg-icons';
+import { faGraduationCap, faPlus, faListCheck, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
@@ -131,13 +131,11 @@ export default function QuizPage() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-[120px] animate-pulse rounded-[1.5rem] bg-surface-2/50 border border-border/50"
-              />
-            ))}
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 text-violet-500 animate-spin" />
+            <p className="text-lg font-bold text-foreground animate-pulse">
+              Loading your quizzes...
+            </p>
           </div>
         ) : quizzes.length === 0 ? (
           <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onClick={() => setModalOpen(true)}>

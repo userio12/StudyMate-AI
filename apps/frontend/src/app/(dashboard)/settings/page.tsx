@@ -55,7 +55,10 @@ export default function SettingsPage() {
           <div className="flex items-center gap-5 p-4 rounded-2xl bg-surface-2/50 border border-border/50">
             <div className="h-20 w-20 rounded-full bg-surface-3 flex items-center justify-center overflow-hidden border-2 border-border shadow-inner shrink-0">
               {isLoaded && user?.imageUrl ? (
-                <img src={user.imageUrl} alt="Avatar" className="h-full w-full object-cover" />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={user.imageUrl} alt="Avatar" className="h-full w-full object-cover" />
+                </>
               ) : (
                 <span className="text-2xl font-black text-slate-400">
                   {user?.firstName?.charAt(0) || 'U'}

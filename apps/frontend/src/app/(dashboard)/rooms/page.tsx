@@ -1,22 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RoomCard } from '@/components/rooms/room-card';
 import { useRooms } from '@/hooks/use-rooms';
+import { useUiStore } from '@/store/ui-store';
 import { useApiClient } from '@/lib/api-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faSpinner, faPlus, faRightToBracket, faSignal } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faSpinner, faPlus, faRightToBracket, faSignal, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
 
 export default function RoomsPage() {
-  const { rooms, isLoading, mutate } = useRooms();
+  const { rooms, isLoading, mutate, deleteRoom } = useRooms();
   const api = useApiClient();
+  const { presence, setPresence } = useUiStore();
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [roomName, setRoomName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [creating, setCreating] = useState(false);
+  
+  // Need mounted check for persisted presence state
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const handleCreate = async () => {
     if (!roomName.trim()) return;
@@ -47,6 +53,16 @@ export default function RoomsPage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
+    try {
+      await deleteRoom(id);
+      toast.success('Room deleted successfully');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    }
+  };
+
   return (
     <div className="pb-10">
       
@@ -67,6 +83,29 @@ export default function RoomsPage() {
             <p className="text-base sm:text-lg text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
               Study together in real-time. Create a new multiplayer room to collaborate with peers, or join an existing session using an invite code.
             </p>
+            
+            {/* Presence Toggle */}
+            {mounted && (
+              <div className="mt-6 inline-flex items-center gap-3 bg-surface-2/50 border border-border/50 rounded-xl p-2 pr-4 w-auto">
+                <button
+                  onClick={() => setPresence(presence === 'online' ? 'offline' : 'online')}
+                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${presence === 'online' ? 'bg-emerald-500' : 'bg-surface-3'}`}
+                  role="switch"
+                  aria-checked={presence === 'online'}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${presence === 'online' ? 'translate-x-5' : 'translate-x-1'}`} />
+                </button>
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon 
+                    icon={presence === 'online' ? faEye : faEyeSlash} 
+                    className={`w-3.5 h-3.5 ${presence === 'online' ? 'text-emerald-400' : 'text-muted'}`} 
+                  />
+                  <span className={`text-sm font-bold ${presence === 'online' ? 'text-foreground' : 'text-muted'}`}>
+                    {presence === 'online' ? 'Appearing Online' : 'Appearing Offline'}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="w-full lg:w-auto shrink-0 flex flex-col gap-3">
@@ -99,7 +138,6 @@ export default function RoomsPage() {
             placeholder="Name your new room..."
             aria-label="Room name"
             autoComplete="off"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             className="flex-1 bg-transparent px-4 py-2 text-base text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none"
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -122,7 +160,6 @@ export default function RoomsPage() {
             placeholder="Enter invite code..."
             aria-label="Invite code"
             autoComplete="off"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             className="flex-1 bg-transparent px-4 py-2 text-base font-mono text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none uppercase"
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
@@ -151,13 +188,11 @@ export default function RoomsPage() {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-[140px] animate-pulse rounded-[1.5rem] bg-surface-2/50 border border-border/50"
-              />
-            ))}
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 text-emerald-500 animate-spin" />
+            <p className="text-lg font-bold text-foreground animate-pulse">
+              Loading study rooms...
+            </p>
           </div>
         ) : rooms.length === 0 ? (
           <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-emerald-500/30 transition-colors">
@@ -182,6 +217,8 @@ export default function RoomsPage() {
                 name={room.name}
                 inviteCode={room.inviteCode}
                 createdAt={room.createdAt}
+                isOwner={room.isOwner}
+                onDelete={() => handleDelete(room.id)}
               />
             ))}
           </div>

@@ -21,6 +21,10 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const setSidebarOpen = useUiStore((s) => s.setSidebarOpen);
+  
+  if (pathname.startsWith('/chat')) {
+    return null;
+  }
 
   return (
     <DashboardSidebar>
@@ -42,7 +46,8 @@ export function Sidebar() {
       </div>
 
       {/* ── Nav items ─── */}
-      <nav className="flex-1 space-y-1 p-4" aria-label="Main navigation">
+      <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-8" aria-label="Main navigation">
+        <div className="space-y-1">
         {navItems.map((item) => {
           const active = isActiveRoute(pathname, item.href);
           return (
@@ -69,6 +74,7 @@ export function Sidebar() {
             </Link>
           );
         })}
+        </div>
       </nav>
 
       {/* ── Bottom strip ─── */}

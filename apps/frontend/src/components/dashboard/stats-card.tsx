@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowTrendUp, faArrowTrendDown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowTrendUp, faArrowTrendDown, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 interface StatsCardProps {
   label: string;
@@ -53,14 +53,9 @@ export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 
 
   if (isLoading) {
     return (
-      <div className={cn("glass-card animate-pulse p-6", className)}>
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <div className="h-2.5 w-20 rounded-full shimmer" />
-            <div className="h-8 w-12 rounded-lg shimmer" />
-          </div>
-          <div className="h-10 w-10 rounded-xl shimmer" />
-        </div>
+      <div className={cn("glass-card p-6 flex flex-col items-center justify-center h-full min-h-[120px] space-y-3", className)}>
+        <FontAwesomeIcon icon={faSpinner} className="w-6 h-6 text-brand-500 animate-spin" />
+        <span className="text-sm font-medium text-muted tracking-wide animate-pulse">Loading stats...</span>
       </div>
     );
   }

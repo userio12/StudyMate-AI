@@ -2,7 +2,7 @@
 
 import { formatRelativeTime } from '@/lib/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faClock, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 interface RoomCardProps {
@@ -10,6 +10,8 @@ interface RoomCardProps {
   name: string;
   inviteCode: string;
   createdAt: string;
+  isOwner?: boolean;
+  onDelete?: (e: React.MouseEvent) => void;
 }
 
 // Deterministic gradient per room name
@@ -24,7 +26,7 @@ function roomGradient(name: string) {
   return gradients[idx] ?? gradients[0];
 }
 
-export function RoomCard({ id, name, inviteCode, createdAt }: RoomCardProps) {
+export function RoomCard({ id, name, inviteCode, createdAt, isOwner, onDelete }: RoomCardProps) {
   const grad = roomGradient(name);
   const initials = name.slice(0, 2).toUpperCase();
 
@@ -55,10 +57,25 @@ export function RoomCard({ id, name, inviteCode, createdAt }: RoomCardProps) {
           </div>
         </div>
 
-        <FontAwesomeIcon
-          icon={faArrowRight}
-          className="shrink-0 text-muted group-hover:text-cyan-400 group-hover:translate-x-1 transition-all duration-200 w-4 h-4"
-        />
+        <div className="flex items-center gap-2">
+          {isOwner && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete?.(e);
+              }}
+              className="relative z-10 shrink-0 text-muted hover:text-red-400 p-2 rounded-full hover:bg-red-400/10 transition-all duration-200"
+              aria-label="Delete room"
+            >
+              <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
+            </button>
+          )}
+          <FontAwesomeIcon
+            icon={faArrowRight}
+            className="shrink-0 text-muted group-hover:text-cyan-400 group-hover:translate-x-1 transition-all duration-200 w-4 h-4"
+          />
+        </div>
       </div>
     </Link>
   );

@@ -5,6 +5,8 @@ interface UiState {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
+  presence: 'online' | 'offline';
+  setPresence: (presence: 'online' | 'offline') => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -13,6 +15,8 @@ export const useUiStore = create<UiState>()(
       sidebarOpen: true,
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      presence: 'online',
+      setPresence: (presence) => set({ presence }),
     }),
     {
       name: 'studymate-ui',

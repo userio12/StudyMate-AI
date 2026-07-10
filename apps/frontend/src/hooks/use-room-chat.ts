@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import type { Socket } from 'socket.io-client';
 import { useApiClient, CLERK_JWT_TEMPLATE } from '@/lib/api-client';
 import { getSocket, disconnectSocket } from '@/lib/websocket';
+import { useUiStore } from '@/store/ui-store';
 
 interface ChatMessage {
   id: string;
@@ -21,6 +22,7 @@ export function useRoomChat(roomId: string) {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const { presence } = useUiStore();
   const socketRef = useRef<Socket | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // FIX BUG-27: Track whether the socket was actually acquired so disconnectSocket()
@@ -71,6 +73,7 @@ export function useRoomChat(roomId: string) {
       socket.on('connect', () => setIsConnected(true));
       socket.on('disconnect', () => setIsConnected(false));
       socket.emit('join:room', { roomId });
+      socket.emit('presence:update', { status: presence });
 
       socket.on('message:received', (msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
@@ -126,6 +129,13 @@ export function useRoomChat(roomId: string) {
       }
     };
   }, [roomId, getToken]);
+
+  // Sync presence changes
+  useEffect(() => {
+    if (socketRef.current && isConnected) {
+      socketRef.current.emit('presence:update', { status: presence });
+    }
+  }, [presence, isConnected]);
 
   const sendMessage = useCallback((content: string) => {
     socketRef.current?.emit('message:send', { roomId, content });

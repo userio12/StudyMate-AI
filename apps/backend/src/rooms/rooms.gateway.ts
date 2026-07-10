@@ -45,6 +45,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         socket.data.userId = user.id;
         socket.data.rooms = new Set<string>();
         socket.data.typingRooms = new Set<string>();
+        socket.data.presence = 'online'; // Default to online
         next();
       } catch {
         next(new Error('Invalid or expired token'));
@@ -92,7 +93,11 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
     rooms.add(payload.roomId);
     client.join(payload.roomId);
-    client.to(payload.roomId).emit('user:joined', { userId, timestamp: new Date().toISOString() });
+    
+    // Only broadcast user:joined if the user's presence is online
+    if (client.data.presence !== 'offline') {
+      client.to(payload.roomId).emit('user:joined', { userId, timestamp: new Date().toISOString() });
+    }
   }
 
   @SubscribeMessage('leave:room')
@@ -154,6 +159,28 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     if (userId && typingRooms) {
       typingRooms.delete(payload.roomId);
       client.to(payload.roomId).emit('typing:update', { userId, typing: false });
+    }
+  }
+
+  @SubscribeMessage('presence:update')
+  handlePresenceUpdate(client: Socket, payload: { status: 'online' | 'offline' }) {
+    const userId = client.data.userId as string | undefined;
+    const rooms = client.data.rooms as Set<string> | undefined;
+    
+    if (!userId || !rooms) return;
+
+    // Prevent unnecessary broadcasts if status hasn't changed
+    if (client.data.presence === payload.status) return;
+
+    client.data.presence = payload.status;
+    
+    // Broadcast the status change to all rooms the user is currently in
+    for (const roomId of rooms) {
+      if (payload.status === 'offline') {
+        client.to(roomId).emit('user:left', { userId, timestamp: new Date().toISOString() });
+      } else {
+        client.to(roomId).emit('user:joined', { userId, timestamp: new Date().toISOString() });
+      }
     }
   }
 }
