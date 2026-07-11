@@ -9,7 +9,7 @@ interface GenerateQuizModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultDifficulty: DifficultyLevel;
-  onGenerate: (difficulty: DifficultyLevel) => Promise<void>;
+  onGenerate: (difficulty: DifficultyLevel, topic?: string) => Promise<void>;
   generating: boolean;
 }
 
@@ -21,9 +21,10 @@ export function GenerateQuizModal({
   generating,
 }: GenerateQuizModalProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>(defaultDifficulty);
+  const [topic, setTopic] = useState('');
 
   const handleGenerate = async () => {
-    await onGenerate(selectedDifficulty);
+    await onGenerate(selectedDifficulty, topic.trim() || undefined);
   };
 
   return (
@@ -67,6 +68,20 @@ export function GenerateQuizModal({
               <span className="text-brand-500 font-medium">Recommended based on your Trust Level</span>
             )}
           </p>
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-foreground">
+            Custom Topic (Optional)
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., React Hooks, Mitochondria..."
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            disabled={generating}
+            className="w-full rounded-xl bg-surface-1 border border-border px-4 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all duration-200"
+          />
         </div>
 
         <div className="flex justify-end gap-3 pt-4">

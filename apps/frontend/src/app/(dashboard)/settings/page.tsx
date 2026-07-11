@@ -1,8 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import useSWR from 'swr';
 import { useUser } from '@clerk/nextjs';
 import { useSearchPreference } from '@/hooks/use-search-preference';
+import { useAiModelPreferences, type AIProvider } from '@/hooks/use-ai-models';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faRobot, faGlobe, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -16,12 +18,29 @@ import {
 export default function SettingsPage() {
   const { isLoaded, user } = useUser();
   const { searchProvider, setSearchProvider } = useSearchPreference();
+  const { 
+    chatProvider, setChatProvider, 
+    quizProvider, setQuizProvider, 
+    pdfProvider, setPdfProvider,
+    openRouterChatModel, setOpenRouterChatModel,
+    openRouterQuizModel, setOpenRouterQuizModel
+  } = useAiModelPreferences();
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data: modelsData, isLoading: isLoadingModels } = useSWR('https://openrouter.ai/api/v1/models', fetcher);
+  
+  const freeModels = React.useMemo(() => {
+    if (!modelsData?.data) return [];
+    return modelsData.data
+      .filter((model: any) => parseFloat(model.pricing.prompt) === 0 && parseFloat(model.pricing.completion) === 0)
+      .slice(0, 30); // Limit to top 30 to avoid overwhelming UI
+  }, [modelsData]);
 
   return (
     <div className="pb-10 max-w-5xl mx-auto space-y-8">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1/40 p-6 sm:p-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-500/10 via-transparent to-brand-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-slate-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -44,7 +63,7 @@ export default function SettingsPage() {
       <div className="grid gap-8 md:grid-cols-2">
         
         {/* ── Account Information ────────────────────────────────────────────── */}
-        <section className="glass bg-surface-1/40 border border-border/60 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-shadow">
+        <section className="glass bg-surface-1/40 border border-border/60 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 mb-8">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20">
               <FontAwesomeIcon icon={faUserShield} className="text-blue-400 w-5 h-5" />
@@ -76,7 +95,7 @@ export default function SettingsPage() {
         </section>
 
         {/* ── Web Search Preferences ────────────────────────────────────────────── */}
-        <section className="glass bg-surface-1/40 border border-border/60 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-shadow">
+        <section className="glass bg-surface-1/40 border border-border/60 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20">
               <FontAwesomeIcon icon={faGlobe} className="text-cyan-400 w-5 h-5" />
@@ -106,7 +125,7 @@ export default function SettingsPage() {
         </section>
 
         {/* ── AI Intelligence Engine ────────────────────────────────────────────── */}
-        <section className="md:col-span-2 glass bg-surface-1/40 border border-border/60 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-shadow">
+        <section className="md:col-span-2 glass bg-surface-1/40 border border-border/60 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/10 border border-brand-500/20">
               <FontAwesomeIcon icon={faRobot} className="text-brand-400 w-5 h-5" />
@@ -116,10 +135,109 @@ export default function SettingsPage() {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <p className="text-base text-muted leading-relaxed">
-              StudyMate AI is exclusively powered by <strong>Google Gemini</strong>. This provides state-of-the-art performance for RAG chat, automated document chunking, and adaptive quiz generation without requiring manual model selection.
-            </p>
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            <div className="space-y-6">
+              <p className="text-base text-muted leading-relaxed">
+                Customize the underlying LLM providers for different features. While Gemini provides state-of-the-art performance out-of-the-box, you can switch to OpenRouter or NVIDIA models if you prefer.
+              </p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-1.5">Chat Provider</label>
+                  <div className="p-1 rounded-xl bg-surface-2 border border-border/50">
+                    <Select value={chatProvider} onValueChange={(val) => setChatProvider(val as AIProvider)}>
+                      <SelectTrigger className="w-full bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Gemini">Gemini (Recommended)</SelectItem>
+                        <SelectItem value="OpenRouter">OpenRouter</SelectItem>
+                        <SelectItem value="NVIDIA">NVIDIA</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {chatProvider === 'OpenRouter' && (
+                    <div className="mt-3 p-1 rounded-xl bg-surface-2/50 border border-border/30 pl-4 border-l-4 border-l-brand-500">
+                      <label className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
+                      <Select 
+                        value={openRouterChatModel || ''} 
+                        onValueChange={setOpenRouterChatModel}
+                        disabled={isLoadingModels}
+                      >
+                        <SelectTrigger className="w-full h-10 bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
+                          <SelectValue placeholder={isLoadingModels ? "Loading models..." : "Choose a free model"} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {freeModels.map((model: any) => (
+                            <SelectItem key={model.id} value={model.id}>
+                              {model.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-1.5">Quiz Generation Provider</label>
+                  <div className="p-1 rounded-xl bg-surface-2 border border-border/50">
+                    <Select value={quizProvider} onValueChange={(val) => setQuizProvider(val as AIProvider)}>
+                      <SelectTrigger className="w-full bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Gemini">Gemini (Recommended)</SelectItem>
+                        <SelectItem value="OpenRouter">OpenRouter</SelectItem>
+                        <SelectItem value="NVIDIA">NVIDIA</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {quizProvider === 'OpenRouter' && (
+                    <div className="mt-3 p-1 rounded-xl bg-surface-2/50 border border-border/30 pl-4 border-l-4 border-l-brand-500">
+                      <label className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
+                      <Select 
+                        value={openRouterQuizModel || ''} 
+                        onValueChange={setOpenRouterQuizModel}
+                        disabled={isLoadingModels}
+                      >
+                        <SelectTrigger className="w-full h-10 bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
+                          <SelectValue placeholder={isLoadingModels ? "Loading models..." : "Choose a free model"} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {freeModels.map((model: any) => (
+                            <SelectItem key={model.id} value={model.id}>
+                              {model.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-1.5 flex items-center gap-2">
+                    PDF OCR Provider
+                    <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400">Fallback</span>
+                  </label>
+                  <div className="p-1 rounded-xl bg-surface-2 border border-border/50">
+                    <Select value={pdfProvider} onValueChange={(val) => setPdfProvider(val as AIProvider)}>
+                      <SelectTrigger className="w-full bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Gemini">Gemini</SelectItem>
+                        <SelectItem value="OpenRouter">OpenRouter</SelectItem>
+                        <SelectItem value="NVIDIA">NVIDIA (Recommended)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             <div className="p-6 rounded-2xl bg-brand-500/5 border border-brand-500/20 flex flex-col items-center justify-center text-center">
               <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-brand-500/20 mb-4">

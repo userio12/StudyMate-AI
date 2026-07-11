@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
 import { useDocuments } from '@/hooks/use-documents';
+import { useAiModelPreferences } from '@/hooks/use-ai-models';
 
 const trustToDifficulty: Record<string, DifficultyLevel> = {
   stranger: 'beginner',
@@ -27,6 +28,7 @@ export default function QuizPage() {
   const { quizzes, isLoading, mutate, updateQuiz, deleteQuiz } = useQuizzes();
   const { documents } = useDocuments();
   const { trustLevel, persona } = useTrustLevel();
+  const { quizProvider, openRouterQuizModel } = useAiModelPreferences();
   const api = useApiClient();
   
   const [modalOpen, setModalOpen] = useState(false);
@@ -41,7 +43,7 @@ export default function QuizPage() {
     adaptive: 'Adaptive',
   };
 
-  const handleGenerate = async (difficulty: DifficultyLevel) => {
+  const handleGenerate = async (difficulty: DifficultyLevel, topic?: string, questionCount?: number) => {
     const readyDocs = documents.filter((d) => d.status === 'ready');
     if (readyDocs.length === 0) {
       toast.error('Upload and process at least one document first');
@@ -54,6 +56,10 @@ export default function QuizPage() {
       await api.post('/quiz/generate', {
         documentIds: readyDocs.map((d) => d.id),
         difficulty,
+        questionCount,
+        topic,
+        quizProvider,
+        quizModel: openRouterQuizModel,
       });
       await mutate();
       toast.success(`Quiz generated at ${difficultyLabel[difficulty]} level`);
@@ -69,7 +75,7 @@ export default function QuizPage() {
     <div className="pb-10">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1/40 p-6 sm:p-10 mb-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 mb-10 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-brand-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -99,7 +105,7 @@ export default function QuizPage() {
           <div className="w-full lg:w-auto shrink-0">
             <button 
               onClick={() => setModalOpen(true)}
-              className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-10 py-5 text-lg font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] overflow-hidden border-0"
+              className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-base font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] overflow-hidden border-0"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1.5s_infinite]" />
               <FontAwesomeIcon icon={faPlus} className="w-5 h-5 transition-transform duration-300 group-hover/btn:rotate-90" />
@@ -138,7 +144,7 @@ export default function QuizPage() {
             </p>
           </div>
         ) : quizzes.length === 0 ? (
-          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onClick={() => setModalOpen(true)}>
+          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-2xl md:rounded-3xl border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onClick={() => setModalOpen(true)}>
             <div className="rounded-2xl bg-violet-500/10 p-5 border border-violet-500/20">
               <FontAwesomeIcon icon={faGraduationCap} className="text-violet-400 w-8 h-8" />
             </div>

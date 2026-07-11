@@ -41,7 +41,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate.
   };
 
   return (
-    <div className="relative flex w-full items-end gap-3 rounded-3xl bg-surface-1 border border-border/60 p-2 shadow-sm transition-all duration-300 focus-within:border-border focus-within:shadow-md">
+    <div className="relative flex w-full items-end gap-2 rounded-2xl bg-surface-2 border border-border/40 p-1.5 transition-all duration-300 focus-within:border-brand-500/50 focus-within:ring-1 focus-within:ring-brand-500/20">
       <textarea
         ref={textareaRef}
         value={value}
@@ -51,7 +51,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate.
         placeholder={placeholder}
         rows={1}
         disabled={isLoading}
-        className="max-h-[200px] min-h-[44px] flex-1 resize-none bg-transparent px-4 py-3 text-base text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
+        className="max-h-[200px] min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
         aria-label="Chat input"
       />
 
@@ -59,9 +59,9 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate.
         onClick={handleSend}
         disabled={!value.trim() || isLoading}
         className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-200 mb-0.5 mr-0.5',
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 mb-0.5 mr-0.5',
           value.trim() && !isLoading
-            ? 'bg-foreground text-surface hover:scale-105 active:scale-95 shadow-sm'
+            ? 'bg-foreground text-background hover:bg-foreground/90 active:scale-95'
             : 'bg-surface-2 text-muted cursor-not-allowed opacity-70',
         )}
         aria-label="Send message"
@@ -69,7 +69,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate.
         {isLoading ? (
           <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" />
         ) : (
-          <FontAwesomeIcon icon={faArrowUp} className="w-5 h-5" />
+          <FontAwesomeIcon icon={faArrowUp} className="w-[18px] h-[18px]" />
         )}
       </button>
     </div>

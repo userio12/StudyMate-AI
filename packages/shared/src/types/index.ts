@@ -168,6 +168,8 @@ export type CreateConversationDto = z.infer<typeof CreateConversationSchema>;
 export const SendMessageSchema = z.object({
   content: z.string().min(1).max(10000),
   searchProvider: z.enum(['duckduckgo', 'tavily', 'off']).optional(),
+  chatProvider: z.enum(['Gemini', 'OpenRouter', 'NVIDIA']).optional(),
+  chatModel: z.string().optional(),
 });
 export type SendMessageDto = z.infer<typeof SendMessageSchema>;
 
@@ -175,8 +177,16 @@ export const GenerateQuizSchema = z.object({
   documentIds: z.array(z.string().uuid()).min(1, 'At least one document is required'),
   difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'adaptive']),
   questionCount: z.number().int().positive().max(50).optional(),
+  topic: z.string().max(100).optional(),
+  quizProvider: z.enum(['Gemini', 'OpenRouter', 'NVIDIA']).optional(),
+  quizModel: z.string().optional(),
 });
 export type GenerateQuizDto = z.infer<typeof GenerateQuizSchema>;
+
+export const ProcessDocumentSchema = z.object({
+  pdfProvider: z.enum(['Gemini', 'OpenRouter', 'NVIDIA']).optional(),
+});
+export type ProcessDocumentDto = z.infer<typeof ProcessDocumentSchema>;
 
 export const SubmitAttemptSchema = z.object({
   answers: z.record(z.string(), z.string()),

@@ -76,10 +76,10 @@ export function ConversationList({
     <div className="space-y-1">
       <button
         onClick={onCreate}
-        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] text-muted hover:bg-surface-hover hover:text-foreground border border-transparent"
+        className="flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] text-muted hover:bg-surface-hover hover:text-foreground border border-transparent"
       >
         <FontAwesomeIcon icon={faPlus} className="shrink-0 w-[18px] h-[18px] text-brand-300" />
-        New chat
+        <span className="truncate min-w-0 flex-1 text-left">New chat</span>
       </button>
 
       <div className="mt-2 space-y-0.5">
@@ -91,27 +91,31 @@ export function ConversationList({
               href={`/chat/${conv.id}`}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                'min-h-[44px]',
+                'relative group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                'min-h-[44px] overflow-hidden',
                 active
                   ? 'bg-brand-500/10 text-brand-400 font-medium'
                   : 'text-muted hover:bg-surface-hover hover:text-foreground',
               )}
             >
               <FontAwesomeIcon icon={faCommentDots} className="shrink-0 w-4 h-4" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate flex items-center gap-2">
-                  {conv.isPinned && <FontAwesomeIcon icon={faThumbtack} className="w-3 h-3 text-brand-500" />}
-                  {conv.title}
-                </p>
+              <div className="min-w-0 flex-1 pr-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  {conv.isPinned && <FontAwesomeIcon icon={faThumbtack} className="shrink-0 w-3 h-3 text-brand-500" />}
+                  <p className="truncate min-w-0 flex-1">{conv.title}</p>
+                </div>
                 {conv.lastMessageAt && (
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-muted truncate min-w-0">
                     {formatRelativeTime(conv.lastMessageAt)}
                   </p>
                 )}
               </div>
               
-              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className={cn(
+                "absolute right-2 flex items-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity",
+                active ? 'bg-surface-2' : 'bg-surface-hover',
+                "rounded-md pl-1"
+              )}>
                 <button
                   onClick={(e) => {
                     e.preventDefault();

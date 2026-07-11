@@ -14,11 +14,11 @@ export class QuizService {
     private scorer: QuizScorerService,
   ) {}
 
-  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = DEFAULT_QUIZ_QUESTION_COUNT) {
+  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = DEFAULT_QUIZ_QUESTION_COUNT, customTopic?: string, quizProvider?: string, quizModel?: string) {
     const userRecord = await this.db.db!.query.users.findFirst({
       where: eq(users.id, userId),
     });
-    const preferredModel = (userRecord?.metadata as any)?.preferredModel as string | undefined;
+    const preferredModel = quizProvider || (userRecord?.metadata as any)?.preferredModel as string | undefined;
 
     let resolvedDifficulty = difficulty;
     let adaptiveContext: string | undefined = undefined;
@@ -52,7 +52,7 @@ export class QuizService {
       }
     }
 
-    const questions = await this.generator.generate(documentIds, resolvedDifficulty, preferredModel, questionCount, adaptiveContext);
+    const quizData = await this.generator.generate(documentIds, resolvedDifficulty, preferredModel, questionCount, adaptiveContext, customTopic, quizModel);
 
     const quizId = crypto.randomUUID();
 
@@ -60,14 +60,14 @@ export class QuizService {
       await tx.insert(quizzes).values({
         id: quizId,
         userId,
-        title: `Quiz on ${resolvedDifficulty} difficulty`,
+        title: customTopic || quizData.topic,
         documentIds,
         difficulty: resolvedDifficulty as 'beginner' | 'intermediate' | 'advanced',
-        questionCount: questions.length,
+        questionCount: quizData.questions.length,
       });
 
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i]!;
+      for (let i = 0; i < quizData.questions.length; i++) {
+        const q = quizData.questions[i]!;
         await tx.insert(quizQuestions).values({
           id: crypto.randomUUID(),
           quizId,
@@ -81,7 +81,7 @@ export class QuizService {
       }
     });
 
-    return { id: quizId, questionCount: questions.length };
+    return { id: quizId, questionCount: quizData.questions.length };
   }
 
   async listQuizzes(userId: string, limit = 20, offset = 0) {
@@ -171,7 +171,10 @@ export class QuizService {
       where: eq(quizQuestions.quizId, quizId),
     });
 
-    const result = this.scorer.score(questions, answers);
+    const result = this.scorer.score(
+      questions.map(q => ({ ...q, options: (q.options as string[]) ?? [] })),
+      answers
+    );
 
     await this.db.db!
       .update(quizAttempts)

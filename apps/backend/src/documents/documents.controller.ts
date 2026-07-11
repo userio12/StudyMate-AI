@@ -3,7 +3,7 @@ import { DocumentsService } from './documents.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 import { CreateUploadUrlSchema, type CreateUploadUrlDto } from './dto/create-upload-url.dto.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
-import { PaginationSchema, type Pagination } from '@studymate/shared';
+import { PaginationSchema, type Pagination, ProcessDocumentSchema, type ProcessDocumentDto } from '@studymate/shared';
 
 @Controller('documents')
 export class DocumentsController {
@@ -21,10 +21,11 @@ export class DocumentsController {
   @HttpCode(HttpStatus.ACCEPTED)
   async processDocument(
     @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodValidationPipe(ProcessDocumentSchema)) body: ProcessDocumentDto,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     // Start processing in the background to avoid timeouts
-    this.documentsService.processDocument(id, user.userId).catch((err) => {
+    this.documentsService.processDocument(id, user.userId, body.pdfProvider).catch((err) => {
       console.error(`Background processing failed for document ${id}:`, err);
     });
 

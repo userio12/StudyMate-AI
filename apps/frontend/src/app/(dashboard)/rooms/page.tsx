@@ -67,7 +67,7 @@ export default function RoomsPage() {
     <div className="pb-10">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1/40 p-6 sm:p-10 mb-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 mb-10 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -111,7 +111,7 @@ export default function RoomsPage() {
           <div className="w-full lg:w-auto shrink-0 flex flex-col gap-3">
             <button 
               onClick={() => { setShowCreate(true); setShowJoin(false); }}
-              className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-4 text-base font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] overflow-hidden border-0"
+              className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-sm font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] overflow-hidden border-0"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1.5s_infinite]" />
               <FontAwesomeIcon icon={faPlus} className="w-4 h-4 transition-transform duration-300 group-hover/btn:rotate-90" />
@@ -120,7 +120,7 @@ export default function RoomsPage() {
 
             <button 
               onClick={() => { setShowJoin(true); setShowCreate(false); }}
-              className="w-full lg:w-auto group/btn2 inline-flex items-center justify-center gap-3 rounded-2xl border border-emerald-500/30 bg-surface-2/50 px-8 py-4 text-base font-bold text-foreground transition-all duration-300 hover:bg-emerald-500/10 hover:border-emerald-500/50 backdrop-blur-sm"
+              className="w-full lg:w-auto group/btn2 inline-flex items-center justify-center gap-3 rounded-2xl border border-emerald-500/30 bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-emerald-500/10 hover:border-emerald-500/50 backdrop-blur-sm"
             >
               <FontAwesomeIcon icon={faRightToBracket} className="w-4 h-4 text-emerald-400 transition-transform duration-300 group-hover/btn2:translate-x-1" />
               Join with Code
@@ -195,7 +195,7 @@ export default function RoomsPage() {
             </p>
           </div>
         ) : rooms.length === 0 ? (
-          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-emerald-500/30 transition-colors">
+          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-2xl md:rounded-3xl border-dashed border-2 hover:border-emerald-500/30 transition-colors">
             <div className="rounded-2xl bg-emerald-500/10 p-5 border border-emerald-500/20">
               <FontAwesomeIcon icon={faUsers} className="text-emerald-400 w-8 h-8" />
             </div>

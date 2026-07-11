@@ -33,20 +33,20 @@ export function RoomCard({ id, name, inviteCode, createdAt, isOwner, onDelete }:
   return (
     <Link
       href={`/rooms/${id}`}
-      className="glass-card group block px-6 py-5 hover:border-border-bright hover:bg-surface-2 hover:shadow-md transition-all duration-300"
+      className="glass-card group block px-5 py-4 hover:border-border-bright hover:bg-surface-2 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1 min-w-0">
           {/* Gradient avatar */}
-          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${grad} text-white text-sm font-bold brand-glow group-hover:scale-105 transition-transform duration-300`}>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${grad} text-white text-[13px] font-bold brand-glow group-hover:scale-105 transition-transform duration-300`}>
             {initials}
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col justify-center">
-            <h3 className="text-base font-bold text-foreground group-hover:text-cyan-400 transition-colors truncate leading-tight">
+            <h3 className="text-[15px] font-bold text-foreground group-hover:text-cyan-400 transition-colors truncate leading-tight">
               {name}
             </h3>
-            <div className="mt-1.5 flex items-center gap-3 text-xs text-muted">
+            <div className="mt-1 flex items-center gap-3 text-xs text-muted">
               <span className="font-mono bg-surface-2 border border-border px-1.5 py-0.5 rounded text-foreground">
                 {inviteCode}
               </span>

@@ -15,6 +15,10 @@ class MockEmbeddings {
   embedBatch = async (texts: string[]) => texts.map(() => Array(768).fill(0.1));
 }
 
+class MockAiService {
+  executeWithFallback = async (fn: any) => fn({}, 'Mock');
+}
+
 describe('PdfProcessorService', () => {
   let service: PdfProcessorService;
 
@@ -22,7 +26,8 @@ describe('PdfProcessorService', () => {
     const db = new MockDb() as any;
     const storage = new MockStorage() as any;
     const embeddings = new MockEmbeddings() as any;
-    service = new PdfProcessorService(db, storage, embeddings);
+    const ai = new MockAiService() as any;
+    service = new PdfProcessorService(db, storage, embeddings, ai);
   });
 
   describe('semanticChunk', () => {

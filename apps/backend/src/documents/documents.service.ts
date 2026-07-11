@@ -34,7 +34,7 @@ export class DocumentsService {
     return { id, uploadUrl, s3Key };
   }
 
-  async processDocument(id: string, userId: string) {
+  async processDocument(id: string, userId: string, pdfProvider?: string) {
     const doc = await this.db.db!.query.documents.findFirst({
       where: eq(documents.id, id),
     });
@@ -48,7 +48,7 @@ export class DocumentsService {
       .where(eq(documents.id, id));
 
     try {
-      await this.pdfProcessor.processDocument(id);
+      await this.pdfProcessor.processDocument(id, pdfProvider);
     } catch {
       await this.db.db!
         .update(documents)

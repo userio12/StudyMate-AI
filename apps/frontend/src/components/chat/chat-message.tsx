@@ -33,7 +33,7 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
       <div className={cn('max-w-[75%]', isUser && 'order-first')}>
         <div
           className={cn(
-            'rounded-2xl px-5 py-3.5 text-[15px] leading-relaxed shadow-sm',
+            'rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm',
             isUser
               ? 'bg-brand-500 text-white'
               : 'bg-surface-2 border border-border/40 text-foreground',

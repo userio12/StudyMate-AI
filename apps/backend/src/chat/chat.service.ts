@@ -64,6 +64,8 @@ export class ChatService {
     content: string,
     userId: string,
     searchProvider: 'duckduckgo' | 'tavily' | 'off' | undefined,
+    chatProvider: string | undefined,
+    chatModel: string | undefined,
     onToken: (token: string) => void,
     signal?: AbortSignal,
   ): Promise<string> {
@@ -99,6 +101,8 @@ export class ChatService {
       history,
       contextChunks.map((c) => c.content),
       searchProvider,
+      chatProvider,
+      chatModel,
       signal,
     )) {
       fullResponse.push(token);

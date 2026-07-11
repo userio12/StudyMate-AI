@@ -3,6 +3,7 @@
 import { UploadZone } from '@/components/documents/upload-zone';
 import { DocumentCard } from '@/components/documents/document-card';
 import { useDocuments } from '@/hooks/use-documents';
+import { useAiModelPreferences } from '@/hooks/use-ai-models';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faFileLines, faFolderOpen, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { handleApiError } from '@/lib/error-handler';
@@ -11,6 +12,7 @@ import { useApiClient } from '@/lib/api-client';
 
 export default function DocumentsPage() {
   const { documents, isLoading, mutate, deleteDocument, updateDocument } = useDocuments();
+  const { pdfProvider } = useAiModelPreferences();
   const api = useApiClient();
 
   const handleUpload = async (file: File, onProgress?: (progress: number) => void) => {
@@ -38,7 +40,7 @@ export default function DocumentsPage() {
       if (onProgress) onProgress(100);
 
       // Kick off processing in the background (returns immediately)
-      await api.post(`/documents/${id}/process`);
+      await api.post(`/documents/${id}/process`, { pdfProvider });
 
       // Immediately refresh the document list so SWR sees the 'processing' doc
       // and starts polling every 3s to track real progress via DocumentCard.
@@ -55,7 +57,7 @@ export default function DocumentsPage() {
     <div className="pb-10">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1/40 p-6 sm:p-10 mb-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 mb-10 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-brand-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-cyan-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -103,7 +105,7 @@ export default function DocumentsPage() {
             </p>
           </div>
         ) : documents.length === 0 ? (
-          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-[2rem] border-dashed border-2 hover:border-cyan-500/30 transition-colors">
+          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-2xl md:rounded-3xl border-dashed border-2 hover:border-cyan-500/30 transition-colors">
             <div className="rounded-2xl bg-cyan-500/10 p-5 border border-cyan-500/20">
               <FontAwesomeIcon icon={faUpload} className="text-cyan-400 w-8 h-8" />
             </div>

@@ -10,10 +10,10 @@ export class QuizController {
 
   @Post('generate')
   generateQuiz(
-    @Body(new ZodValidationPipe(GenerateQuizSchema)) body: { documentIds: string[]; difficulty: string; questionCount?: number },
+    @Body(new ZodValidationPipe(GenerateQuizSchema)) body: { documentIds: string[]; difficulty: string; questionCount?: number; topic?: string; quizProvider?: string; quizModel?: string },
     @CurrentUser() user: CurrentUserPayload,
   ) {
-    return this.quizService.generateQuiz(body.documentIds, body.difficulty, user.userId, body.questionCount);
+    return this.quizService.generateQuiz(body.documentIds, body.difficulty, user.userId, body.questionCount, body.topic, body.quizProvider, body.quizModel);
   }
 
   @Get('list')

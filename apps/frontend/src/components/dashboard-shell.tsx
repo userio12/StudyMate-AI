@@ -32,7 +32,7 @@ export function DashboardSidebar({ children, className }: { children: ReactNode;
       <aside
         className={cn(
           // Always visible on desktop — floating panel with margins
-          'fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col p-4',
+          'fixed left-0 top-0 z-40 flex h-screen w-60 flex-col p-4',
           // Mobile: slide in/out
           'transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)]',
           '-translate-x-full lg:translate-x-0',
@@ -53,7 +53,7 @@ export function DashboardNavbar({ children, className }: { children: ReactNode; 
   return (
     <header
       className={cn(
-        'sticky top-0 z-20 flex h-20 items-center gap-4 px-6',
+        'sticky top-0 z-20 flex h-16 items-center gap-4 px-6',
         className,
       )}
     >
@@ -65,7 +65,7 @@ export function DashboardNavbar({ children, className }: { children: ReactNode; 
 /** Main content area — offset by sidebar width on desktop */
 export function DashboardContent({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex flex-1 flex-col lg:ml-[260px]', className)}>
+    <div className={cn('flex flex-1 flex-col lg:ml-60', className)}>
       {children}
     </div>
   );

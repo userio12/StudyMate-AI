@@ -6,10 +6,10 @@ import { AiService } from '../ai/ai.service.js';
 import { chunks, documents } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import { MAX_CHUNK_LENGTH, CHUNK_OVERLAP } from '@studymate/shared';
-// @ts-ignore
-import pdfParse from 'pdf-parse/lib/pdf-parse.js';
-
-@Injectable()
+import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { convert } from '@opendataloader/pdf';@Injectable()
 export class PdfProcessorService {
   private readonly logger = new Logger(PdfProcessorService.name);
 
@@ -20,7 +20,7 @@ export class PdfProcessorService {
     private ai: AiService,
   ) {}
 
-  async processDocument(docId: string) {
+  async processDocument(docId: string, pdfProvider?: string) {
     try {
       this.logger.log(`[PdfProcessorService] Starting processing for document ID: ${docId}`);
       
@@ -36,7 +36,7 @@ export class PdfProcessorService {
       const downloadUrl = await this.storage.generateDownloadUrl(doc.s3Key);
       
       this.logger.log(`[PdfProcessorService] Extracting text from PDF (using pdf-parse)`);
-      const text = await this.extractText(downloadUrl);
+      const text = await this.extractText(downloadUrl, pdfProvider);
       
       this.logger.log(`[PdfProcessorService] Text extracted successfully. Extracted length: ${text.length} characters.`);
       
@@ -93,7 +93,10 @@ export class PdfProcessorService {
     }
   }
 
-  private async extractText(url: string): Promise<string> {
+  private async extractText(url: string, pdfProvider?: string): Promise<string> {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'studymate-pdf-'));
+    const tempFilePath = path.join(tempDir, 'document.pdf');
+    
     try {
       const response = await fetch(url);
       
@@ -102,26 +105,34 @@ export class PdfProcessorService {
       }
       
       const buffer = await response.arrayBuffer();
+      await fs.writeFile(tempFilePath, Buffer.from(buffer));
       
-      // Try extracting text using pdf-parse first as it's much faster
-      const data = await pdfParse(Buffer.from(buffer));
-      let text = data.text.trim();
-      
-      // If pdf-parse failed to extract meaningful text, it's likely an image-based PDF
-      // Fallback to OCR using NVIDIA's Llama 3.2 90B Vision Instruct
+      this.logger.log(`[PdfProcessorService] Extracting text using @opendataloader/pdf...`);
+      // Use deterministic layout-aware extraction to Markdown
+      const markdown = await convert(tempFilePath, { 
+        format: 'markdown', 
+        toStdout: true, 
+        quiet: true,
+      });
+      let text = markdown.trim();
+
+      // If opendataloader-pdf extracted little to no text, it's likely an image-based PDF.
+      // Fallback to OCR by rendering the PDF to images using pdfjs-dist
       if (text.length < 50) {
-         this.logger.warn(`[PdfProcessorService] Extracted text is too short or empty. Falling back to OCR using LLaMA Vision via NVIDIA...`);
-         text = await this.performOCR(Buffer.from(buffer));
+        this.logger.warn(`[PdfProcessorService] Extracted text is too short or empty. Falling back to OCR...`);
+        text = await this.performOCR(Buffer.from(buffer), pdfProvider);
       }
       
       return text;
     } catch (error) {
       this.logger.error('PDF Text Extraction Error:', error);
       throw new Error(`PDF text extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
     }
   }
 
-  private async performOCR(buffer: Buffer): Promise<string> {
+  private async performOCR(buffer: Buffer, pdfProvider?: string): Promise<string> {
     try {
       this.logger.log(`[PdfProcessorService] Rendering PDF to images for OCR...`);
       const { createCanvas } = await import('@napi-rs/canvas');
@@ -165,16 +176,14 @@ export class PdfProcessorService {
         await page.render({
           canvasContext: canvasAndContext.context,
           viewport: viewport,
-          // @ts-ignore - canvasFactory is an internal property used for Node.js rendering
+          // @ts-ignore
           canvasFactory: canvasFactory,
         }).promise;
 
         const base64Image = canvasAndContext.canvas.toDataURL('image/jpeg');
         
-        // Call Nvidia Llama 3.2 90B Vision Instruct
         const pageText = await this.ai.executeWithFallback(async (client, providerName) => {
-           // We explicitly want to use NVIDIA for OCR. If the fallback hits OpenRouter, we can try its 11B version.
-           let visionModel = 'meta/llama-3.2-90b-vision-instruct'; // NVIDIA's default
+           let visionModel = 'meta/llama-3.2-90b-vision-instruct'; 
            if (providerName === 'OpenRouter') {
              visionModel = 'meta-llama/llama-3.2-11b-vision-instruct'; 
            } else if (providerName === 'Gemini') {
@@ -195,7 +204,7 @@ export class PdfProcessorService {
              ]
            });
            return response.choices[0]?.message?.content || '';
-        }, 'OCR Extraction', 'NVIDIA');
+        }, 'OCR Extraction', (pdfProvider as 'OpenRouter' | 'Gemini' | 'NVIDIA' | undefined) || 'Gemini');
         
         fullText += `\n\n[Page ${i}]\n${pageText}\n`;
       }

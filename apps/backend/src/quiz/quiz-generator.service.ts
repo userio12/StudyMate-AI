@@ -23,6 +23,8 @@ export class QuizGeneratorService {
     preferredModel: string = CHAT_MODEL,
     count: number = DEFAULT_QUIZ_QUESTION_COUNT,
     adaptiveContext?: string,
+    customTopic?: string,
+    quizModel?: string,
   ) {
     if (documentIds.length === 0) {
       throw new Error('At least one document ID is required to generate a quiz.');
@@ -44,6 +46,7 @@ Using ONLY the following context from the user's documents, generate ${count} mu
 The difficulty level should be: ${difficulty.toUpperCase()}.
 ${difficulty === 'advanced' ? 'CRITICAL: Since this is an ADVANCED quiz, questions must be highly challenging, focusing on deep synthesis, edge cases, and complex applications of the material. Do not ask simple definitional questions.' : ''}
 ${adaptiveContext ? `\nADAPTIVE INSTRUCTION based on user's past performance:\n${adaptiveContext}\n` : ''}
+${customTopic ? `\nSPECIAL INSTRUCTION: Generate questions STRICTLY focusing on the following specific topic requested by the user: "${customTopic}". Ignore other concepts in the text unless they are directly related to this topic.\n` : ''}
 Context:
 ${context}
 
@@ -56,51 +59,60 @@ Rules:
 6. You MUST return ONLY a valid JSON array of objects, with no markdown formatting, no code blocks, and no extra text.
 
 Format:
-[
-  {
-    "question": "What is the main concept?",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctOptionIndex": 1,
-    "explanation": "Option B is correct because the text states..."
-  }
-]`;
+{
+  "topic": "Machine Learning Fundamentals",
+  "questions": [
+    {
+      "question": "What is the main concept?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctOptionIndex": 1,
+      "explanation": "Option B is correct because the text states..."
+    }
+  ]
+}`;
 
     let retries = 2;
 
     while (retries >= 0) {
       try {
-        console.log(`[QuizGeneratorService] Generating quiz using Gemini... (retries left: ${retries})`);
-        
-        if (!this.ai.geminiClient) {
-           throw new Error('Gemini API key is not configured!');
-        }
+        const text = await this.ai.executeWithFallback(async (client, providerName) => {
+          let modelToUse: string = CHAT_MODEL;
+          if (providerName === 'OpenRouter') {
+            modelToUse = quizModel || CHAT_MODEL;
+          } else if (providerName === 'Gemini') {
+            modelToUse = 'gemini-2.5-flash';
+          } else if (providerName === 'NVIDIA') {
+            modelToUse = 'meta/llama-3.1-8b-instruct';
+          }
 
-        const response = await this.ai.geminiClient.chat.completions.create({
-          model: 'gemini-2.5-flash',
-          messages: [{ role: 'user', content: prompt }],
-        });
+          console.log(`[QuizGeneratorService] Requesting quiz from ${providerName} using model ${modelToUse}`);
+          const response = await client.chat.completions.create({
+            model: modelToUse,
+            messages: [{ role: 'user', content: prompt }],
+          });
+          return response.choices[0]?.message?.content;
+        }, 'Generate Quiz', preferredModel as any || 'Gemini');
 
-        const text = response.choices[0]?.message?.content;
         if (!text) {
           throw new Error('No response from AI');
         }
 
         console.log(`[QuizGeneratorService] Received response from Gemini. Parsing JSON...`);
         const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(cleanedText) as GeneratedQuestion[];
+        const parsed = JSON.parse(cleanedText) as { topic: string; questions: GeneratedQuestion[] };
         
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-          throw new Error('AI returned empty or invalid question array');
+        if (!parsed.topic || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+          throw new Error('AI returned empty or invalid response');
         }
 
-        for (const q of parsed) {
+        for (const q of parsed.questions) {
           if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
               typeof q.correctOptionIndex !== 'number' || !q.explanation) {
             throw new Error('Invalid question format returned by AI');
           }
         }
 
-        return parsed.slice(0, count);
+        return { topic: parsed.topic, questions: parsed.questions.slice(0, count) };
 
       } catch (error: any) {
         retries--;
@@ -110,6 +122,6 @@ Format:
       }
     }
     
-    return [];
+    return { topic: 'Unknown Topic', questions: [] };
   }
 }

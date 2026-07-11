@@ -13,6 +13,8 @@ export class ChatLlmService {
     messages: Array<{ role: string; content: string }>,
     contextChunks: string[],
     searchProvider: 'duckduckgo' | 'tavily' | 'off' = 'duckduckgo',
+    chatProvider?: string,
+    chatModel?: string,
     signal?: AbortSignal,
   ) {
     let webContext = '';
@@ -50,11 +52,18 @@ export class ChatLlmService {
       console.error('[ChatLlmService] Web search error:', err);
     }
 
-    const systemPrompt = `You are StudyMate AI, a highly intelligent and comprehensive study assistant.
-Your goal is to provide deeply informative, step-by-step explanations formatted beautifully in Markdown.
-Always use bullet points, bold text for key terms, and code blocks where appropriate. Do not give short, lazy answers. 
+    const systemPrompt = `You are StudyMate AI, a highly intelligent, encouraging, and patient study mentor tailored for students.
+Your primary goal is to help the student deeply understand the material, not just give them the answers.
+
+Follow these pedagogical guidelines:
+- **Tone:** Be supportive, enthusiastic, and empathetic. Use an encouraging voice that builds the student's confidence.
+- **Clarity:** Break down complex concepts into bite-sized, easy-to-understand pieces. Use relatable analogies where helpful.
+- **Formatting:** Provide beautifully structured answers using Markdown. Utilize bullet points, bold text for key terms, and code blocks to make the content highly readable.
+- **Socratic Method:** When appropriate, gently prompt the student with guiding questions to help them connect the dots themselves.
+- **Thoroughness:** Do not give short, lazy answers. Be comprehensive, but avoid overwhelming walls of text.
+
 Answer the user's questions based on the provided document context and real-time web search results (if any).
-When you use information from the document context, cite the source.
+When you use information from the document context, explicitly cite the source to help the student verify the information.
 
 Document Context:
 ${contextChunks.join('\n\n')}${webContext}`;
@@ -73,7 +82,7 @@ ${contextChunks.join('\n\n')}${webContext}`;
     const stream = await this.ai.executeWithFallback(async (client, providerName) => {
       let modelToUse: string = CHAT_MODEL;
       if (providerName === 'OpenRouter') {
-        modelToUse = CHAT_MODEL;
+        modelToUse = chatModel || CHAT_MODEL;
       } else if (providerName === 'Gemini') {
         modelToUse = 'gemini-2.5-flash'; // fallback specific model for gemini
       } else if (providerName === 'NVIDIA') {
@@ -90,7 +99,7 @@ ${contextChunks.join('\n\n')}${webContext}`;
         },
         { signal: combinedSignal }
       );
-    }, 'Stream Chat', 'OpenRouter');
+    }, 'Stream Chat', chatProvider as any || 'Gemini');
 
     let streamYielded = false;
     for await (const chunk of stream) {

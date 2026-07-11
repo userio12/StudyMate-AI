@@ -52,7 +52,13 @@ export class ClerkAuthService {
     }
 
     if (!user) {
-      const clerkUser = await this.clerk.users.getUser(clerkId);
+      let clerkUser;
+      try {
+        clerkUser = await this.clerk.users.getUser(clerkId);
+      } catch (err) {
+        console.error('Clerk getUser failed:', err);
+        throw new UnauthorizedException('Failed to fetch user from Clerk');
+      }
       const email = clerkUser.emailAddresses[0]?.emailAddress ?? '';
       const name = `${clerkUser.firstName ?? ''} ${clerkUser.lastName ?? ''}`.trim() || null;
       // Start with 1 as this is their first "session" detected by our backend
@@ -83,9 +89,13 @@ export class ClerkAuthService {
         .returning();
 
       // Sync initial sessionCount to Clerk if it wasn't there
-      await this.clerk.users.updateUserMetadata(clerkId, {
-        publicMetadata: { sessionCount },
-      });
+      try {
+        await this.clerk.users.updateUserMetadata(clerkId, {
+          publicMetadata: { sessionCount },
+        });
+      } catch (err) {
+        console.error('Clerk updateUserMetadata failed (initial):', err);
+      }
     } else {
       // Logic to increment session count if it's a new day
       const lastActive = user.lastActiveAt;
@@ -103,9 +113,13 @@ export class ClerkAuthService {
           .where(eq(users.id, user.id));
         
         // Sync to Clerk so frontend useTrustLevel hook gets updated value
-        await this.clerk.users.updateUserMetadata(clerkId, {
-          publicMetadata: { sessionCount: newCount },
-        });
+        try {
+          await this.clerk.users.updateUserMetadata(clerkId, {
+            publicMetadata: { sessionCount: newCount },
+          });
+        } catch (err) {
+          console.error('Clerk updateUserMetadata failed (update):', err);
+        }
         
         user.sessionCount = newCount;
         user.lastActiveAt = now;

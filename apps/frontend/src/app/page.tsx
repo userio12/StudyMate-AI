@@ -48,7 +48,7 @@ export default async function HomePage() {
               Google Gemini 2.0 Flash Integration
             </div>
 
-            <h1 className="font-heading text-5xl font-extrabold leading-[1.1] tracking-tight md:text-7xl lg:text-8xl">
+            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
               <span className="text-foreground">Study smarter</span>
               <br />
               <span className="bg-gradient-to-r from-brand-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm">
@@ -64,7 +64,7 @@ export default async function HomePage() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/sign-up"
-                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-8 py-4 text-sm font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] overflow-hidden w-full sm:w-auto"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] overflow-hidden w-full sm:w-auto"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-brand-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative z-10 flex items-center gap-2">
@@ -75,7 +75,7 @@ export default async function HomePage() {
                 href="https://github.com/userio12/StudyMate-AI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/50 px-8 py-4 text-sm font-semibold text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-surface-2 hover:border-border-bright w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/50 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-surface-2 hover:border-border-bright w-full sm:w-auto"
               >
                 <FontAwesomeIcon icon={faGithub} className="w-5 h-5" /> View on GitHub
               </a>
@@ -97,12 +97,12 @@ export default async function HomePage() {
             </div>
             
             {/* Mock Dashboard UI Showcase */}
-            <div className="mt-20 md:mt-32 relative mx-auto max-w-5xl rounded-[2rem] border border-border/60 bg-surface-1/40 p-2 sm:p-4 backdrop-blur-xl shadow-2xl overflow-hidden group perspective-1000">
+            <div className="mt-20 md:mt-32 relative mx-auto max-w-5xl rounded-2xl md:rounded-3xl border border-border/60 bg-surface-1/40 p-2 sm:p-4 backdrop-blur-xl shadow-2xl overflow-hidden group perspective-1000">
               {/* Animated Border Gradient */}
               <div className="absolute inset-0 bg-gradient-to-br from-brand-500/20 via-transparent to-violet-500/20 opacity-50" />
               
               {/* Inner Window */}
-              <div className="relative rounded-2xl md:rounded-[1.5rem] border border-border bg-[#0a0a0a] shadow-inner overflow-hidden aspect-video flex flex-col transform transition-transform duration-700 ease-out group-hover:scale-[1.01] group-hover:shadow-[0_0_80px_rgba(99,102,241,0.15)]">
+              <div className="relative rounded-[1rem] md:rounded-2xl border border-border bg-[#0a0a0a] shadow-inner overflow-hidden aspect-video flex flex-col transform transition-transform duration-700 ease-out group-hover:scale-[1.01] group-hover:shadow-[0_0_80px_rgba(99,102,241,0.15)]">
                 {/* Mac-style Window header */}
                 <div className="h-12 border-b border-white/5 bg-white/5 flex items-center px-4 gap-2 backdrop-blur-md">
                   <div className="flex gap-2">
@@ -206,15 +206,15 @@ export default async function HomePage() {
         {/* ── Massive Edge-to-Edge CTA ──────────────────────────────────── */}
         <section className="px-4 sm:px-6 py-24 md:py-32">
           <div className="mx-auto max-w-6xl">
-            <div className="relative rounded-[2.5rem] md:rounded-[3.5rem] p-[2px] overflow-hidden group">
+            <div className="relative rounded-2xl md:rounded-3xl p-[2px] overflow-hidden group">
               {/* Spinning gradient border effect */}
               <div className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#6366f1_50%,#000000_100%)] animate-[spin_4s_linear_infinite] opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
               
-              <div className="relative h-full w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-surface-1 px-6 py-16 md:py-24 text-center overflow-hidden">
+              <div className="relative h-full w-full rounded-2xl md:rounded-3xl bg-surface-1 px-6 py-12 md:py-16 text-center overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-brand-500/20 blur-[120px] rounded-full pointer-events-none" />
                 
                 <div className="relative z-10 flex flex-col items-center">
-                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tight max-w-3xl leading-tight">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tight max-w-3xl leading-tight">
                     Ready to revolutionize <br className="hidden md:block" /> your study routine?
                   </h2>
                   <p className="mt-6 md:mt-8 text-lg md:text-xl text-muted font-medium max-w-xl mx-auto">
@@ -224,7 +224,7 @@ export default async function HomePage() {
                   <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
                     <Link
                       href="/sign-up"
-                      className="group inline-flex items-center gap-2 rounded-xl brand-gradient px-8 py-4 text-base font-bold text-white brand-glow transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                      className="group inline-flex items-center gap-2 rounded-xl brand-gradient px-6 py-3 text-sm font-bold text-white brand-glow transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                     >
                       Create your free account <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>

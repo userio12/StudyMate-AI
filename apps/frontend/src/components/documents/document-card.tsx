@@ -94,7 +94,7 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
         }}
       >
         <div className={cn(
-          'glass-card relative overflow-hidden px-6 py-5 transition-all duration-300',
+          'glass-card relative overflow-hidden px-5 py-4 transition-all duration-300',
           isReady && 'hover:bg-surface-2 hover:border-border-bright hover:shadow-md',
         )}>
           {/* Progress Bar */}
@@ -111,12 +111,12 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
             {/* File icon */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className={cn(
-                'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors duration-300',
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors duration-300',
                 isReady ? 'bg-brand-500/10 group-hover:bg-brand-500/20' : isProcessing ? 'bg-brand-500/10' : 'bg-surface-2',
               )}>
                 <FontAwesomeIcon
                   icon={Icon}
-                  className={cn("w-[18px] h-[18px]", cfg.iconClass, cfg.spin && 'animate-spin')}
+                  className={cn("w-4 h-4", cfg.iconClass, cfg.spin && 'animate-spin')}
                 />
               </div>
 

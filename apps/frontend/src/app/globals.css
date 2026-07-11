@@ -98,15 +98,15 @@
   --font-body:    "Plus Jakarta Sans", sans-serif;
   --font-mono:    "JetBrains Mono", monospace;
 
-  /* ── Fluid type scale ── */
-  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
-  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
-  --text-base: clamp(1rem,     0.9rem  + 0.5vw,  1.125rem);
-  --text-lg:   clamp(1.125rem, 1rem    + 0.6vw,  1.375rem);
-  --text-xl:   clamp(1.25rem,  1.1rem  + 0.8vw,  1.75rem);
-  --text-2xl:  clamp(1.75rem,  1.5rem  + 1.5vw,  2.5rem);
-  --text-3xl:  clamp(2.25rem,  2rem    + 2vw,    3.5rem);
-  --text-4xl:  clamp(3rem,     2.5rem  + 3vw,    5rem);
+  /* ── Fluid type scale (reduced for density) ── */
+  --text-xs:   clamp(0.7rem,   0.65rem + 0.15vw, 0.75rem);
+  --text-sm:   clamp(0.8125rem, 0.75rem + 0.2vw,  0.875rem);
+  --text-base: clamp(0.9375rem, 0.85rem + 0.25vw, 1rem);
+  --text-lg:   clamp(1rem,      0.95rem + 0.3vw,  1.125rem);
+  --text-xl:   clamp(1.125rem,  1rem    + 0.4vw,  1.25rem);
+  --text-2xl:  clamp(1.5rem,    1.3rem  + 1vw,    1.875rem);
+  --text-3xl:  clamp(1.875rem,  1.6rem  + 1.5vw,  2.25rem);
+  --text-4xl:  clamp(2.25rem,   1.8rem  + 2vw,    3rem);
 
   /* ── Shadows ── */
   --shadow-sm:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
@@ -116,12 +116,12 @@
   --shadow-cyan:  0 0 20px rgba(6, 182, 212, 0.3);
   --shadow-glow:  0 0 40px rgba(99, 102, 241, 0.2), 0 0 80px rgba(168, 85, 247, 0.1);
 
-  /* ── Radii ── */
-  --radius-sm:   0.375rem;
-  --radius-md:   0.625rem;
-  --radius-lg:   0.875rem;
-  --radius-xl:   1.25rem;
-  --radius-2xl:  1.75rem;
+  /* ── Radii (reduced for less massive corners) ── */
+  --radius-sm:   0.25rem;
+  --radius-md:   0.5rem;
+  --radius-lg:   0.75rem;
+  --radius-xl:   1rem;
+  --radius-2xl:  1.25rem;
   --radius-full: 9999px;
 
   /* ── Transitions ── */
@@ -164,17 +164,17 @@ h1, h2, h3, h4, h5, h6 {
    FLUID TYPOGRAPHY  — maps Tailwind text-* to responsive clamp()
 ───────────────────────────────────────────────────────────── */
 @layer base {
-  .text-xs   { font-size: clamp(0.6875rem, 0.65rem  + 0.15vw, 0.75rem)   !important; }
-  .text-sm   { font-size: clamp(0.75rem,   0.7rem   + 0.2vw,  0.875rem)  !important; }
-  .text-base { font-size: clamp(0.875rem,  0.82rem  + 0.25vw, 1rem)      !important; }
-  .text-lg   { font-size: clamp(0.9375rem, 0.875rem + 0.3vw,  1.125rem)  !important; }
-  .text-xl   { font-size: clamp(1rem,      0.925rem + 0.4vw,  1.25rem)   !important; }
-  .text-2xl  { font-size: clamp(1.25rem,   1.1rem   + 0.7vw,  1.5rem)    !important; }
-  .text-3xl  { font-size: clamp(1.5rem,    1.3rem   + 1vw,    1.875rem)  !important; }
-  .text-4xl  { font-size: clamp(1.75rem,   1.4rem   + 1.5vw,  2.25rem)   !important; }
-  .text-5xl  { font-size: clamp(2rem,      1.5rem   + 2vw,    3rem)      !important; }
-  .text-6xl  { font-size: clamp(2.25rem,   1.6rem   + 2.8vw,  3.75rem)   !important; }
-  .text-7xl  { font-size: clamp(2.5rem,    1.7rem   + 3.5vw,  4.5rem)    !important; }
+  .text-xs   { font-size: clamp(0.7rem,   0.65rem + 0.15vw, 0.75rem)   !important; }
+  .text-sm   { font-size: clamp(0.8125rem, 0.75rem + 0.2vw,  0.875rem)  !important; }
+  .text-base { font-size: clamp(0.9375rem, 0.85rem + 0.25vw, 1rem)      !important; }
+  .text-lg   { font-size: clamp(1rem,      0.95rem + 0.3vw,  1.125rem)  !important; }
+  .text-xl   { font-size: clamp(1.125rem,  1rem    + 0.4vw,  1.25rem)   !important; }
+  .text-2xl  { font-size: clamp(1.5rem,    1.3rem  + 1vw,    1.875rem)  !important; }
+  .text-3xl  { font-size: clamp(1.875rem,  1.6rem  + 1.5vw,  2.25rem)   !important; }
+  .text-4xl  { font-size: clamp(2.25rem,   1.8rem  + 2vw,    3rem)      !important; }
+  .text-5xl  { font-size: clamp(2.75rem,   2.2rem  + 2.5vw,  3.75rem)   !important; }
+  .text-6xl  { font-size: clamp(3.25rem,   2.5rem  + 3vw,    4.5rem)    !important; }
+  .text-7xl  { font-size: clamp(3.75rem,   3rem    + 3.5vw,  5.5rem)    !important; }
 }
 
 /* ─────────────────────────────────────────────────────────────

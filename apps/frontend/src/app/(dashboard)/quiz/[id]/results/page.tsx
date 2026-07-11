@@ -12,6 +12,7 @@ import { useDocuments } from '@/hooks/use-documents';
 import { useApiClient } from '@/lib/api-client';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/error-handler';
+import { useAiModelPreferences } from '@/hooks/use-ai-models';
 import type { DifficultyLevel } from '@studymate/shared';
 import jsPDF from 'jspdf';
 
@@ -30,6 +31,7 @@ function ResultsContent({ quizId }: { quizId: string }) {
   
   const { trustLevel } = useTrustLevel();
   const { documents } = useDocuments();
+  const { quizProvider, openRouterQuizModel } = useAiModelPreferences();
   const api = useApiClient();
   
   const [modalOpen, setModalOpen] = useState(false);
@@ -70,7 +72,7 @@ function ResultsContent({ quizId }: { quizId: string }) {
       
       result.details.forEach((d: any, i: number) => {
         // Check page break
-        if (yPos > 270) {
+        if (yPos > 260) {
           doc.addPage();
           yPos = 20;
         }
@@ -82,19 +84,33 @@ function ResultsContent({ quizId }: { quizId: string }) {
         const textLines = doc.splitTextToSize(`Q${i + 1}: ${d.question}`, 170);
         yPos += (textLines.length * 6) + 2;
         
+        // Print Options
         doc.setFont('helvetica', 'normal');
+        doc.setTextColor('#334155');
+        d.options?.forEach((opt: string, optIdx: number) => {
+          const letter = String.fromCharCode(65 + optIdx);
+          doc.text(`${letter}) ${opt}`, 25, yPos, { maxWidth: 165 });
+          const optLines = doc.splitTextToSize(`${letter}) ${opt}`, 165);
+          yPos += (optLines.length * 6) + 1;
+        });
+        
+        yPos += 2; // Small gap before answers
+
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(d.correct ? '#16a34a' : '#dc2626');
         doc.text(`Your Answer: ${d.userAnswer}`, 25, yPos, { maxWidth: 165 });
-        yPos += 7;
+        const userAnsLines = doc.splitTextToSize(`Your Answer: ${d.userAnswer}`, 165);
+        yPos += (userAnsLines.length * 6) + 1;
         
         if (!d.correct) {
           doc.setTextColor('#16a34a');
           doc.text(`Correct Answer: ${d.correctAnswer}`, 25, yPos, { maxWidth: 165 });
-          yPos += 7;
+          const correctAnsLines = doc.splitTextToSize(`Correct Answer: ${d.correctAnswer}`, 165);
+          yPos += (correctAnsLines.length * 6) + 1;
         }
         
         doc.setTextColor('#000000');
-        yPos += 5; // space between questions
+        yPos += 8; // space between questions
       });
       
       doc.save(`quiz-report-${quizId}.pdf`);
@@ -104,7 +120,7 @@ function ResultsContent({ quizId }: { quizId: string }) {
     }
   };
 
-  const handleGenerateQuiz = async (difficulty: DifficultyLevel) => {
+  const handleGenerateQuiz = async (difficulty: DifficultyLevel, topic?: string) => {
     const readyDocs = documents.filter((d) => d.status === 'ready');
     if (readyDocs.length === 0) {
       toast.error('Upload and process at least one document first');
@@ -117,6 +133,9 @@ function ResultsContent({ quizId }: { quizId: string }) {
       const response = await api.post<{ id: string }>('/quiz/generate', {
         documentIds: readyDocs.map((d) => d.id),
         difficulty,
+        topic,
+        quizProvider,
+        quizModel: openRouterQuizModel,
       });
       toast.success('New quiz generated successfully!');
       setModalOpen(false);

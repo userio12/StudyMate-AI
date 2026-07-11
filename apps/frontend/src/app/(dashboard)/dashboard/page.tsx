@@ -23,17 +23,19 @@ export default function DashboardPage() {
   const firstName = user?.firstName ?? 'there';
   const greeting = getGreeting();
 
-  const activities = (stats?.recentActivity ?? []).map((entry, i) => ({
-    id: `activity-${i}`,
-    type: 'message' as const,
-    description: `${entry.count} conversation${entry.count === 1 ? '' : 's'} on ${entry.date}`,
-    createdAt: entry.date,
-  }));
+  const activities = (stats?.recentActivity ?? [])
+    .slice(0, 3)
+    .map((entry: any) => ({
+      id: entry.id,
+      type: entry.type as 'message' | 'document' | 'quiz' | 'room',
+      description: entry.description,
+      createdAt: new Date(entry.date).toLocaleDateString(),
+    }));
 
   return (
     <article className="space-y-10 pb-10">
       {/* ── Massive Hero Banner ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-surface-1/40 p-8 sm:p-12 md:p-16 shadow-2xl glass group">
+      <header className="relative overflow-hidden rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-12 shadow-2xl glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-violet-500/10 opacity-70" />
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -50,7 +52,7 @@ export default function DashboardPage() {
             {greeting}
           </p>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground mb-6 leading-tight">
             Welcome back, <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-brand-400 to-violet-500 bg-clip-text text-transparent">
               {firstName}
@@ -63,13 +65,13 @@ export default function DashboardPage() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <NextLink href="/documents" className="w-full sm:w-auto">
-              <button className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
+              <button className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
                 <FontAwesomeIcon icon={faFileLines} className="w-4 h-4" /> Upload PDF
               </button>
             </NextLink>
             
             <NextLink href="/chat" className="w-full sm:w-auto">
-              <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-8 py-4 text-sm font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
+              <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
                 <FontAwesomeIcon icon={faCommentDots} className="w-4 h-4 text-brand-400" /> Start Chatting
               </button>
             </NextLink>
@@ -110,9 +112,9 @@ export default function DashboardPage() {
             <NextLink
               key={href}
               href={href}
-              className={`group flex flex-col p-6 md:p-8 rounded-[2rem] border border-border/60 bg-surface-1/40 glass transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl ${color}`}
+              className={`group flex flex-col p-6 rounded-2xl border border-border/60 bg-surface-1/40 glass transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl ${color}`}
             >
-              <div className={`mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl ${bg} transition-transform duration-300 group-hover:scale-110`}>
+              <div className={`mb-6 inline-flex h-10 w-10 items-center justify-center rounded-xl ${bg} transition-transform duration-300 group-hover:scale-110`}>
                 <FontAwesomeIcon icon={icon} className={`text-xl ${iconColor}`} />
               </div>
               <div>
@@ -139,7 +141,7 @@ export default function DashboardPage() {
               icon={<FontAwesomeIcon icon={faFileLines} className="w-5 h-5" />}
               isLoading={isLoading}
               accentColor="cyan"
-              className="flex-1 rounded-[2rem]"
+              className="flex-1 rounded-2xl"
             />
             <StatsCard
               label="Conversations"
@@ -147,13 +149,13 @@ export default function DashboardPage() {
               icon={<FontAwesomeIcon icon={faCommentDots} className="w-5 h-5" />}
               isLoading={isLoading}
               accentColor="brand"
-              className="flex-1 rounded-[2rem]"
+              className="flex-1 rounded-2xl"
             />
           </div>
 
           {/* Recent Activity - Spans 2 columns */}
           <div className="lg:col-span-2">
-            <div className="glass bg-surface-1/40 border border-border/60 rounded-[2.5rem] p-8 h-full flex flex-col">
+            <div className="glass bg-surface-1/40 border border-border/60 rounded-3xl p-6 md:p-8 h-full flex flex-col">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-xl font-extrabold text-foreground tracking-tight">
@@ -171,7 +173,7 @@ export default function DashboardPage() {
 
         {/* Weak Topics - Full Width */}
         <div className="mt-8">
-          <div className="glass bg-surface-1/40 border border-border/60 rounded-[2.5rem] p-8">
+          <div className="glass bg-surface-1/40 border border-border/60 rounded-3xl p-6 md:p-8">
              <WeakTopicsChart data={[]} />
           </div>
         </div>
