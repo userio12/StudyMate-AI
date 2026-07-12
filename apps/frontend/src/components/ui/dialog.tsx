@@ -14,56 +14,54 @@ export function Dialog({
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
 }) {
+  const dialogRef = React.useRef<HTMLDialogElement>(null);
+
   React.useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    
     if (open) {
+      if (!dialog.open) dialog.showModal();
       document.body.style.overflow = 'hidden';
     } else {
+      if (dialog.open) dialog.close();
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  const onOpenChangeRef = React.useRef(onOpenChange);
   React.useEffect(() => {
-    onOpenChangeRef.current = onOpenChange;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const handleClose = () => onOpenChange(false);
+    dialog.addEventListener('close', handleClose);
+    return () => dialog.removeEventListener('close', handleClose);
   }, [onOpenChange]);
 
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onOpenChangeRef.current(false);
-    };
-    if (open) document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [open]);
-
-  if (!open) return null;
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+    if (e.target === dialogRef.current) {
+      onOpenChange(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-        aria-hidden="true"
+    <dialog
+      ref={dialogRef}
+      onClick={handleBackdropClick}
+      className={cn(
+        'glass-card relative z-50 w-full max-w-md p-6 shadow-lg backdrop:bg-black/30 backdrop:backdrop-blur-sm',
+      )}
+      aria-label="Dialog"
+    >
+      <button type="button"
         onClick={() => onOpenChange(false)}
-      />
-      {/* eslint-disable-next-line */}
-      <div
-        className={cn(
-          'glass-card relative z-10 w-full max-w-md p-6 shadow-lg',
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Dialog"
+        className="absolute right-4 top-4 rounded-lg p-1 text-muted hover:bg-surface-hover hover:text-foreground"
+        aria-label="Close dialog"
       >
-        <button type="button"
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 rounded-lg p-1 text-muted hover:bg-surface-hover hover:text-foreground"
-          aria-label="Close dialog"
-        >
-          <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
-        </button>
-        {children}
-      </div>
-    </div>
+        <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
+      </button>
+      {children}
+    </dialog>
   );
 }
 
