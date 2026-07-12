@@ -7,9 +7,10 @@ interface WordRotatorProps {
   words: string[];
   interval?: number;
   className?: string;
+  wrapperClassName?: string;
 }
 
-export function WordRotator({ words, interval = 3000, className }: WordRotatorProps) {
+export function WordRotator({ words, interval = 3000, className, wrapperClassName }: WordRotatorProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export function WordRotator({ words, interval = 3000, className }: WordRotatorPr
   }, [words, interval]);
 
   return (
-    <span className={cn("inline-grid overflow-hidden py-2 -my-2", className)}>
+    <span className={cn("inline-grid overflow-hidden py-2 -my-2", wrapperClassName)}>
       {words.map((word, i) => {
         const isActive = i === index;
         const isPrev = i === (index - 1 + words.length) % words.length;
@@ -33,8 +34,9 @@ export function WordRotator({ words, interval = 3000, className }: WordRotatorPr
               isActive 
                 ? "translate-y-0 opacity-100" 
                 : isPrev 
-                  ? "translate-y-full opacity-0" // Slide down to exit
-                  : "-translate-y-full opacity-0" // Staged above to enter (slide down)
+                  ? "-translate-y-full opacity-0" // Slide up to exit
+                  : "translate-y-full opacity-0", // Staged below to enter (slide up)
+              className
             )}
           >
             {word}
