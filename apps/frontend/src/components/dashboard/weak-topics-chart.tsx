@@ -54,7 +54,7 @@ export function WeakTopicsChart({ data }: WeakTopicsChartProps) {
               : 'from-brand-500 to-violet-500';
 
             return (
-              <div key={i} className="group">
+              <div key={topic} className="group">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm font-medium text-slate-300 truncate max-w-[70%]">{topic}</span>
                   <span className={`text-sm font-bold ${isWeak ? 'text-red-400' : 'text-emerald-400'}`}>

@@ -33,19 +33,19 @@ export function Footer() {
 
             {/* Social Icons */}
             <div className="flex items-center gap-3 mt-auto">
-              <a href="https://github.com/userio12/StudyMate-AI" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
+              <a href="https://github.com/userio12/StudyMate-AI" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
                 <FontAwesomeIcon icon={faGithub} className="w-4 h-4" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
                 <FontAwesomeIcon icon={faTwitter} className="w-4 h-4" />
               </a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" aria-label="Discord" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
                 <FontAwesomeIcon icon={faDiscord} className="w-4 h-4" />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
                 <FontAwesomeIcon icon={faFacebook} className="w-4 h-4" />
               </a>
-              <a href="mailto:hello@studymate.ai" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
+              <a href="mailto:hello@studymate.ai" aria-label="Email" className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 border border-border text-muted transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-500 hover:scale-105">
                 <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4" />
               </a>
             </div>

@@ -80,7 +80,7 @@ export function ScoreCircle({ score, size = 120, showLabel = true }: ScoreCircle
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)' }}
+          style={{ transition: 'stroke-dashoffset 0.7s ease-out' }}
         />
       </svg>
 

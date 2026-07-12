@@ -21,7 +21,7 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
-export const ChatMessage = React.memo(function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
+export function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
   const isUser = role === 'user';
 
   return (
@@ -71,4 +71,4 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
       )}
     </div>
   );
-});
+}

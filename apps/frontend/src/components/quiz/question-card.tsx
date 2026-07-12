@@ -80,7 +80,7 @@ function QuestionCardRoot({
 
               return (
                 <button type="button"
-                  key={i}
+                  key={option}
                   onClick={() => handleSelect(option)}
                   disabled={submitted}
                   className={cn(

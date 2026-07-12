@@ -24,10 +24,12 @@ export function DashboardSidebar({ children, className }: { children: ReactNode;
     <>
       {/* Mobile overlay */}
       {mounted && sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+          <div
+            className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+            role="presentation"
+            aria-hidden="true"
+            onClick={() => setSidebarOpen(false)}
+          />
       )}
       <aside
         className={cn(

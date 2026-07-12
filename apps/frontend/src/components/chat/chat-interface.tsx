@@ -90,7 +90,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
     return () => abortRef.current?.abort();
   }, []);
 
-  const handleSend = useCallback(async (content: string) => {
+  const handleSend = async (content: string) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -130,7 +130,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         abortRef.current = null;
       },
     );
-  }, [conversationId, api, searchProvider, chatProvider, openRouterChatModel]);
+  };
 
   if (messages.length === 0 && !error && !isStreaming) {
     return (
@@ -172,7 +172,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-8">
             {SUGGESTED_PROMPTS.map((item, idx) => (
               <button type="button"
-                key={idx}
+                key={item.title}
                 onClick={() => handleSend(item.prompt)}
                 className={`flex items-start gap-3 p-3.5 rounded-2xl border transition-all duration-300 text-left group ${item.bg}`}
               >

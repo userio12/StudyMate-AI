@@ -134,23 +134,23 @@ export function useRoomChat(roomId: string) {
     }
   }, [presence, isConnected]);
 
-  const sendMessage = useCallback((content: string) => {
+  const sendMessage = (content: string) => {
     socketRef.current?.emit('message:send', { roomId, content });
-  }, [roomId]);
+  };
 
-  const handleTyping = useCallback((typing: boolean) => {
+  const handleTyping = (typing: boolean) => {
     if (typing) {
       socketRef.current?.emit('typing:start', { roomId });
     } else {
       socketRef.current?.emit('typing:stop', { roomId });
     }
-  }, [roomId]);
+  };
 
-  const handleInputChange = useCallback(() => {
+  const handleInputChange = () => {
     handleTyping(true);
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => handleTyping(false), 2000);
-  }, [handleTyping]);
+  };
 
   return {
     messages,

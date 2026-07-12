@@ -38,9 +38,9 @@ export function GenerateQuizModal({
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">
+          <div className="text-sm font-medium text-foreground">
             Difficulty Level
-          </label>
+          </div>
           <Select 
             value={selectedDifficulty} 
             onValueChange={(v) => setSelectedDifficulty(v as DifficultyLevel)}
@@ -71,10 +71,11 @@ export function GenerateQuizModal({
         </div>
 
         <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">
+          <label htmlFor="custom-topic" className="text-sm font-medium text-foreground">
             Custom Topic (Optional)
           </label>
           <input
+            id="custom-topic"
             type="text"
             placeholder="e.g., React Hooks, Mitochondria..."
             value={topic}

@@ -20,57 +20,51 @@ export function UploadZone({
   const [error, setError] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      console.log(`[UploadZone] Starting upload for file: ${file.name} (size: ${file.size} bytes, type: ${file.type})`);
-      if (file.type !== 'application/pdf') {
-        console.error(`[UploadZone] Invalid file type: ${file.type}`);
-        setState('error');
-        setError('Only PDF files are supported');
-        return;
-      }
-      if (file.size > 50 * 1024 * 1024) {
-        console.error(`[UploadZone] File too large: ${file.size} bytes`);
-        setState('error');
-        setError('File must be under 50 MB');
-        return;
-      }
-      setFileName(file.name);
-      setState('uploading');
-      setProgress(0);
-      try {
-        console.log(`[UploadZone] Calling onUpload prop...`);
-        await onUpload(file, (p) => {
-          console.log(`[UploadZone] Upload progress: ${p}%`);
-          setProgress(p);
-          if (p === 100) {
-            console.log(`[UploadZone] Upload reached 100%. Transitioning to processing state.`);
-            setState('processing');
-            // Fake progress for processing phase (goes from 0 to 95)
-            setProgress(0);
-          }
-        });
-        console.log(`[UploadZone] Upload and initial processing initiated successfully.`);
-        setState('success');
-        if (inputRef.current) inputRef.current.value = '';
-      } catch (err) {
-        console.error(`[UploadZone] Upload failed with error:`, err);
-        setState('error');
-        setError(err instanceof Error ? err.message : 'Upload failed');
-      }
-    },
-    [onUpload],
-  );
+  const handleFile = async (file: File) => {
+    console.log(`[UploadZone] Starting upload for file: ${file.name} (size: ${file.size} bytes, type: ${file.type})`);
+    if (file.type !== 'application/pdf') {
+      console.error(`[UploadZone] Invalid file type: ${file.type}`);
+      setState('error');
+      setError('Only PDF files are supported');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      console.error(`[UploadZone] File too large: ${file.size} bytes`);
+      setState('error');
+      setError('File must be under 50 MB');
+      return;
+    }
+    setFileName(file.name);
+    setState('uploading');
+    setProgress(0);
+    try {
+      console.log(`[UploadZone] Calling onUpload prop...`);
+      await onUpload(file, (p) => {
+        console.log(`[UploadZone] Upload progress: ${p}%`);
+        setProgress(p);
+        if (p === 100) {
+          console.log(`[UploadZone] Upload reached 100%. Transitioning to processing state.`);
+          setState('processing');
+          // Fake progress for processing phase (goes from 0 to 95)
+          setProgress(0);
+        }
+      });
+      console.log(`[UploadZone] Upload and initial processing initiated successfully.`);
+      setState('success');
+      if (inputRef.current) inputRef.current.value = '';
+    } catch (err) {
+      console.error(`[UploadZone] Upload failed with error:`, err);
+      setState('error');
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    }
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setState('idle');
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile],
-  );
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setState('idle');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  };
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -96,14 +90,14 @@ export function UploadZone({
     return () => clearTimeout(timeout);
   }, [state]);
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setState('dragging');
-  }, []);
+  };
 
-  const handleDragLeave = useCallback(() => {
+  const handleDragLeave = () => {
     setState('idle');
-  }, []);
+  };
 
   const isDragging = state === 'dragging';
   const isIdle = state === 'idle';
@@ -183,7 +177,7 @@ function UploadStateContent({ state, progress, fileName, error }: { state: Uploa
     case 'dragging':
       return (
         <>
-          <div className="mb-4 flex h-16 w-16 animate-bounce items-center justify-center rounded-2xl bg-brand-500/20">
+          <div className="mb-4 flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl bg-brand-500/20">
             <FontAwesomeIcon icon={faUpload} className="text-brand-300 w-7 h-7" />
           </div>
           <p className="text-base font-semibold text-brand-300">Release to upload</p>

@@ -3,6 +3,7 @@
 import { useUser } from '@clerk/nextjs';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useMounted } from '@/hooks/use-mounted';
+import { formatDate } from '@/lib/utils';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { WeakTopicsChart } from '@/components/dashboard/weak-topics-chart';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
@@ -32,7 +33,7 @@ export default function DashboardPage() {
       id: entry.id,
       type: entry.type as 'message' | 'document' | 'quiz' | 'room',
       description: entry.description,
-      createdAt: mounted ? new Date(entry.date).toLocaleDateString() : '',
+      createdAt: mounted ? formatDate(entry.date) : '',
     }));
 
   return (

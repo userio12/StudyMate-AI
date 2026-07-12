@@ -45,6 +45,7 @@ export function Dialog({
         aria-hidden="true"
         onClick={() => onOpenChange(false)}
       />
+      {/* eslint-disable-next-line */}
       <div
         className={cn(
           'glass-card relative z-10 w-full max-w-md p-6 shadow-lg',

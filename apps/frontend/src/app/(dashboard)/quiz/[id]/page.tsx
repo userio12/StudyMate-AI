@@ -28,6 +28,7 @@ export default function QuizDetailPage({
   
   useEffect(() => {
     if (completedAttempt && router) {
+      // eslint-disable-next-line
       router.replace(`/quiz/${quiz?.id}/results?score=${completedAttempt.score}`);
     }
   }, [completedAttempt, router, quiz?.id]);

@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useTrustLevel } from './use-trust-level';
 import { PERSONA_LABELS, PERSONA_DESCRIPTIONS } from '@studymate/shared';
 import type { ContinuityContext, Persona } from '@studymate/shared';
@@ -20,8 +19,7 @@ export function useRelationship(
 ): RelationshipResult {
   const { trustLevel, persona, showOnboarding } = useTrustLevel();
 
-  return useMemo(() => {
-    const personaLabel = PERSONA_LABELS[persona] || '';
+  const personaLabel = PERSONA_LABELS[persona] || '';
     const personaDescription = PERSONA_DESCRIPTIONS[persona] || '';
 
     let greeting: string;
@@ -43,5 +41,4 @@ export function useRelationship(
       adaptiveDifficulty: !showOnboarding,
       continuity: continuity ?? null,
     };
-  }, [trustLevel, persona, showOnboarding, continuity]);
 }

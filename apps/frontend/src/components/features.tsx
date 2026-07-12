@@ -70,7 +70,7 @@ export function Features() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {coreFeatures.map((feature, idx) => (
             <div 
-              key={idx} 
+              key={feature.title} 
               className={`glass bg-surface-1/40 rounded-3xl border border-border p-8 group transition-all duration-300 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] ${feature.border} hover:-translate-y-1`}
             >
               <div className="flex items-start justify-between mb-6">
