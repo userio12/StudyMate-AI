@@ -5,6 +5,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { Features } from '@/components/features';
 import { LandingNavbar } from '@/components/landing-navbar';
 import { Footer } from '@/components/footer';
+import { WordRotator } from '@/components/word-rotator';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
@@ -49,10 +50,18 @@ export default async function HomePage() {
             </div>
 
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
-              <span className="text-foreground">Study smarter</span>
+              <span className="text-foreground">Upload your notes.</span>
               <br />
-              <span className="bg-gradient-to-r from-brand-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm">
-                with AI that reads your docs
+              <span className="bg-gradient-to-r from-brand-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm inline-flex justify-center mt-2">
+                <WordRotator 
+                  words={[
+                    "Learn it smarter.", 
+                    "Understand it deeper.", 
+                    "Pass your exams.", 
+                    "Remember it longer.", 
+                    "Study more effectively."
+                  ]} 
+                />
               </span>
             </h1>
 
