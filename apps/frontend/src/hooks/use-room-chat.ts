@@ -106,19 +106,16 @@ export function useRoomChat(roomId: string) {
 
     return () => {
       cancelled = true;
-      const s = socketRef.current;
-      if (s) {
-        s.emit('leave:room', { roomId });
-        s.off('message:received');
-        s.off('user:joined');
-        s.off('user:left');
-        s.off('typing:update');
-        s.off('error');
-        s.off('connect');
-        s.off('disconnect');
-        s.off('connect_error');
-        socketRef.current = null;
-      }
+      socket.emit('leave:room', { roomId });
+      socket.off('message:received');
+      socket.off('user:joined');
+      socket.off('user:left');
+      socket.off('typing:update');
+      socket.off('error');
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('connect_error');
+      socketRef.current = null;
       // FIX BUG-27: Only release the socket if we successfully acquired it.
       // Without this guard, a rapid unmount before the async token fetch
       // finishes would decrement refCount without a matching increment.
