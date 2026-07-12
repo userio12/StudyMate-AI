@@ -55,7 +55,7 @@ export default function ChatPage() {
             </p>
             
             {/* Massive Primary Action Button */}
-            <button 
+            <button type="button" 
               onClick={handleCreate} 
               className="group/btn relative inline-flex items-center justify-center gap-3 rounded-xl brand-gradient px-6 py-3 text-base font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] overflow-hidden"
             >

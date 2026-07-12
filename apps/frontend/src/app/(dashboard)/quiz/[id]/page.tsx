@@ -118,7 +118,7 @@ export default function QuizDetailPage({
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
+        <button type="button"
           onClick={handleSubmit}
           disabled={!allAnswered || submitting}
           className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700 disabled:opacity-50"

@@ -16,7 +16,7 @@ export function CitationBadge({ number, title, snippet }: CitationBadgeProps) {
 
   return (
     <span className="relative inline-flex">
-      <button
+      <button type="button"
         onClick={() => setOpen(!open)}
         className={cn(
           'inline-flex min-h-7 min-w-7 items-center justify-center rounded-full text-xs font-medium transition-all duration-200',
@@ -33,7 +33,7 @@ export function CitationBadge({ number, title, snippet }: CitationBadgeProps) {
             <p className="text-xs font-medium text-foreground">
               {title}
             </p>
-            <button
+            <button type="button"
               onClick={() => setOpen(false)}
               className="shrink-0 rounded p-0.5 text-muted hover:bg-surface-2"
               aria-label="Close citation"

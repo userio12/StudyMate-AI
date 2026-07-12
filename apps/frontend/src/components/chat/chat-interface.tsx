@@ -143,7 +143,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
             label={personaLabel}
             description={personaDescription}
           />
-          <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
+          <button type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </button>
         </div>
@@ -171,7 +171,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
           {/* Suggested Prompts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-8">
             {SUGGESTED_PROMPTS.map((item, idx) => (
-              <button
+              <button type="button"
                 key={idx}
                 onClick={() => handleSend(item.prompt)}
                 className={`flex items-start gap-3 p-3.5 rounded-2xl border transition-all duration-300 text-left group ${item.bg}`}
@@ -207,7 +207,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
           label={personaLabel}
           description={personaDescription}
         />
-        <button className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
+        <button type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
           <FontAwesomeIcon icon={faEllipsisVertical} />
         </button>
       </div>
@@ -234,7 +234,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         {error && (
           <div className="glass rounded-2xl p-4 text-sm text-error/90 border border-error/20 flex justify-between items-center bg-error/5">
             <span className="font-medium">{error}</span>
-            <button
+            <button type="button"
               onClick={() => setError(null)}
               className="px-3 py-1.5 rounded-lg bg-error/10 hover:bg-error/20 transition-colors font-bold"
             >

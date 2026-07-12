@@ -79,7 +79,7 @@ function QuestionCardRoot({
               const optionLabel = String.fromCharCode(65 + i);
 
               return (
-                <button
+                <button type="button"
                   key={i}
                   onClick={() => handleSelect(option)}
                   disabled={submitted}
@@ -125,7 +125,7 @@ function QuestionCardRoot({
 
         {/* Submit button */}
         {!submitted && selected && (
-          <button
+          <button type="button"
             onClick={handleSubmit}
             className="flex items-center gap-2 rounded-xl brand-gradient px-5 py-2.5 text-sm font-semibold text-white brand-glow transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
           >

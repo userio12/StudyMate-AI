@@ -168,14 +168,14 @@ function ResultsContent({ quizId }: { quizId: string }) {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <button
+        <button type="button"
           onClick={handleDownloadPDF}
           className="inline-flex items-center gap-2 rounded-lg bg-surface-2 border border-border px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:bg-surface-3"
         >
           <FontAwesomeIcon icon={faFilePdf} className="w-4 h-4 text-red-500" />
           Download PDF Report
         </button>
-        <button
+        <button type="button"
           onClick={() => setModalOpen(true)}
           className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700"
         >

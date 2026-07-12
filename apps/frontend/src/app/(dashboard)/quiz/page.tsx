@@ -103,7 +103,7 @@ export default function QuizPage() {
           </div>
           
           <div className="w-full lg:w-auto shrink-0">
-            <button 
+            <button type="button" 
               onClick={() => setModalOpen(true)}
               className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-base font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] overflow-hidden border-0"
             >

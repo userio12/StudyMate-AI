@@ -46,7 +46,7 @@ export function Dialog({
         role="dialog"
         aria-modal="true"
       >
-        <button
+        <button type="button"
           onClick={() => onOpenChange(false)}
           className="absolute right-4 top-4 rounded-lg p-1 text-muted hover:bg-surface-hover hover:text-foreground"
           aria-label="Close dialog"

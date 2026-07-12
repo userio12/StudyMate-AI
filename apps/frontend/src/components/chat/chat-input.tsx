@@ -60,7 +60,7 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
         aria-label="Chat input"
       />
 
-      <button
+      <button type="button"
         onClick={handleSend}
         disabled={!isLoading && !value.trim()}
         className={cn(

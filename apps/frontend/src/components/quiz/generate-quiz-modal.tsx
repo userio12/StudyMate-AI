@@ -85,14 +85,14 @@ export function GenerateQuizModal({
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <button
+          <button type="button"
             onClick={() => onOpenChange(false)}
             disabled={generating}
             className="rounded-lg px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-hover transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             onClick={handleGenerate}
             disabled={generating}
             className="inline-flex items-center gap-2 rounded-lg brand-gradient px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 brand-glow hover:scale-[1.02] active:scale-95 disabled:opacity-50"

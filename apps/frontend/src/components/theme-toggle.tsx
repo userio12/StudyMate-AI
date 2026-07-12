@@ -16,7 +16,7 @@ export function ThemeToggle() {
 
   return (
     <div className="flex items-center rounded-full bg-slate-200/50 p-1 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 backdrop-blur-sm shadow-inner">
-      <button
+      <button type="button"
         onClick={() => setTheme('light')}
         className={cn(
           'flex h-7 w-9 items-center justify-center rounded-full transition-all duration-200',
@@ -28,7 +28,7 @@ export function ThemeToggle() {
       >
         <FontAwesomeIcon icon={faSun} className="h-[14px] w-[14px]" />
       </button>
-      <button
+      <button type="button"
         onClick={() => setTheme('system')}
         className={cn(
           'flex h-7 w-9 items-center justify-center rounded-full transition-all duration-200',
@@ -40,7 +40,7 @@ export function ThemeToggle() {
       >
         <FontAwesomeIcon icon={faDesktop} className="h-[13px] w-[13px]" />
       </button>
-      <button
+      <button type="button"
         onClick={() => setTheme('dark')}
         className={cn(
           'flex h-7 w-9 items-center justify-center rounded-full transition-all duration-200',

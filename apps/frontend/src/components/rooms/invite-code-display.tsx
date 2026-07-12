@@ -19,7 +19,7 @@ export function InviteCodeDisplay({ code }: { code: string }) {
         <p className="label-caps text-slate-600 mb-1">Invite Code</p>
         <p className="font-mono text-lg font-bold tracking-widest text-slate-100 select-all">{code}</p>
       </div>
-      <button
+      <button type="button"
         onClick={handleCopy}
         className={[
           'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-200',

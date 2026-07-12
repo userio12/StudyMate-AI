@@ -36,7 +36,7 @@ export function Sidebar() {
           </div>
           <span className="font-bold text-foreground tracking-tight">StudyMate-AI</span>
         </Link>
-        <button
+        <button type="button"
           onClick={() => setSidebarOpen(false)}
           className="rounded-lg p-1.5 text-muted hover:bg-surface-2 hover:text-foreground lg:hidden transition-colors"
           aria-label="Close sidebar"

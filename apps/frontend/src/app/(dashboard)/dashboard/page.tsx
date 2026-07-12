@@ -65,13 +65,13 @@ export default function DashboardPage() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <NextLink href="/documents" className="w-full sm:w-auto">
-              <button className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
+              <button type="button" className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
                 <FontAwesomeIcon icon={faFileLines} className="w-4 h-4" /> Upload PDF
               </button>
             </NextLink>
             
             <NextLink href="/chat" className="w-full sm:w-auto">
-              <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
+              <button type="button" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
                 <FontAwesomeIcon icon={faCommentDots} className="w-4 h-4 text-brand-400" /> Start Chatting
               </button>
             </NextLink>

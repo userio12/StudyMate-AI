@@ -74,7 +74,7 @@ export function ConversationList({
 
   return (
     <div className="space-y-1">
-      <button
+      <button type="button"
         onClick={onCreate}
         className="flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] text-muted hover:bg-surface-hover hover:text-foreground border border-transparent"
       >
@@ -116,7 +116,7 @@ export function ConversationList({
                 active ? 'bg-surface-2' : 'bg-surface-hover',
                 "rounded-md pl-1"
               )}>
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setPinItem({ id: conv.id, title: conv.title, isPinned: !!conv.isPinned });
@@ -126,7 +126,7 @@ export function ConversationList({
                 >
                   <FontAwesomeIcon icon={faThumbtack} className="w-3.5 h-3.5" />
                 </button>
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setRenameItem({ id: conv.id, title: conv.title });
@@ -136,7 +136,7 @@ export function ConversationList({
                 >
                   <FontAwesomeIcon icon={faPen} className="w-3.5 h-3.5" />
                 </button>
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setDeleteItem({ id: conv.id, title: conv.title });

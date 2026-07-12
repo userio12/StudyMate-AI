@@ -69,7 +69,7 @@ export function TabsTrigger({
   const active = selected === value;
 
   return (
-    <button
+    <button type="button"
       role="tab"
       aria-selected={active}
       onClick={() => onValueChange(value)}

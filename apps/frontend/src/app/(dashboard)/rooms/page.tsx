@@ -94,7 +94,7 @@ export default function RoomsPage() {
             {/* Presence Toggle */}
             {mounted && (
               <div className="mt-6 inline-flex items-center gap-3 bg-surface-2/50 border border-border/50 rounded-xl p-2 pr-4 w-auto">
-                <button
+                <button type="button"
                   onClick={() => setPresence(presence === 'online' ? 'offline' : 'online')}
                   className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${presence === 'online' ? 'bg-emerald-500' : 'bg-surface-3'}`}
                   role="switch"
@@ -116,7 +116,7 @@ export default function RoomsPage() {
           </div>
           
           <div className="w-full lg:w-auto shrink-0 flex flex-col gap-3">
-            <button 
+            <button type="button" 
               onClick={() => { setShowCreate(true); setShowJoin(false); }}
               className="w-full lg:w-auto group/btn relative inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-sm font-extrabold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] overflow-hidden border-0"
             >
@@ -125,7 +125,7 @@ export default function RoomsPage() {
               Create New Room
             </button>
 
-            <button 
+            <button type="button" 
               onClick={() => { setShowJoin(true); setShowCreate(false); }}
               className="w-full lg:w-auto group/btn2 inline-flex items-center justify-center gap-3 rounded-2xl border border-emerald-500/30 bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-emerald-500/10 hover:border-emerald-500/50 backdrop-blur-sm"
             >
@@ -149,7 +149,7 @@ export default function RoomsPage() {
             className="flex-1 bg-transparent px-4 py-2 text-base text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none"
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
-          <button
+          <button type="button"
             onClick={handleCreate}
             disabled={creating || !roomName.trim()}
             className="rounded-xl bg-emerald-500 hover:bg-emerald-600 px-6 py-2.5 font-bold text-white transition-colors disabled:opacity-50 disabled:pointer-events-none"
@@ -171,7 +171,7 @@ export default function RoomsPage() {
             className="flex-1 bg-transparent px-4 py-2 text-base font-mono text-foreground placeholder:text-muted outline-none border-none focus:ring-0 focus:outline-none uppercase"
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
           />
-          <button
+          <button type="button"
             onClick={handleJoin}
             disabled={!inviteCode.trim()}
             className="rounded-xl bg-emerald-500 hover:bg-emerald-600 px-6 py-2.5 font-bold text-white transition-colors disabled:opacity-50 disabled:pointer-events-none"

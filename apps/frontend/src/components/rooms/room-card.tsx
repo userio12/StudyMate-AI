@@ -59,7 +59,7 @@ export function RoomCard({ id, name, inviteCode, createdAt, isOwner, onDelete }:
 
         <div className="flex items-center gap-2">
           {isOwner && (
-            <button
+            <button type="button"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

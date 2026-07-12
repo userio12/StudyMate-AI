@@ -49,7 +49,7 @@ export function LandingNavbar() {
           </Link>
 
           {/* Mobile Menu Toggle Button */}
-          <button
+          <button type="button"
             className="md:hidden flex items-center justify-center p-2 text-muted hover:text-foreground transition-colors"
             onClick={toggleMobileMenu}
             aria-label="Toggle mobile menu"

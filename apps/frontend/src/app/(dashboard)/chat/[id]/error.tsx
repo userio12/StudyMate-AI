@@ -9,7 +9,7 @@ export default function ChatError({ error, reset }: { error: Error; reset: () =>
       <p className="mt-2 text-sm text-ink-400 dark:text-ink-200">
         {error.message || 'Failed to load conversation.'}
       </p>
-      <button
+      <button type="button"
         onClick={reset}
         className="mt-6 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-brand-600 active:bg-brand-700"
       >

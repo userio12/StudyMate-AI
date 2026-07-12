@@ -12,7 +12,7 @@ export function Navbar({ className }: { className?: string }) {
 
   return (
     <DashboardNavbar className={cn('lg:hidden', className)}>
-      <button
+      <button type="button"
         onClick={toggleSidebar}
         className="rounded-lg p-2 text-muted hover:bg-surface-hover hover:text-foreground transition-colors min-h-11 min-w-11 flex items-center justify-center"
         aria-label="Toggle sidebar"

@@ -74,7 +74,7 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
 
             <div className="flex items-center gap-1 opacity-0 transition-opacity duration-200 focus-within:opacity-100 group-hover:opacity-100">
               {onUpdate && (
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -89,7 +89,7 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
                 </button>
               )}
               {onUpdate && (
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -101,7 +101,7 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
                 </button>
               )}
               {onDelete && (
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
