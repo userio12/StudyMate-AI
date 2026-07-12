@@ -19,7 +19,7 @@ export class EmbeddingsService {
       dimensions: EMBEDDING_DIMENSIONS,
     });
 
-    const values = result.data[0]?.embedding;
+    const values = result?.data?.[0]?.embedding;
     if (!values) throw new Error('No embedding returned');
 
     return values;
@@ -43,7 +43,7 @@ export class EmbeddingsService {
         dimensions: EMBEDDING_DIMENSIONS,
       });
       
-      const batchEmbeddings = response.data
+      const batchEmbeddings = (response?.data || [])
         .sort((a, b) => a.index - b.index)
         .map((d) => d.embedding);
         

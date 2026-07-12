@@ -4,6 +4,10 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { RoomsService } from './rooms.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('rooms')
+@ApiBearerAuth()
 @Controller('rooms')
 export class RoomsController {
   constructor(private roomsService: RoomsService) {}

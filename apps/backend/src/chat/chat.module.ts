@@ -9,5 +9,6 @@ import { AiModule } from '../ai/ai.module.js';
   imports: [DatabaseModule, AiModule],
   controllers: [ChatController],
   providers: [ChatService, RagService],
+  exports: [RagService],
 })
 export class ChatModule {}

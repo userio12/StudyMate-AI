@@ -5,9 +5,10 @@ import { QuizGeneratorService } from './quiz-generator.service.js';
 import { QuizScorerService } from './quiz-scorer.service.js';
 import { DatabaseModule } from '../database/database.module.js';
 import { AiModule } from '../ai/ai.module.js';
+import { ChatModule } from '../chat/chat.module.js';
 
 @Module({
-  imports: [DatabaseModule, AiModule],
+  imports: [DatabaseModule, AiModule, ChatModule],
   controllers: [QuizController],
   providers: [QuizService, QuizGeneratorService, QuizScorerService],
 })

@@ -10,6 +10,8 @@ import { quizAttempts } from './quiz-attempts.js';
 import { rooms } from './rooms.js';
 import { roomMembers } from './room-members.js';
 import { roomMessages } from './room-messages.js';
+import { conversationDocuments } from './conversation-documents.js';
+import { quizDocuments } from './quiz-documents.js';
 
 export const usersRelations = relations(users, ({ many }) => ({
   documents: many(documents),
@@ -27,6 +29,8 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     references: [users.id],
   }),
   chunks: many(chunks),
+  conversationDocuments: many(conversationDocuments),
+  quizDocuments: many(quizDocuments),
 }));
 
 export const chunksRelations = relations(chunks, ({ one, many }) => ({
@@ -43,6 +47,7 @@ export const conversationsRelations = relations(conversations, ({ one, many }) =
     references: [users.id],
   }),
   messages: many(messages),
+  documents: many(conversationDocuments),
 }));
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -59,6 +64,7 @@ export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   }),
   questions: many(quizQuestions),
   attempts: many(quizAttempts),
+  documents: many(quizDocuments),
 }));
 
 export const quizQuestionsRelations = relations(quizQuestions, ({ one }) => ({
@@ -111,5 +117,27 @@ export const roomMessagesRelations = relations(roomMessages, ({ one }) => ({
   user: one(users, {
     fields: [roomMessages.userId],
     references: [users.id],
+  }),
+}));
+
+export const conversationDocumentsRelations = relations(conversationDocuments, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [conversationDocuments.conversationId],
+    references: [conversations.id],
+  }),
+  document: one(documents, {
+    fields: [conversationDocuments.documentId],
+    references: [documents.id],
+  }),
+}));
+
+export const quizDocumentsRelations = relations(quizDocuments, ({ one }) => ({
+  quiz: one(quizzes, {
+    fields: [quizDocuments.quizId],
+    references: [quizzes.id],
+  }),
+  document: one(documents, {
+    fields: [quizDocuments.documentId],
+    references: [documents.id],
   }),
 }));

@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule } from './config/config.module.js';
+import { ConfigService } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CommonModule } from './common/common.module.js';
@@ -17,6 +20,15 @@ import { HealthController } from './health.controller.js';
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          url: config.get('REDIS_URL'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
     ConfigModule,
     DatabaseModule,
     AuthModule,
@@ -31,5 +43,11 @@ import { HealthController } from './health.controller.js';
     WebhooksModule,
   ],
   controllers: [HealthController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

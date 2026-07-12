@@ -25,31 +25,32 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   ) {}
 
   afterInit(server: Server) {
-    server.use(async (socket, next) => {
+    server.use((socket, next) => {
       const token = socket.handshake.auth?.token as string | undefined;
 
       if (!token) {
         return next(new Error('Authentication required'));
       }
 
-      try {
-        const payload = await this.clerkAuth.verifyToken(token);
-        const clerkId = payload.sub;
-
-        if (!clerkId) {
-          return next(new Error('Invalid token'));
-        }
-
-        const user = await this.clerkAuth.getOrCreateUser(clerkId);
-        
-        socket.data.userId = user.id;
-        socket.data.rooms = new Set<string>();
-        socket.data.typingRooms = new Set<string>();
-        socket.data.presence = 'online'; // Default to online
-        next();
-      } catch {
-        next(new Error('Invalid or expired token'));
-      }
+      this.clerkAuth
+        .verifyToken(token)
+        .then((payload) => {
+          const clerkId = payload.sub;
+          if (!clerkId) {
+            throw new Error('Invalid token');
+          }
+          return this.clerkAuth.getOrCreateUser(clerkId as string);
+        })
+        .then((user) => {
+          socket.data.userId = user.id;
+          socket.data.rooms = new Set<string>();
+          socket.data.typingRooms = new Set<string>();
+          socket.data.presence = 'online'; // Default to online
+          next();
+        })
+        .catch(() => {
+          next(new Error('Invalid or expired token'));
+        });
     });
     console.log('Socket.IO gateway initialized with auth middleware');
   }
@@ -92,7 +93,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     }
 
     rooms.add(payload.roomId);
-    client.join(payload.roomId);
+    await client.join(payload.roomId);
     
     // Only broadcast user:joined if the user's presence is online
     if (client.data.presence !== 'offline') {
@@ -101,7 +102,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   }
 
   @SubscribeMessage('leave:room')
-  handleLeaveRoom(client: Socket, payload: { roomId: string }) {
+  async handleLeaveRoom(client: Socket, payload: { roomId: string }) {
     const userId = client.data.userId as string | undefined;
     const rooms = client.data.rooms as Set<string> | undefined;
     const typingRooms = client.data.typingRooms as Set<string> | undefined;
@@ -109,7 +110,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     rooms?.delete(payload.roomId);
     typingRooms?.delete(payload.roomId);
     
-    client.leave(payload.roomId);
+    await client.leave(payload.roomId);
     client.to(payload.roomId).emit('user:left', { userId, timestamp: new Date().toISOString() });
   }
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AiService } from '../ai/ai.service.js';
 import { DatabaseService } from '../database/database.service.js';
+import { RagService } from '../chat/rag.service.js';
 import { CHAT_MODEL, DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
 
 interface GeneratedQuestion {
@@ -15,10 +16,12 @@ export class QuizGeneratorService {
   constructor(
     private ai: AiService,
     private db: DatabaseService,
+    private rag: RagService,
   ) {}
 
   async generate(
     documentIds: string[],
+    userId: string,
     difficulty: string = 'intermediate',
     preferredModel: string = CHAT_MODEL,
     count: number = DEFAULT_QUIZ_QUESTION_COUNT,
@@ -30,10 +33,12 @@ export class QuizGeneratorService {
       throw new Error('At least one document ID is required to generate a quiz.');
     }
 
-    const chunksResult = await this.db.db!.query.chunks.findMany({
-      where: (chunks, { inArray }) => inArray(chunks.documentId, documentIds),
-      limit: 20, 
-    });
+    let chunksResult;
+    if (customTopic) {
+      chunksResult = await this.rag.search(customTopic, userId, documentIds);
+    } else {
+      chunksResult = await this.rag.search('main concepts, definitions, and important topics', userId, documentIds);
+    }
 
     if (chunksResult.length === 0) {
       throw new Error('No content found in the specified documents.');
@@ -46,7 +51,7 @@ Using ONLY the following context from the user's documents, generate ${count} mu
 The difficulty level should be: ${difficulty.toUpperCase()}.
 ${difficulty === 'advanced' ? 'CRITICAL: Since this is an ADVANCED quiz, questions must be highly challenging, focusing on deep synthesis, edge cases, and complex applications of the material. Do not ask simple definitional questions.' : ''}
 ${adaptiveContext ? `\nADAPTIVE INSTRUCTION based on user's past performance:\n${adaptiveContext}\n` : ''}
-${customTopic ? `\nSPECIAL INSTRUCTION: Generate questions STRICTLY focusing on the following specific topic requested by the user: "${customTopic}". Ignore other concepts in the text unless they are directly related to this topic.\n` : ''}
+${customTopic ? `\nSPECIAL INSTRUCTION: Generate questions STRICTLY focusing on the following specific topic requested by the user: "${customTopic}". If the context provided does not cover this topic, use your general knowledge to generate the quiz on this specific topic anyway.\n` : ''}
 Context:
 ${context}
 
@@ -56,7 +61,8 @@ Rules:
 3. Only one option can be correct.
 4. Provide a brief explanation for why the answer is correct based on the text.
 5. STRICTLY NO REPETITION: Every single question MUST cover a completely different topic, concept, or section of the text. Do not ask about the same fact twice. If you cannot find ${count} unique topics, combine concepts.
-6. You MUST return ONLY a valid JSON array of objects, with no markdown formatting, no code blocks, and no extra text.
+6. You MUST return ONLY a valid JSON object matching the format below, with no markdown formatting, no code blocks, and no extra text.
+7. If the provided context does NOT contain information about the requested topic, you MUST still generate questions about the requested topic using your general knowledge.
 
 Format:
 {
@@ -91,7 +97,7 @@ Format:
             messages: [{ role: 'user', content: prompt }],
           });
           return response.choices[0]?.message?.content;
-        }, 'Generate Quiz', preferredModel as any || 'Gemini');
+        }, 'Generate Quiz', (preferredModel as "OpenRouter" | "Gemini" | "NVIDIA" | undefined) || 'Gemini');
 
         if (!text) {
           throw new Error('No response from AI');
@@ -117,7 +123,7 @@ Format:
       } catch (error: any) {
         retries--;
         if (retries < 0) {
-          throw new Error(`Failed to generate valid quiz questions: ${error.message}`);
+          throw new Error(`Failed to generate valid quiz questions: ${error.message}`, { cause: error });
         }
       }
     }

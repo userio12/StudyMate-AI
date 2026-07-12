@@ -21,6 +21,7 @@ export class AiService implements OnModuleInit {
       this.openRouterClient = new OpenAI({
         apiKey: openRouterKey,
         baseURL: 'https://openrouter.ai/api/v1',
+        timeout: 20000,
       });
     }
 
@@ -28,6 +29,7 @@ export class AiService implements OnModuleInit {
       this.geminiClient = new OpenAI({
         apiKey: geminiKey,
         baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+        timeout: 20000,
       });
     }
 
@@ -35,6 +37,7 @@ export class AiService implements OnModuleInit {
       this.nvidiaClient = new OpenAI({
         apiKey: nvidiaKey,
         baseURL: 'https://integrate.api.nvidia.com/v1',
+        timeout: 20000,
       });
     }
   }

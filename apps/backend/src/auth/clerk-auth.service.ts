@@ -110,7 +110,7 @@ export class ClerkAuthService {
             lastActiveAt: now,
             updatedAt: now 
           })
-          .where(eq(users.id, user.id));
+          .where(eq(users.id, user.id as string));
         
         // Sync to Clerk so frontend useTrustLevel hook gets updated value
         try {
@@ -127,7 +127,7 @@ export class ClerkAuthService {
     }
 
     if (user) {
-      this.userCache.set(clerkId, user.id);
+      this.userCache.set(clerkId, user.id as string);
       return user;
     }
     

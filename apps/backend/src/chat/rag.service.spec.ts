@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RagService } from './rag.service.js';
 
+import { DatabaseService } from '../database/database.service.js';
+import { EmbeddingsService } from '../ai/embeddings.service.js';
+
 describe('RagService', () => {
   let service: RagService;
   let mockDb: { db: { execute: ReturnType<typeof vi.fn> } };
@@ -17,7 +20,10 @@ describe('RagService', () => {
       embed: vi.fn(),
     };
 
-    service = new RagService(mockDb as any, mockEmbeddings as any);
+    service = new RagService(
+      mockDb as unknown as DatabaseService,
+      mockEmbeddings as unknown as EmbeddingsService
+    );
   });
 
   describe('search', () => {
@@ -27,7 +33,7 @@ describe('RagService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      const results = await service.search('test query');
+      const results = await service.search('test query', 'user-123');
 
       expect(results).toEqual([]);
     });
@@ -38,7 +44,7 @@ describe('RagService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      await service.search('custom query');
+      await service.search('custom query', 'user-123');
 
       expect(mockEmbeddings.embed).toHaveBeenCalledWith('custom query');
     });
@@ -49,7 +55,7 @@ describe('RagService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      await service.search('query', ['doc-1', 'doc-2']);
+      await service.search('query', 'user-123', ['doc-1', 'doc-2']);
 
       expect(mockDb.db.execute).toHaveBeenCalledTimes(2);
     });
@@ -71,7 +77,7 @@ describe('RagService', () => {
         .mockResolvedValueOnce(vectorResults)
         .mockResolvedValueOnce(ftsResults);
 
-      const results = await service.search('test');
+      const results = await service.search('test', 'user-123');
 
       expect(results).toHaveLength(3);
 
@@ -96,7 +102,7 @@ describe('RagService', () => {
         .mockResolvedValueOnce(vectorResults)
         .mockResolvedValueOnce(ftsResults);
 
-      const results = await service.search('test');
+      const results = await service.search('test', 'user-123');
 
       expect(results).toHaveLength(2);
       expect(results[0]?.id).toBe('2');

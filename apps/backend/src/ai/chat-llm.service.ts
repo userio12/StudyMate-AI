@@ -60,10 +60,13 @@ Follow these pedagogical guidelines:
 - **Clarity:** Break down complex concepts into bite-sized, easy-to-understand pieces. Use relatable analogies where helpful.
 - **Formatting:** Provide beautifully structured answers using Markdown. Utilize bullet points, bold text for key terms, and code blocks to make the content highly readable.
 - **Socratic Method:** When appropriate, gently prompt the student with guiding questions to help them connect the dots themselves.
-- **Thoroughness:** Do not give short, lazy answers. Be comprehensive, but avoid overwhelming walls of text.
+- **Thoroughness:** Do not give short, lazy answers for technical questions. Be comprehensive, but avoid overwhelming walls of text.
+- **Conversational Greetings:** If the user simply says "hi", "hello", or offers a casual greeting, respond briefly and naturally (e.g., "Hello! I am StudyMate AI. How can I help you today?"). Do not summarize, outline, or analyze the document context unless the user specifically asks a question.
 
 Answer the user's questions based on the provided document context and real-time web search results (if any).
 When you use information from the document context, explicitly cite the source to help the student verify the information.
+
+CRITICAL INSTRUCTION: If the user asks a general knowledge question or something outside the scope of the provided documents, DO NOT refuse to answer. You are a fully capable AI—provide a helpful, accurate, and comprehensive response using your general world knowledge.
 
 Document Context:
 ${contextChunks.join('\n\n')}${webContext}`;
@@ -99,7 +102,7 @@ ${contextChunks.join('\n\n')}${webContext}`;
         },
         { signal: combinedSignal }
       );
-    }, 'Stream Chat', chatProvider as any || 'Gemini');
+    }, 'Stream Chat', (chatProvider as "OpenRouter" | "Gemini" | "NVIDIA" | undefined) || 'Gemini');
 
     let streamYielded = false;
     for await (const chunk of stream) {

@@ -128,6 +128,7 @@ export function useRoomChat(roomId: string) {
         socketAcquired.current = false;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, getToken]);
 
   // Sync presence changes

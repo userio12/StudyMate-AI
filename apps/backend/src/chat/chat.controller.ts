@@ -5,6 +5,10 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { ChatService } from './chat.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('chat')
+@ApiBearerAuth()
 @Controller('chat')
 export class ChatController {
   constructor(private chatService: ChatService) {}

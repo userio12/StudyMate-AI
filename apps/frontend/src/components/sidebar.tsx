@@ -89,7 +89,7 @@ export function Sidebar() {
         </div>
         {/* User */}
         <div className="flex items-center gap-2.5 px-1">
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
           <p className="text-xs text-muted truncate">Your account</p>
         </div>
       </div>

@@ -9,9 +9,8 @@ export const conversations = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
-    documentIds: jsonb('document_ids').default([]),
-    lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
     isPinned: boolean('is_pinned').default(false).notNull(),
+    lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

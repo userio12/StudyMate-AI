@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { CitationBadge } from './citation-badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
@@ -23,7 +25,7 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
   const isUser = role === 'user';
 
   return (
-    <div className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}>
+    <div className={cn('flex gap-3 animate-message-appear', isUser ? 'justify-end' : 'justify-start')}>
       {!isUser && (
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
           <FontAwesomeIcon icon={faRobot} className="w-[18px] h-[18px]" />
@@ -46,19 +48,13 @@ export const ChatMessage = React.memo(function ChatMessage({ role, content, cita
               <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           ) : (
-            <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
-          )}
-
-          {citations && citations.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border/50 pt-3">
-              {citations.map((c, i) => (
-                <CitationBadge
-                  key={c.chunkId}
-                  number={i + 1}
-                  title={c.documentTitle}
-                  snippet={c.snippet}
-                />
-              ))}
+            <div className={cn(
+              "prose prose-sm max-w-none break-words",
+              isUser ? "prose-p:text-white prose-a:text-white prose-strong:text-white prose-ul:text-white prose-li:text-white text-white" : "dark:prose-invert prose-p:leading-relaxed"
+            )}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content}
+              </ReactMarkdown>
             </div>
           )}
 

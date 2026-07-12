@@ -75,8 +75,16 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
   const { chatProvider, openRouterChatModel } = useAiModelPreferences();
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingContent]);
+    if (!isStreaming) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isStreaming]);
+
+  useEffect(() => {
+    if (isStreaming) {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [streamingContent, isStreaming]);
 
   useEffect(() => {
     return () => abortRef.current?.abort();
@@ -121,9 +129,8 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         setIsStreaming(false);
         abortRef.current = null;
       },
-      controller.signal,
     );
-  }, [conversationId, api, searchProvider, chatProvider]);
+  }, [conversationId, api, searchProvider, chatProvider, openRouterChatModel]);
 
   if (messages.length === 0 && !error && !isStreaming) {
     return (
@@ -185,7 +192,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         
         {/* Input Area */}
         <div className="mx-auto w-full max-w-3xl p-4 md:p-6 relative z-20">
-          <ChatInput onSend={handleSend} />
+          <ChatInput onSend={handleSend} isLoading={isStreaming} onStop={() => abortRef.current?.abort()} />
         </div>
       </div>
     );
@@ -243,7 +250,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
       {/* Enhanced Scrolling Fade & Input Container */}
       <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-background via-background/95 to-transparent pt-32 pb-8 px-4 pointer-events-none">
         <div className="mx-auto w-full max-w-3xl pointer-events-auto">
-          <ChatInput onSend={handleSend} isLoading={isStreaming} />
+          <ChatInput onSend={handleSend} isLoading={isStreaming} onStop={() => abortRef.current?.abort()} />
         </div>
       </div>
     </div>

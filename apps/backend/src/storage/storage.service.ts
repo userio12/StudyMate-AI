@@ -23,7 +23,7 @@ export class StorageService {
     this.bucket = this.configService.get<string>('SUPABASE_STORAGE_BUCKET')!;
   }
 
-  async generateUploadUrl(key: string, contentType: string): Promise<string> {
+  async generateUploadUrl(key: string, _contentType: string): Promise<string> {
     if (!this.supabase) throw new Error('Supabase not configured \u2014 missing credentials');
     try {
       const { data, error } = await this.supabase.storage
@@ -37,7 +37,7 @@ export class StorageService {
       return data.signedUrl;
     } catch (error) {
       this.logger.error(`Failed to generate upload URL for ${key}:`, error);
-      throw new Error('Could not generate upload URL');
+      throw new Error('Could not generate upload URL', { cause: error });
     }
   }
 
@@ -55,7 +55,7 @@ export class StorageService {
       return data.signedUrl;
     } catch (error) {
       this.logger.error(`Failed to generate download URL for ${key}:`, error);
-      throw new Error('Could not generate download URL');
+      throw new Error('Could not generate download URL', { cause: error });
     }
   }
 
@@ -71,7 +71,7 @@ export class StorageService {
       }
     } catch (error) {
       this.logger.error(`Failed to delete object ${key}:`, error);
-      throw new Error('Failed to delete storage object');
+      throw new Error('Failed to delete storage object', { cause: error });
     }
   }
 }

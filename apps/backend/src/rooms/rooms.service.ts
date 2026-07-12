@@ -69,7 +69,7 @@ export class RoomsService {
     return { success: true };
   }
 
-  async getRoom(id: string, userId: string) {
+  async getRoom(id: string, _userId: string) {
     const room = await this.db.db!.query.rooms.findFirst({
       where: eq(rooms.id, id),
     });

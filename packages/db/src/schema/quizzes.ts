@@ -11,7 +11,6 @@ export const quizzes = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
-    documentIds: jsonb('document_ids').default([]).notNull(),
     difficulty: difficultyLevelEnum('difficulty').notNull(),
     questionCount: integer('question_count').notNull(),
     timeLimit: integer('time_limit'),

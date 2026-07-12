@@ -4,6 +4,10 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { QuizService } from './quiz.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('quiz')
+@ApiBearerAuth()
 @Controller('quiz')
 export class QuizController {
   constructor(private quizService: QuizService) {}

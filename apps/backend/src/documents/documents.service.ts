@@ -5,6 +5,8 @@ import { PdfProcessorService } from './pdf-processor.service.js';
 import { documents } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import type { CreateUploadUrlDto } from './dto/create-upload-url.dto.js';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class DocumentsService {
@@ -12,6 +14,7 @@ export class DocumentsService {
     private db: DatabaseService,
     private storage: StorageService,
     private pdfProcessor: PdfProcessorService,
+    @InjectQueue('document-processing') private documentQueue: Queue,
   ) {}
 
   async createUploadUrl(body: CreateUploadUrlDto, userId: string) {
@@ -42,22 +45,18 @@ export class DocumentsService {
     if (!doc) throw new NotFoundException('Document not found');
     if (doc.userId !== userId) throw new ForbiddenException();
 
-    await this.db.db!
-      .update(documents)
-      .set({ status: 'processing' })
-      .where(eq(documents.id, id));
+    await this.documentQueue.add('process-pdf', {
+      id,
+      pdfProvider,
+    }, {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 5000,
+      }
+    });
 
-    try {
-      await this.pdfProcessor.processDocument(id, pdfProvider);
-    } catch {
-      await this.db.db!
-        .update(documents)
-        .set({ status: 'error' })
-        .where(eq(documents.id, id));
-      throw new Error('Failed to process document');
-    }
-
-    return { id, status: 'ready' };
+    return { id, status: 'queued' };
   }
 
   async listDocuments(userId: string, limit = 20, offset = 0) {

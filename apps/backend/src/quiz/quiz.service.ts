@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { DatabaseService } from '../database/database.service.js';
 import { QuizGeneratorService } from './quiz-generator.service.js';
 import { QuizScorerService } from './quiz-scorer.service.js';
-import { quizzes, quizQuestions, quizAttempts, users } from '@studymate/db';
+import { quizzes, quizQuestions, quizAttempts, users, quizDocuments } from '@studymate/db';
 import { eq, and } from 'drizzle-orm';
 import { DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
 
@@ -52,7 +52,7 @@ export class QuizService {
       }
     }
 
-    const quizData = await this.generator.generate(documentIds, resolvedDifficulty, preferredModel, questionCount, adaptiveContext, customTopic, quizModel);
+    const quizData = await this.generator.generate(documentIds, userId, resolvedDifficulty, preferredModel, questionCount, adaptiveContext, customTopic, quizModel);
 
     const quizId = crypto.randomUUID();
 
@@ -61,10 +61,18 @@ export class QuizService {
         id: quizId,
         userId,
         title: customTopic || quizData.topic,
-        documentIds,
         difficulty: resolvedDifficulty as 'beginner' | 'intermediate' | 'advanced',
         questionCount: quizData.questions.length,
       });
+
+      if (documentIds && documentIds.length > 0) {
+        await tx.insert(quizDocuments).values(
+          documentIds.map((docId) => ({
+            quizId,
+            documentId: docId,
+          }))
+        );
+      }
 
       for (let i = 0; i < quizData.questions.length; i++) {
         const q = quizData.questions[i]!;
@@ -96,6 +104,9 @@ export class QuizService {
   async getQuiz(id: string, userId: string) {
     const quiz = await this.db.db!.query.quizzes.findFirst({
       where: eq(quizzes.id, id),
+      with: {
+        documents: true,
+      },
     });
     if (!quiz) throw new NotFoundException('Quiz not found');
     if (quiz.userId !== userId) throw new ForbiddenException();
@@ -110,7 +121,9 @@ export class QuizService {
       orderBy: (a, { desc }) => [desc(a.completedAt)],
     });
 
-    return { ...quiz, questions, attempts };
+    const documentIds = quiz.documents?.map(d => d.documentId) || [];
+
+    return { ...quiz, documentIds, questions, attempts };
   }
 
   async updateQuiz(id: string, userId: string, data: { title?: string; isPinned?: boolean }) {
@@ -119,7 +132,7 @@ export class QuizService {
     });
     if (!quiz) throw new NotFoundException('Quiz not found');
 
-    const updateData: any = {};
+    const updateData: Partial<typeof quizzes.$inferInsert> = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.isPinned !== undefined) updateData.isPinned = data.isPinned;
 

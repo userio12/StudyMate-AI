@@ -5,6 +5,10 @@ import { CreateUploadUrlSchema, type CreateUploadUrlDto } from './dto/create-upl
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { PaginationSchema, type Pagination, ProcessDocumentSchema, type ProcessDocumentDto } from '@studymate/shared';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('documents')
+@ApiBearerAuth()
 @Controller('documents')
 export class DocumentsController {
   constructor(private documentsService: DocumentsService) {}
@@ -24,12 +28,8 @@ export class DocumentsController {
     @Body(new ZodValidationPipe(ProcessDocumentSchema)) body: ProcessDocumentDto,
     @CurrentUser() user: CurrentUserPayload,
   ) {
-    // Start processing in the background to avoid timeouts
-    this.documentsService.processDocument(id, user.userId, body.pdfProvider).catch((err) => {
-      console.error(`Background processing failed for document ${id}:`, err);
-    });
-
-    return { status: 'processing', message: 'Document processing started in background' };
+    await this.documentsService.processDocument(id, user.userId, body.pdfProvider);
+    return { status: 'processing', message: 'Document processing queued' };
   }
 
   @Get()

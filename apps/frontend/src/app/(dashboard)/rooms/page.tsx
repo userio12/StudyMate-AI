@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { RoomCard } from '@/components/rooms/room-card';
+import { ConfirmDeleteDialog } from '@/components/ui/action-dialogs';
 import { useRooms } from '@/hooks/use-rooms';
 import { useUiStore } from '@/store/ui-store';
 import { useApiClient } from '@/lib/api-client';
@@ -19,6 +20,8 @@ export default function RoomsPage() {
   const [roomName, setRoomName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [creating, setCreating] = useState(false);
+  const [deleteItem, setDeleteItem] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Need mounted check for persisted presence state
   const [mounted, setMounted] = useState(false);
@@ -53,13 +56,17 @@ export default function RoomsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteItem) return;
+    setIsDeleting(true);
     try {
-      await deleteRoom(id);
+      await deleteRoom(deleteItem.id);
       toast.success('Room deleted successfully');
+      setDeleteItem(null);
     } catch (err) {
       toast.error(handleApiError(err));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -218,12 +225,21 @@ export default function RoomsPage() {
                 inviteCode={room.inviteCode}
                 createdAt={room.createdAt}
                 isOwner={room.isOwner}
-                onDelete={() => handleDelete(room.id)}
+                onDelete={() => setDeleteItem({ id: room.id, name: room.name })}
               />
             ))}
           </div>
         )}
       </section>
+
+      <ConfirmDeleteDialog
+        open={!!deleteItem}
+        onOpenChange={(open) => !open && setDeleteItem(null)}
+        title="Delete Room"
+        itemName={deleteItem?.name ?? ''}
+        onConfirm={handleDeleteConfirm}
+        isPending={isDeleting}
+      />
     </div>
   );
 }

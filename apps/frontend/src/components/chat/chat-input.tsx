@@ -3,21 +3,26 @@
 import { useState, useRef, type KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faStop } from '@fortawesome/free-solid-svg-icons';
 
 interface ChatInputProps {
   onSend: (content: string) => void;
   isLoading?: boolean;
+  onStop?: () => void;
   placeholder?: string;
 }
 
-export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate...' }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message StudyMate...' }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
+    if (isLoading) {
+      onStop?.();
+      return;
+    }
     const trimmed = value.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed) return;
     onSend(trimmed);
     setValue('');
     if (textareaRef.current) {
@@ -57,17 +62,17 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Message StudyMate.
 
       <button
         onClick={handleSend}
-        disabled={!value.trim() || isLoading}
+        disabled={!isLoading && !value.trim()}
         className={cn(
           'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 mb-0.5 mr-0.5',
-          value.trim() && !isLoading
+          (value.trim() || isLoading)
             ? 'bg-foreground text-background hover:bg-foreground/90 active:scale-95'
             : 'bg-surface-2 text-muted cursor-not-allowed opacity-70',
         )}
-        aria-label="Send message"
+        aria-label={isLoading ? "Stop generating" : "Send message"}
       >
         {isLoading ? (
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" />
+          <FontAwesomeIcon icon={faStop} className="w-4 h-4 text-background" />
         ) : (
           <FontAwesomeIcon icon={faArrowUp} className="w-[18px] h-[18px]" />
         )}

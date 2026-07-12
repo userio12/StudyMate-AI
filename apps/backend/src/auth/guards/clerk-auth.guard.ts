@@ -35,7 +35,7 @@ export class ClerkAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid token payload');
     }
 
-    const user = await this.clerkAuth.getOrCreateUser(clerkId);
+    const user = await this.clerkAuth.getOrCreateUser(clerkId as string);
 
     const userPayload: CurrentUserPayload = {
       userId: user.id,

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Headers, UnauthorizedException, OnApplicationShutdown, Req } from '@nestjs/common';
+import { Body, Controller, Post, Headers, UnauthorizedException, Req } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service.js';
@@ -7,28 +7,22 @@ import { users } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { Request } from 'express';
+import { LRUCache } from 'lru-cache';
 
 const REPLAY_TTL = 300_000;
-const processedIds = new Map<string, number>();
-const cleanupInterval = setInterval(() => {
-  const now = Date.now();
-  for (const [id, ts] of processedIds) {
-    if (now - ts > REPLAY_TTL) processedIds.delete(id);
-  }
-}, REPLAY_TTL).unref();
+const processedIds = new LRUCache<string, boolean>({
+  max: 1000,
+  ttl: REPLAY_TTL,
+});
 
 @Public()
 @SkipThrottle()
 @Controller('webhooks/clerk')
-export class WebhooksController implements OnApplicationShutdown {
+export class WebhooksController {
   constructor(
     private configService: ConfigService,
     private db: DatabaseService,
   ) {}
-
-  onApplicationShutdown() {
-    clearInterval(cleanupInterval);
-  }
 
   @Post()
   async handleClerkWebhook(
@@ -75,7 +69,7 @@ export class WebhooksController implements OnApplicationShutdown {
       throw new UnauthorizedException('Invalid webhook signature');
     }
 
-    processedIds.set(svixId, Date.now());
+    processedIds.set(svixId, true);
 
     const type = body.type as string | undefined;
 
@@ -86,7 +80,9 @@ export class WebhooksController implements OnApplicationShutdown {
 
       const emailAddresses = data?.email_addresses as Array<{ email_address: string }> | undefined;
       const email = emailAddresses?.[0]?.email_address ?? '';
-      const name = `${data?.first_name ?? ''} ${data?.last_name ?? ''}`.trim() || null;
+      const firstName = typeof data?.first_name === 'string' ? data.first_name : '';
+      const lastName = typeof data?.last_name === 'string' ? data.last_name : '';
+      const name = `${firstName} ${lastName}`.trim() || null;
       const avatarUrl = data?.image_url as string | undefined;
       const sessionCount = (data?.public_metadata as Record<string, unknown> | undefined)?.sessionCount as number ?? 0;
 

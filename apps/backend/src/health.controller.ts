@@ -4,6 +4,9 @@ import { DatabaseService } from './database/database.service.js';
 import { StorageService } from './storage/storage.service.js';
 import { AiService } from './ai/ai.service.js';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('health')
 @Controller()
 export class HealthController {
   constructor(
