@@ -38,10 +38,10 @@ export function useRoomChat(roomId: string) {
 
   useEffect(() => {
     if (history) {
-      // FIX BUG-25: Spread into a new array before reversing to avoid mutating the
-      // original SWR-cached array in place. Mutating cached data causes SWR to see
-      // the data as changed on the next render and triggers spurious re-fetches.
-      setMessages([...history].reverse());
+      const timer = setTimeout(() => {
+        setMessages([...history].reverse());
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [history]);
 
@@ -49,63 +49,60 @@ export function useRoomChat(roomId: string) {
     let cancelled = false;
     socketAcquired.current = false;
 
-    async function connect() {
-      if (cancelled) return;
+    // FIX BUG-26: Use the shared CLERK_JWT_TEMPLATE constant from api-client
+    // instead of a hardcoded string. This ensures both auth mechanisms (REST API
+    // and WebSocket) always use the same template name.
+    //
+    // FIX BUG-30: Pass a token-getter function to getSocket() instead of a static
+    // token string. The SocketManager uses it as a callback that is invoked on
+    // every connection attempt (including reconnects), so the token stays fresh.
+    const tokenGetter = () => getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
 
-      // FIX BUG-26: Use the shared CLERK_JWT_TEMPLATE constant from api-client
-      // instead of a hardcoded string. This ensures both auth mechanisms (REST API
-      // and WebSocket) always use the same template name.
-      //
-      // FIX BUG-30: Pass a token-getter function to getSocket() instead of a static
-      // token string. The SocketManager uses it as a callback that is invoked on
-      // every connection attempt (including reconnects), so the token stays fresh.
-      const tokenGetter = () => getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
-
-      const socket = getSocket(tokenGetter);
-      if (cancelled) {
-        // Component unmounted between getSocket() and here — release immediately
-        disconnectSocket();
-        return;
-      }
-
-      socketAcquired.current = true;
-      socketRef.current = socket;
-
-      socket.on('connect', () => setIsConnected(true));
-      socket.on('disconnect', () => setIsConnected(false));
-      socket.emit('join:room', { roomId });
-      socket.emit('presence:update', { status: presence });
-
-      socket.on('message:received', (msg: ChatMessage) => {
-        setMessages((prev) => [...prev, msg]);
-      });
-
-      socket.on('user:joined', ({ userId }: { userId: string }) => {
-        setOnlineUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
-      });
-
-      socket.on('user:left', ({ userId }: { userId: string }) => {
-        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-      });
-
-      socket.on('typing:update', ({ userId, typing }: { userId: string; typing: boolean }) => {
-        setTypingUsers((prev) =>
-          typing
-            ? prev.includes(userId) ? prev : [...prev, userId]
-            : prev.filter((id) => id !== userId),
-        );
-      });
-
-      socket.on('error', ({ message }: { message: string }) => {
-        console.error('Socket error:', message);
-      });
-
-      socket.on('connect_error', (err) => {
-        console.error('Socket connection error:', err.message);
-      });
+    const socket = getSocket(tokenGetter);
+    if (cancelled) {
+      // Component unmounted between getSocket() and here — release immediately
+      disconnectSocket();
+      return;
     }
 
-    connect();
+    socketAcquired.current = true;
+    socketRef.current = socket;
+
+    socket.on('connect', () => setIsConnected(true));
+    socket.on('disconnect', () => setIsConnected(false));
+    socket.emit('join:room', { roomId });
+    socket.emit('presence:update', { status: presence });
+
+    socket.on('message:received', (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    socket.on('user:joined', ({ userId }: { userId: string }) => {
+      setOnlineUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
+    });
+
+    socket.on('user:left', ({ userId }: { userId: string }) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+    });
+
+    socket.on('typing:update', ({ userId, isTyping }: { userId: string; isTyping: boolean }) => {
+      setTypingUsers((prev) => {
+        if (isTyping) {
+          return prev.includes(userId) ? prev : [...prev, userId];
+        } else {
+          return prev.filter((id) => id !== userId);
+        }
+      });
+    });
+
+    socket.on('connect_error', (err: Error) => {
+      console.error('Socket connection error:', err.message);
+      setIsConnected(false);
+    });
+
+    socket.on('error', (err: { message: string }) => {
+      console.error('Room error:', err.message);
+    });
 
     return () => {
       cancelled = true;

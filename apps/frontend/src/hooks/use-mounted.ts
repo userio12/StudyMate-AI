@@ -7,7 +7,10 @@ export function useMounted() {
   // while allowing the rest of the application's components to be fully optimized.
   // eslint-disable-next-line react-compiler/react-compiler
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return mounted;

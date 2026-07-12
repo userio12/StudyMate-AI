@@ -14,17 +14,20 @@ export function useAiModelPreferences() {
   const [openRouterQuizModel, setOpenRouterQuizModelState] = useState<string>('');
 
   useEffect(() => {
-    const storedChat = localStorage.getItem('studymate_chat_provider');
-    const storedQuiz = localStorage.getItem('studymate_quiz_provider');
-    const storedPdf = localStorage.getItem('studymate_pdf_provider');
-    const storedChatModel = localStorage.getItem('studymate_chat_model');
-    const storedQuizModel = localStorage.getItem('studymate_quiz_model');
+    const timer = setTimeout(() => {
+      const storedChat = localStorage.getItem('studymate_chat_provider');
+      const storedQuiz = localStorage.getItem('studymate_quiz_provider');
+      const storedPdf = localStorage.getItem('studymate_pdf_provider');
+      const storedChatModel = localStorage.getItem('studymate_chat_model');
+      const storedQuizModel = localStorage.getItem('studymate_quiz_model');
 
-    if (storedChat) setChatProviderState(storedChat as AIProvider);
-    if (storedQuiz) setQuizProviderState(storedQuiz as AIProvider);
-    if (storedPdf) setPdfProviderState(storedPdf as AIProvider);
-    if (storedChatModel) setOpenRouterChatModelState(storedChatModel);
-    if (storedQuizModel) setOpenRouterQuizModelState(storedQuizModel);
+      if (storedChat) setChatProviderState(storedChat as AIProvider);
+      if (storedQuiz) setQuizProviderState(storedQuiz as AIProvider);
+      if (storedPdf) setPdfProviderState(storedPdf as AIProvider);
+      if (storedChatModel) setOpenRouterChatModelState(storedChatModel);
+      if (storedQuizModel) setOpenRouterQuizModelState(storedQuizModel);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const setChatProvider = (newProvider: AIProvider) => {

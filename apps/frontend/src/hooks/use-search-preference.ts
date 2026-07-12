@@ -9,10 +9,13 @@ export function useSearchPreference() {
   const [provider, setProvider] = useState<SearchProvider>('duckduckgo');
 
   useEffect(() => {
-    const stored = localStorage.getItem('studymate_search_provider');
-    if (stored) {
-      setProvider(stored as SearchProvider);
-    }
+    const timer = setTimeout(() => {
+      const stored = localStorage.getItem('studymate_search_provider');
+      if (stored) {
+        setProvider(stored as SearchProvider);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const updateProvider = (newProvider: SearchProvider) => {
