@@ -5,6 +5,7 @@ import { RoomCard } from '@/components/rooms/room-card';
 import { ConfirmDeleteDialog } from '@/components/ui/action-dialogs';
 import { useRooms } from '@/hooks/use-rooms';
 import { useUiStore } from '@/store/ui-store';
+import { useMounted } from '@/hooks/use-mounted';
 import { useApiClient } from '@/lib/api-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faSpinner, faPlus, faRightToBracket, faSignal, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -24,8 +25,7 @@ export default function RoomsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   
   // Need mounted check for persisted presence state
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const handleCreate = async () => {
     if (!roomName.trim()) return;
@@ -36,9 +36,9 @@ export default function RoomsPage() {
       setRoomName('');
       setShowCreate(false);
       toast.success('Room created');
+      setCreating(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setCreating(false);
     }
   };
@@ -63,9 +63,9 @@ export default function RoomsPage() {
       await deleteRoom(deleteItem.id);
       toast.success('Room deleted successfully');
       setDeleteItem(null);
+      setIsDeleting(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setIsDeleting(false);
     }
   };

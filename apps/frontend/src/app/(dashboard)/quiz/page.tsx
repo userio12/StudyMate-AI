@@ -64,9 +64,9 @@ export default function QuizPage() {
       await mutate();
       toast.success(`Quiz generated at ${difficultyLabel[difficulty]} level`);
       setModalOpen(false);
+      setGenerating(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setGenerating(false);
     }
   };

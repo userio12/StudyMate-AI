@@ -139,10 +139,10 @@ function ResultsContent({ quizId }: { quizId: string }) {
       });
       toast.success('New quiz generated successfully!');
       setModalOpen(false);
+      setGenerating(false);
       router.push(`/quiz/${response.id}`);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setGenerating(false);
     }
   };

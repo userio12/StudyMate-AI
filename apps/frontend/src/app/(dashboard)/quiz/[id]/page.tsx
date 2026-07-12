@@ -73,10 +73,10 @@ export default function QuizDetailPage({
         { answers },
       );
       sessionStorage.setItem(`quizResult_${quiz.id}`, JSON.stringify(result));
+      setSubmitting(false);
       router.push(`/quiz/${quiz.id}/results?score=${result.score}`);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setSubmitting(false);
     }
   };

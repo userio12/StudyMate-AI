@@ -1,5 +1,5 @@
 import { useAuth } from '@clerk/nextjs';
-import { useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 
 export class ApiError extends Error {
   constructor(
@@ -50,28 +50,29 @@ async function request<T>(
 export function useApiClient() {
   const { getToken } = useAuth();
 
+  const cachedTokenRef = useRef<string | null>(null);
+  const lastFetchedRef = useRef<number>(0);
+
   // FIX BUG-28: Cache the resolved token value (not the Promise) with a short TTL.
   // The previous implementation cached the Promise which could hold a reference
   // to a token that expired mid-cache-window. By re-fetching on TTL expiry and
   // invalidating on auth errors, we ensure stale tokens are not reused.
   const getCachedToken = useMemo(() => {
-    let cachedToken: string | null = null;
-    let lastFetched = 0;
     const CACHE_TTL = 4_000; // 4 seconds — well under typical JWT expiry
 
     const invalidate = () => {
-      cachedToken = null;
-      lastFetched = 0;
+      cachedTokenRef.current = null;
+      lastFetchedRef.current = 0;
     };
 
     const get = async (): Promise<string | null> => {
       const now = Date.now();
-      if (cachedToken !== null && now - lastFetched < CACHE_TTL) {
-        return cachedToken;
+      if (cachedTokenRef.current !== null && now - lastFetchedRef.current < CACHE_TTL) {
+        return cachedTokenRef.current;
       }
-      lastFetched = now;
-      cachedToken = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
-      return cachedToken;
+      lastFetchedRef.current = now;
+      cachedTokenRef.current = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+      return cachedTokenRef.current;
     };
 
     return { get, invalidate };

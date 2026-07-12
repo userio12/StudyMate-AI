@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-compiler/react-compiler */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
@@ -118,6 +119,7 @@ export function useRoomChat(roomId: string) {
         s.off('error');
         s.off('connect');
         s.off('disconnect');
+        s.off('connect_error');
         socketRef.current = null;
       }
       // FIX BUG-27: Only release the socket if we successfully acquired it.

@@ -28,10 +28,12 @@ export function RenameDialog({
   isPending,
 }: RenameDialogProps) {
   const [name, setName] = React.useState(currentName);
+  const [prevOpen, setPrevOpen] = React.useState(open);
 
-  React.useEffect(() => {
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) setName(currentName);
-  }, [open, currentName]);
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

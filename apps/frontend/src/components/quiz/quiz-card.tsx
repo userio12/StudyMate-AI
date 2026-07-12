@@ -136,9 +136,9 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
           try {
             await onUpdate(id, { title: newTitle });
             setShowRename(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}
@@ -156,9 +156,9 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
           try {
             await onDelete(id);
             setShowDelete(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}
@@ -177,9 +177,9 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
           try {
             await onUpdate(id, { isPinned: !isPinned });
             setShowPin(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}

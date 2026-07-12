@@ -39,9 +39,9 @@ export function ConversationList({
     try {
       await updateConversation(pinItem.id, { isPinned: !pinItem.isPinned });
       setPinItem(null);
+      setIsPending(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setIsPending(false);
     }
   };
@@ -52,9 +52,9 @@ export function ConversationList({
     try {
       await updateConversation(renameItem.id, { title: newTitle });
       setRenameItem(null);
+      setIsPending(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setIsPending(false);
     }
   };
@@ -65,9 +65,9 @@ export function ConversationList({
     try {
       await deleteConversation(deleteItem.id);
       setDeleteItem(null);
+      setIsPending(false);
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
       setIsPending(false);
     }
   };

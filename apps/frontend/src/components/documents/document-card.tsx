@@ -205,9 +205,9 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
           try {
             await onUpdate(id, { title: newTitle });
             setShowRename(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}
@@ -225,9 +225,9 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
           try {
             await onDelete(id);
             setShowDelete(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}
@@ -246,9 +246,9 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
           try {
             await onUpdate(id, { isPinned: !isPinned });
             setShowPin(false);
+            setIsPending(false);
           } catch (err) {
             toast.error(handleApiError(err));
-          } finally {
             setIsPending(false);
           }
         }}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { useMounted } from '@/hooks/use-mounted';
 import type { TrustLevel as TrustLevelType, Persona } from '@studymate/shared';
 import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS } from '@studymate/shared';
 
@@ -75,11 +76,7 @@ function computeTrustLevel(sessionCount: number, lastActiveAt: string | null): {
 
 export function useTrustLevel() {
   const { user } = useUser();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   return useMemo(() => {
     const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;

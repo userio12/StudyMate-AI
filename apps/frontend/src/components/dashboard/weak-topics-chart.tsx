@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMounted } from '@/hooks/use-mounted';
 
 interface TopicData {
   topic: string;
@@ -12,8 +12,7 @@ interface WeakTopicsChartProps {
 }
 
 export function WeakTopicsChart({ data }: WeakTopicsChartProps) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useMounted();
 
   const hasData = data.length > 0;
 

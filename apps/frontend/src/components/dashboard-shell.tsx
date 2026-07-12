@@ -17,8 +17,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 export function DashboardSidebar({ children, className }: { children: ReactNode; className?: string }) {
   const sidebarOpen = useUiStore((s) => s.sidebarOpen);
   const setSidebarOpen = useUiStore((s) => s.setSidebarOpen);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useMounted();
 
   return (
     <>
