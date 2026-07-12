@@ -45,7 +45,7 @@ export function useQuiz(id: string) {
   };
 }
 
-export function useAttempts() {
+function useAttempts() {
   const api = useApiClient();
 
   const { data, error, isLoading } = useSWR('/quiz/attempts', (url) =>

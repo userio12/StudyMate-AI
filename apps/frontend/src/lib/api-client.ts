@@ -57,26 +57,24 @@ export function useApiClient() {
   // The previous implementation cached the Promise which could hold a reference
   // to a token that expired mid-cache-window. By re-fetching on TTL expiry and
   // invalidating on auth errors, we ensure stale tokens are not reused.
-  const getCachedToken = useMemo(() => {
-    const CACHE_TTL = 4_000; // 4 seconds — well under typical JWT expiry
+  const CACHE_TTL = 4_000; // 4 seconds — well under typical JWT expiry
 
-    const invalidate = () => {
-      cachedTokenRef.current = null;
-      lastFetchedRef.current = 0;
-    };
+  const invalidate = () => {
+    cachedTokenRef.current = null;
+    lastFetchedRef.current = 0;
+  };
 
-    const get = async (): Promise<string | null> => {
-      const now = Date.now();
-      if (cachedTokenRef.current !== null && now - lastFetchedRef.current < CACHE_TTL) {
-        return cachedTokenRef.current;
-      }
-      lastFetchedRef.current = now;
-      cachedTokenRef.current = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+  const get = async (): Promise<string | null> => {
+    const now = Date.now();
+    if (cachedTokenRef.current !== null && now - lastFetchedRef.current < CACHE_TTL) {
       return cachedTokenRef.current;
-    };
+    }
+    lastFetchedRef.current = now;
+    cachedTokenRef.current = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+    return cachedTokenRef.current;
+  };
 
-    return { get, invalidate };
-  }, [getToken]);
+  const getCachedToken = { get, invalidate };
 
   const getWithAuth = async <T>(path: string) => {
     const token = await getCachedToken.get();

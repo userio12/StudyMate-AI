@@ -35,7 +35,6 @@ export default function DocumentsPage() {
 
       if (!uploadRes.ok) {
         toast.error('Upload failed with status ' + uploadRes.status);
-        setIsUploading(false);
         return;
       }
 

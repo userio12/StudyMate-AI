@@ -23,13 +23,18 @@ export function Dialog({
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
+  const onOpenChangeRef = React.useRef(onOpenChange);
+  React.useEffect(() => {
+    onOpenChangeRef.current = onOpenChange;
+  }, [onOpenChange]);
+
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onOpenChange(false);
+      if (e.key === 'Escape') onOpenChangeRef.current(false);
     };
     if (open) document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [open, onOpenChange]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -37,6 +42,7 @@ export function Dialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+        aria-hidden="true"
         onClick={() => onOpenChange(false)}
       />
       <div
@@ -45,6 +51,7 @@ export function Dialog({
         )}
         role="dialog"
         aria-modal="true"
+        aria-label="Dialog"
       >
         <button type="button"
           onClick={() => onOpenChange(false)}

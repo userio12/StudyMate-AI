@@ -4,7 +4,7 @@ interface SkeletonProps {
   className?: string;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn('rounded-lg shimmer', className)}
@@ -13,7 +13,7 @@ export function Skeleton({ className }: SkeletonProps) {
   );
 }
 
-export function SkeletonCard({ className }: SkeletonProps) {
+function SkeletonCard({ className }: SkeletonProps) {
   return (
     <div className={cn('glass-card p-6 space-y-3', className)}>
       <div className="flex items-center justify-between">

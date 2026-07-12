@@ -3,6 +3,7 @@
 import { type ReactNode, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/store/ui-store';
+import { useMounted } from '@/hooks/use-mounted';
 
 /** Root shell — full-height dark flex container with animated mesh background */
 export function DashboardShell({ children }: { children: ReactNode }) {

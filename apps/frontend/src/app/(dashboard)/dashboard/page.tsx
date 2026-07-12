@@ -2,6 +2,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { useMounted } from '@/hooks/use-mounted';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { WeakTopicsChart } from '@/components/dashboard/weak-topics-chart';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
@@ -23,13 +24,15 @@ export default function DashboardPage() {
   const firstName = user?.firstName ?? 'there';
   const greeting = getGreeting();
 
+  const mounted = useMounted();
+
   const activities = (stats?.recentActivity ?? [])
     .slice(0, 3)
     .map((entry: any) => ({
       id: entry.id,
       type: entry.type as 'message' | 'document' | 'quiz' | 'room',
       description: entry.description,
-      createdAt: new Date(entry.date).toLocaleDateString(),
+      createdAt: mounted ? new Date(entry.date).toLocaleDateString() : '',
     }));
 
   return (

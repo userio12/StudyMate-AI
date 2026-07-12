@@ -6,7 +6,7 @@ import { useMounted } from '@/hooks/use-mounted';
 import type { TrustLevel as TrustLevelType, Persona } from '@studymate/shared';
 import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS } from '@studymate/shared';
 
-const STORAGE_KEY = 'studymate-trust';
+const STORAGE_KEY = 'studymate-trust:v1';
 
 interface TrustStorage {
   lastActiveAt: string;
@@ -78,25 +78,23 @@ export function useTrustLevel() {
   const { user } = useUser();
   const mounted = useMounted();
 
-  return useMemo(() => {
-    const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;
-    // During hydration/SSR, assume no lastActiveAt to match server
-    const lastActiveAt = mounted ? getLastActive() : null;
+  const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;
+  // During hydration/SSR, assume no lastActiveAt to match server
+  const lastActiveAt = mounted ? getLastActive() : null;
 
-    const { trustLevel, persona } = computeTrustLevel(sessionCount, lastActiveAt);
+  const { trustLevel, persona } = computeTrustLevel(sessionCount, lastActiveAt);
 
-    const showOnboarding = trustLevel === 'stranger' || trustLevel === 'acquaintance';
-    const showAdvancedFeatures = trustLevel !== 'stranger';
-    const showBetaFeatures = trustLevel === 'mentor';
+  const showOnboarding = trustLevel === 'stranger' || trustLevel === 'acquaintance';
+  const showAdvancedFeatures = trustLevel !== 'stranger';
+  const showBetaFeatures = trustLevel === 'mentor';
 
-    return {
-      sessionCount,
-      trustLevel,
-      persona,
-      showOnboarding,
-      showAdvancedFeatures,
-      showBetaFeatures,
-      persistActivity,
-    } as const;
-  }, [user, mounted]);
+  return {
+    sessionCount,
+    trustLevel,
+    persona,
+    showOnboarding,
+    showAdvancedFeatures,
+    showBetaFeatures,
+    persistActivity,
+  } as const;
 }

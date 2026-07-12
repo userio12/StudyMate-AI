@@ -12,15 +12,17 @@ export function isActiveRoute(pathname: string, route: string): boolean {
   return pathname.startsWith(route);
 }
 
+const defaultDateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+
 export function formatDate(date: string | Date | undefined | null): string {
   if (!date) return '';
   const parsed = new Date(date);
   if (isNaN(parsed.getTime())) return '';
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(parsed);
+  return defaultDateTimeFormatter.format(parsed);
 }
 
 export function formatRelativeTime(date: string | Date | undefined | null): string {

@@ -54,7 +54,7 @@ export function useDocuments() {
   };
 }
 
-export function useDocument(id: string) {
+function useDocument(id: string) {
   const api = useApiClient();
 
   const { data, error, isLoading } = useSWR(

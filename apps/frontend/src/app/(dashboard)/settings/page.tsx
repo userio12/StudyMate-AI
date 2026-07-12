@@ -2,8 +2,11 @@
 
 import * as React from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { useSearchPreference } from '@/hooks/use-search-preference';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 import { useAiModelPreferences, type AIProvider } from '@/hooks/use-ai-models';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faRobot, faGlobe, faUserShield } from '@fortawesome/free-solid-svg-icons';
@@ -26,15 +29,14 @@ export default function SettingsPage() {
     openRouterQuizModel, setOpenRouterQuizModel
   } = useAiModelPreferences();
 
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data: modelsData, isLoading: isLoadingModels } = useSWR('https://openrouter.ai/api/v1/models', fetcher);
   
-  const freeModels = React.useMemo(() => {
-    if (!modelsData?.data) return [];
-    return modelsData.data
+  let freeModels: any[] = [];
+  if (modelsData?.data) {
+    freeModels = modelsData.data
       .filter((model: any) => parseFloat(model.pricing.prompt) === 0 && parseFloat(model.pricing.completion) === 0)
       .slice(0, 30); // Limit to top 30 to avoid overwhelming UI
-  }, [modelsData]);
+  }
 
   return (
     <div className="pb-10 max-w-5xl mx-auto space-y-8">
@@ -76,7 +78,7 @@ export default function SettingsPage() {
               {isLoaded && user?.imageUrl ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={user.imageUrl} alt="Avatar" className="h-full w-full object-cover" />
+                  <Image src={user.imageUrl} alt="Avatar" width={80} height={80} unoptimized className="h-full w-full object-cover" />
                 </>
               ) : (
                 <span className="text-2xl font-black text-slate-400">
@@ -143,7 +145,7 @@ export default function SettingsPage() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-foreground mb-1.5">Chat Provider</label>
+                  <label htmlFor="input" className="block text-sm font-bold text-foreground mb-1.5">Chat Provider</label>
                   <div className="p-1 rounded-xl bg-surface-2 border border-border/50">
                     <Select value={chatProvider} onValueChange={(val) => setChatProvider(val as AIProvider)}>
                       <SelectTrigger className="w-full bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
@@ -159,7 +161,7 @@ export default function SettingsPage() {
                   
                   {chatProvider === 'OpenRouter' && (
                     <div className="mt-3 p-1 rounded-xl bg-surface-2/50 border border-border/30 pl-4 border-l-4 border-l-brand-500">
-                      <label className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
+                      <label htmlFor="input" className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
                       <Select 
                         value={openRouterChatModel || ''} 
                         onValueChange={setOpenRouterChatModel}
@@ -181,7 +183,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-foreground mb-1.5">Quiz Generation Provider</label>
+                  <label htmlFor="input" className="block text-sm font-bold text-foreground mb-1.5">Quiz Generation Provider</label>
                   <div className="p-1 rounded-xl bg-surface-2 border border-border/50">
                     <Select value={quizProvider} onValueChange={(val) => setQuizProvider(val as AIProvider)}>
                       <SelectTrigger className="w-full bg-transparent border-none focus:ring-0 shadow-none text-sm font-medium">
@@ -197,7 +199,7 @@ export default function SettingsPage() {
                   
                   {quizProvider === 'OpenRouter' && (
                     <div className="mt-3 p-1 rounded-xl bg-surface-2/50 border border-border/30 pl-4 border-l-4 border-l-brand-500">
-                      <label className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
+                      <label htmlFor="input" className="block text-xs font-semibold text-muted mb-1.5">Select Free Model</label>
                       <Select 
                         value={openRouterQuizModel || ''} 
                         onValueChange={setOpenRouterQuizModel}
@@ -219,7 +221,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-foreground mb-1.5 flex items-center gap-2">
+                  <label htmlFor="input" className="block text-sm font-bold text-foreground mb-1.5 flex items-center gap-2">
                     PDF OCR Provider
                     <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400">Fallback</span>
                   </label>
