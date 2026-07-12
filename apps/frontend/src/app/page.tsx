@@ -121,7 +121,7 @@ export default async function HomePage() {
                   <div className="hidden sm:block w-64 border-r border-white/5 bg-white/[0.02] p-5">
                      <div className="flex items-center gap-3 mb-8">
                        <div className="w-8 h-8 rounded-lg brand-gradient flex items-center justify-center text-white font-bold text-xs shadow-lg">S</div>
-                       <span className="text-white font-bold tracking-tight text-lg">StudyMate</span>
+                       <span className="text-white font-bold tracking-tight text-lg">StudyMate-AI</span>
                      </div>
                      <div className="space-y-1">
                        <div className="flex items-center gap-3 text-white/50 text-sm py-2 px-3 hover:text-white transition-colors cursor-default rounded-lg hover:bg-white/5"><FontAwesomeIcon icon={faFileLines} className="w-4 h-4" /> Documents</div>

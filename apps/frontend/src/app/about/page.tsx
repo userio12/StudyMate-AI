@@ -20,7 +20,7 @@ export default function AboutPage() {
               Our mission is to help you <span className="text-brand-400 italic">learn faster</span>.
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              StudyMate AI was built from the ground up to solve a simple problem: traditional studying is slow, passive, and inefficient. We believe that with the right AI tools, anyone can master complex subjects in half the time.
+              StudyMate-AI was built from the ground up to solve a simple problem: traditional studying is slow, passive, and inefficient. We believe that with the right AI tools, anyone can master complex subjects in half the time.
             </p>
           </div>
 

@@ -21,7 +21,7 @@ export function LandingNavbar() {
           <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-brand-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-transform duration-300 group-hover:scale-105">
             <FontAwesomeIcon icon={faBrain} className="text-white w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <span className="font-heading text-base sm:text-lg font-bold text-foreground tracking-tight">StudyMate</span>
+          <span className="font-heading text-base sm:text-lg font-bold text-foreground tracking-tight">StudyMate-AI</span>
         </Link>
 
         {/* Center Section (Navigation) */}

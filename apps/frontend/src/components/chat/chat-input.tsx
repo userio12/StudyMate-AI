@@ -12,7 +12,7 @@ interface ChatInputProps {
   placeholder?: string;
 }
 
-export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message StudyMate...' }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message StudyMate-AI...' }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

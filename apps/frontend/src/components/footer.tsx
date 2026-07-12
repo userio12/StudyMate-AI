@@ -89,8 +89,8 @@ export function Footer() {
 
         {/* Bottom Copyright Bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="text-sm text-muted text-center sm:text-left">
-            © {new Date().getFullYear()} <span className="font-semibold text-foreground">StudyMate AI</span>. All rights reserved.
+          <p className="text-sm text-muted-fg">
+            © {new Date().getFullYear()} <span className="font-semibold text-foreground">StudyMate-AI</span>. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-sm text-muted">
             <span>Built with</span>

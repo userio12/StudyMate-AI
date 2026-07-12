@@ -34,7 +34,7 @@ export function Sidebar() {
           <div className="relative h-8 w-8 rounded-lg brand-gradient flex items-center justify-center transition-all duration-300 group-hover:scale-105">
             <span className="text-white font-bold text-sm">S</span>
           </div>
-          <span className="font-bold text-foreground tracking-tight">StudyMate</span>
+          <span className="font-bold text-foreground tracking-tight">StudyMate-AI</span>
         </Link>
         <button
           onClick={() => setSidebarOpen(false)}

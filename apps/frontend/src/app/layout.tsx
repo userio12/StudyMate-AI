@@ -21,19 +21,19 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'StudyMate AI',
-    template: '%s | StudyMate AI',
+    default: 'StudyMate-AI',
+    template: '%s | StudyMate-AI',
   },
-  description: 'Your AI-powered study companion — upload PDFs, chat with citations, and generate adaptive quizzes.',
+  description: 'Your intelligent study companion for mastering any subject.',
   metadataBase: new URL('https://studymate-ai.vercel.app'),
   openGraph: {
-    title: 'StudyMate AI',
+    title: 'StudyMate-AI',
     description: 'AI-powered study platform — chat with your documents, generate quizzes, collaborate in real-time.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StudyMate AI',
+    title: 'StudyMate-AI',
     description: 'AI-powered study platform',
   },
 };
