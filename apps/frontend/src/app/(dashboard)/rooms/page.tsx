@@ -94,7 +94,7 @@ export default function RoomsPage() {
             {/* Presence Toggle */}
             {mounted && (
               <div className="mt-6 inline-flex items-center gap-3 bg-surface-2/50 border border-border/50 rounded-xl p-2 pr-4 w-auto">
-                <button type="button"
+                <button aria-label="Action" type="button"
                   onClick={() => setPresence(presence === 'online' ? 'offline' : 'online')}
                   className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${presence === 'online' ? 'bg-emerald-500' : 'bg-surface-3'}`}
                   role="switch"

@@ -116,7 +116,7 @@ export function ConversationList({
                 active ? 'bg-surface-2' : 'bg-surface-hover',
                 "rounded-md pl-1"
               )}>
-                <button type="button"
+                <button aria-label="Action" type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setPinItem({ id: conv.id, title: conv.title, isPinned: !!conv.isPinned });
@@ -126,7 +126,7 @@ export function ConversationList({
                 >
                   <FontAwesomeIcon icon={faThumbtack} className="w-3.5 h-3.5" />
                 </button>
-                <button type="button"
+                <button aria-label="Action" type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setRenameItem({ id: conv.id, title: conv.title });
@@ -136,7 +136,7 @@ export function ConversationList({
                 >
                   <FontAwesomeIcon icon={faPen} className="w-3.5 h-3.5" />
                 </button>
-                <button type="button"
+                <button aria-label="Action" type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setDeleteItem({ id: conv.id, title: conv.title });

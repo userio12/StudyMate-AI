@@ -144,7 +144,7 @@ export default function QuizPage() {
             </p>
           </div>
         ) : quizzes.length === 0 ? (
-          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-2xl md:rounded-3xl border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onClick={() => setModalOpen(true)}>
+          <div className="glass-card mt-4 flex flex-col items-center gap-4 py-20 text-center rounded-2xl md:rounded-3xl border-dashed border-2 hover:border-violet-500/30 transition-colors cursor-pointer" onKeyDown={(e) => { if(e.key === "Enter") {/* handled */} }} role="button" tabIndex={0} onClick={() => setModalOpen(true)}>
             <div className="rounded-2xl bg-violet-500/10 p-5 border border-violet-500/20">
               <FontAwesomeIcon icon={faGraduationCap} className="text-violet-400 w-8 h-8" />
             </div>

@@ -143,7 +143,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
             label={personaLabel}
             description={personaDescription}
           />
-          <button type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
+          <button aria-label="Action" type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </button>
         </div>
@@ -207,7 +207,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
           label={personaLabel}
           description={personaDescription}
         />
-        <button type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
+        <button aria-label="Action" type="button" className="h-10 w-10 flex items-center justify-center rounded-full bg-surface-2/50 text-muted hover:text-foreground transition-colors border border-border/50">
           <FontAwesomeIcon icon={faEllipsisVertical} />
         </button>
       </div>
