@@ -45,7 +45,7 @@ export default async function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
               </span>
-              Google Gemini 2.0 Flash Integration
+              AI study platform for students
             </div>
 
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
