@@ -101,7 +101,8 @@ export class ChatService {
     }));
 
     // Add current user message to history so the LLM actually sees it!
-    history.push({ role: 'user', content });
+    // We wrap it in <user_query> tags to prevent prompt injection breaking out of the persona.
+    history.push({ role: 'user', content: `<user_query>\n${content}\n</user_query>` });
 
     const sources = contextChunks.map((c) => ({
       chunkId: c.id,

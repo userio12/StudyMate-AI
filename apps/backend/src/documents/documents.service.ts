@@ -18,6 +18,13 @@ export class DocumentsService {
   ) {}
 
   async createUploadUrl(body: CreateUploadUrlDto, userId: string) {
+    if (body.mimeType !== 'application/pdf') {
+      throw new ForbiddenException('Only PDF files are allowed');
+    }
+    if (body.fileSize > 10 * 1024 * 1024) { // 10MB
+      throw new ForbiddenException('File size exceeds the maximum limit of 10MB');
+    }
+
     const id = crypto.randomUUID();
     const s3Key = `uploads/${userId}/${id}.pdf`;
 

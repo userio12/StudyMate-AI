@@ -23,7 +23,7 @@ export function Navbar({ className }: { className?: string }) {
       <div className="flex-1" />
 
       <div className="flex items-center gap-4">
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
       </div>
     </DashboardNavbar>
   );

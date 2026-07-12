@@ -53,7 +53,8 @@ export default async function HomePage() {
               <span className="text-foreground">Upload your notes.</span>
               <br />
               <WordRotator 
-                className="bg-gradient-to-r from-brand-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm mt-2"
+                wrapperClassName="mt-2"
+                className="bg-gradient-to-r from-brand-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm"
                 words={[
                   "Learn it smarter.", 
                   "Understand it deeper.", 

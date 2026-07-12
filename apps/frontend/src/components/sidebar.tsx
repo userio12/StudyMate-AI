@@ -87,9 +87,8 @@ export function Sidebar() {
             <p className="text-[10px] text-muted">Intelligence engine</p>
           </div>
         </div>
-        {/* User */}
         <div className="flex items-center gap-2.5 px-1">
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
           <p className="text-xs text-muted truncate">Your account</p>
         </div>
       </div>

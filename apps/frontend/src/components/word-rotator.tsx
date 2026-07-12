@@ -10,7 +10,7 @@ interface WordRotatorProps {
   wrapperClassName?: string;
 }
 
-export function WordRotator({ words, interval = 3000, className, wrapperClassName }: WordRotatorProps) {
+export function WordRotator({ words, interval = 4000, className, wrapperClassName }: WordRotatorProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function WordRotator({ words, interval = 3000, className, wrapperClassNam
           <span
             key={word}
             className={cn(
-              "col-start-1 row-start-1 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              "col-start-1 row-start-1 transition-all duration-1000 ease-in-out",
               isActive 
                 ? "translate-y-0 opacity-100" 
                 : isPrev 
