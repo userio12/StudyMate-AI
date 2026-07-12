@@ -19,11 +19,8 @@ export function WordRotator({ words, interval = 3000, className }: WordRotatorPr
     return () => clearInterval(timer);
   }, [words, interval]);
 
-  // Find the longest word to use as an invisible spacer to maintain consistent width
-  const longestWord = [...words].sort((a, b) => b.length - a.length)[0];
-
   return (
-    <span className={cn("relative inline-block overflow-hidden align-top", className)}>
+    <span className={cn("inline-grid overflow-hidden py-2 -my-2", className)}>
       {words.map((word, i) => {
         const isActive = i === index;
         const isPrev = i === (index - 1 + words.length) % words.length;
@@ -32,7 +29,7 @@ export function WordRotator({ words, interval = 3000, className }: WordRotatorPr
           <span
             key={word}
             className={cn(
-              "absolute left-0 top-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              "col-start-1 row-start-1 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
               isActive 
                 ? "translate-y-0 opacity-100" 
                 : isPrev 
@@ -44,10 +41,6 @@ export function WordRotator({ words, interval = 3000, className }: WordRotatorPr
           </span>
         );
       })}
-      {/* Invisible spacer dictates the width and height of the container */}
-      <span className="invisible whitespace-nowrap block pointer-events-none h-auto">
-        {longestWord}
-      </span>
     </span>
   );
 }
