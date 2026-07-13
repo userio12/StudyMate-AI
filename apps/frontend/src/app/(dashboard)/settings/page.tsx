@@ -77,7 +77,6 @@ export default function SettingsPage() {
             <div className="h-20 w-20 rounded-full bg-surface-3 flex items-center justify-center overflow-hidden border-2 border-border shadow-inner shrink-0">
               {isLoaded && user?.imageUrl ? (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <Image src={user.imageUrl} alt="Avatar" width={80} height={80} unoptimized className="h-full w-full object-cover" />
                 </>
               ) : (

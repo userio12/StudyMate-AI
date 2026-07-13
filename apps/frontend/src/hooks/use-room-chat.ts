@@ -1,5 +1,5 @@
 'use client';
-/* eslint-disable react-compiler/react-compiler */
+
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
