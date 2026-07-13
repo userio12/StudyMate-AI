@@ -26,9 +26,10 @@ interface Message {
 }
 
 interface ChatInterfaceProps {
-  conversationId: string;
+  conversationId?: string;
   initialMessages?: Message[];
   continuity?: ContinuityContext | null;
+  onConversationCreated?: (id: string) => void;
 }
 
 const SUGGESTED_PROMPTS = [
@@ -62,29 +63,44 @@ const SUGGESTED_PROMPTS = [
   }
 ];
 
-export function ChatInterface({ conversationId, initialMessages, continuity }: ChatInterfaceProps) {
+export function ChatInterface({ conversationId, initialMessages, continuity, onConversationCreated }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
   const [streamingContent, setStreamingContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = useApiClient();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const { personaLabel, personaDescription, greeting, persona } = useRelationship(continuity);
   const { searchProvider } = useSearchPreference();
   const { chatProvider, openRouterChatModel } = useAiModelPreferences();
 
   useEffect(() => {
-    if (!isStreaming) {
+    let animationFrameId: number;
+    const container = scrollContainerRef.current;
+
+    const smoothScroll = () => {
+      if (!container) return;
+      const targetScrollTop = container.scrollHeight - container.clientHeight;
+      const distance = targetScrollTop - container.scrollTop;
+      
+      if (distance > 1) {
+        container.scrollTop += distance * 0.15; 
+        animationFrameId = requestAnimationFrame(smoothScroll);
+      } else {
+        container.scrollTop = targetScrollTop;
+      }
+    };
+
+    if (isStreaming) {
+      animationFrameId = requestAnimationFrame(smoothScroll);
+    } else {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isStreaming]);
 
-  useEffect(() => {
-    if (isStreaming) {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-    }
-  }, [streamingContent, isStreaming]);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [messages, streamingContent, isStreaming]);
 
   useEffect(() => {
     return () => abortRef.current?.abort();
@@ -106,14 +122,36 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
     setIsStreaming(true);
     setError(null);
     
+    let activeConversationId = conversationId;
+
+    if (!activeConversationId) {
+      try {
+        const { id } = await api.post<{ id: string; title: string }>('/chat/conversations', {
+          title: 'New conversation',
+        });
+        activeConversationId = id;
+        onConversationCreated?.(id);
+      } catch (err: any) {
+        setError(err.message || 'Failed to create conversation');
+        setIsStreaming(false);
+        abortRef.current = null;
+        return;
+      }
+    }
+    
     let currentStream = '';
+    let lastRenderTime = 0;
 
     await api.streamPost(
-      `/chat/conversations/${conversationId}/message`,
+      `/chat/conversations/${activeConversationId}/message`,
       { content, searchProvider, chatProvider, chatModel: openRouterChatModel },
       (token) => {
         currentStream += token;
-        setStreamingContent(currentStream);
+        const now = Date.now();
+        if (now - lastRenderTime > 35) {
+          setStreamingContent(currentStream);
+          lastRenderTime = now;
+        }
       },
       () => {
         setMessages((prev) => [
@@ -152,8 +190,8 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
           
           {/* Clean Logo Hero */}
           <div className="relative flex items-center justify-center mb-2">
-            <div className="h-16 w-16 rounded-2xl bg-surface-2 border border-white/10 flex items-center justify-center shadow-sm">
-              <span className="text-2xl font-black bg-gradient-to-br from-brand-400 to-violet-400 bg-clip-text text-transparent">AI</span>
+            <div className="h-16 px-6 rounded-2xl bg-surface-2 border border-white/10 flex items-center justify-center shadow-sm">
+              <span className="text-2xl font-black bg-gradient-to-br from-brand-400 to-violet-400 bg-clip-text text-transparent">StudyMate AI</span>
             </div>
           </div>
           
@@ -212,7 +250,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity }: C
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-[180px] pt-4 relative z-10">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pb-[180px] pt-4 relative z-10">
         <div className="mx-auto flex w-full max-w-3xl flex-col space-y-6">
           {messages.map((msg) => (
             <ChatMessage

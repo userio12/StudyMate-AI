@@ -49,7 +49,7 @@ export function GenerateQuizModal({
             <SelectTrigger>
               <SelectValue placeholder="Select difficulty" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent disablePortal>
               <SelectItem value="adaptive">
                 <span className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faWandMagicSparkles} className="text-brand-500 w-3 h-3" />

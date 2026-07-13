@@ -12,3 +12,7 @@ export * from './schema/rooms.js';
 export * from './schema/room-members.js';
 export * from './schema/room-messages.js';
 export * from './schema/relations.js';
+export * from './schema/subjects.js';
+export * from './schema/tasks.js';
+export * from './schema/study-sessions.js';
+export * from './schema/goals.js';

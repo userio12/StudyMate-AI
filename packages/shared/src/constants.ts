@@ -41,9 +41,9 @@ export const SESSION_COUNT_THRESHOLDS = {
 export const TRUST_DECAY_DAYS = 14;
 
 export const PERSONA_LABELS: Record<string, string> = {
-  guide: 'Guide',
-  tutor: 'Tutor',
-  partner: 'Study Partner',
+  guide: 'StudyMate AI',
+  tutor: 'StudyMate AI',
+  partner: 'StudyMate AI',
 };
 
 export const PERSONA_DESCRIPTIONS: Record<string, string> = {

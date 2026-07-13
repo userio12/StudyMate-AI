@@ -9,6 +9,7 @@ interface AnalyticsStats {
   quizzes: number;
   averageScore: number | null;
   recentActivity: Array<{ date: string; count: number }>;
+  heatmapData: Array<{ date: string; duration: number }>;
 }
 
 export function useAnalytics() {

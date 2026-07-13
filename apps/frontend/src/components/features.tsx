@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faUpload, faCommentDots, faGraduationCap, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import { ScrollReveal } from '@/components/ui/scroll-reveal';
 
 const coreFeatures = [
   {
@@ -53,24 +54,32 @@ export function Features() {
       <div className="relative mx-auto max-w-6xl z-10">
         {/* Header Section */}
         <div className="mb-20 text-center flex flex-col items-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold tracking-widest text-brand-500 uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-            Platform Features
-          </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-foreground">
-            Everything you need, <br className="hidden md:block" />
-            <span className="gradient-text">all in one place</span>
-          </h2>
-          <p className="text-muted max-w-2xl text-lg md:text-xl">
-            Built for the way brains actually learn. A full AI study stack in one seamless experience — no juggling between tools.
-          </p>
+          <ScrollReveal delay={0}>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold tracking-widest text-brand-500 uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+              Platform Features
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={100}>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-foreground">
+              Everything you need, <br className="hidden md:block" />
+              <span className="gradient-text">all in one place</span>
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={200}>
+            <p className="text-muted max-w-2xl text-lg md:text-xl">
+              Built for the way brains actually learn. A full AI study stack in one seamless experience — no juggling between tools.
+            </p>
+          </ScrollReveal>
         </div>
 
         {/* Clean 2x2 Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {coreFeatures.map((feature, idx) => (
-            <div 
+            <ScrollReveal 
               key={feature.title} 
+              delay={idx * 150} 
+              direction="up" 
               className={`glass bg-surface-1/40 rounded-3xl border border-border p-8 group transition-all duration-300 flex flex-col hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] ${feature.border} hover:-translate-y-1`}
             >
               <div className="flex items-start justify-between mb-6">
@@ -96,7 +105,7 @@ export function Features() {
                   <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

@@ -1,10 +1,7 @@
 'use client';
 
 import { useConversations } from '@/hooks/use-chat';
-import { useApiClient } from '@/lib/api-client';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { handleApiError } from '@/lib/error-handler';
 import { ConversationList } from '@/components/chat/conversation-list';
 import { DashboardSidebar } from '@/components/dashboard-shell';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,16 +11,10 @@ import type { ReactNode } from 'react';
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
   const { conversations } = useConversations();
-  const api = useApiClient();
   const router = useRouter();
 
-  const handleCreate = async () => {
-    try {
-      const { id } = await api.post<{ id: string; title: string }>('/chat/conversations', { title: 'New conversation' });
-      router.push(`/chat/${id}`);
-    } catch (err) {
-      toast.error(handleApiError(err));
-    }
+  const handleCreate = () => {
+    router.push('/chat');
   };
 
   return (

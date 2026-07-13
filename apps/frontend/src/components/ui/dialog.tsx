@@ -9,10 +9,14 @@ export function Dialog({
   open,
   onOpenChange,
   children,
+  position = 'center',
+  className,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  position?: 'center' | 'right';
+  className?: string;
 }) {
   const dialogRef = React.useRef<HTMLDialogElement>(null);
 
@@ -49,7 +53,10 @@ export function Dialog({
       ref={dialogRef}
       onClick={handleBackdropClick}
       className={cn(
-        'glass-card relative z-50 w-full max-w-md p-6 shadow-lg backdrop:bg-black/30 backdrop:backdrop-blur-sm',
+        'glass-card z-50 p-6 shadow-lg backdrop:bg-black/30 backdrop:backdrop-blur-sm transition-all',
+        position === 'center' && 'relative w-full max-w-md rounded-2xl m-auto',
+        position === 'right' && 'fixed right-0 left-auto top-0 bottom-0 m-0 h-full w-full max-w-md rounded-none rounded-l-2xl animate-in slide-in-from-right duration-300',
+        className
       )}
       aria-label="Dialog"
     >

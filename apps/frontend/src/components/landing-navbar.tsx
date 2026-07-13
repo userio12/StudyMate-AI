@@ -27,9 +27,18 @@ export function LandingNavbar() {
         {/* Center Section (Navigation) */}
         <nav className="hidden md:flex items-center gap-8">
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-muted transition-colors hover:text-foreground">Home</Link>
-            <Link href="/#features" className="text-sm font-medium text-muted transition-colors hover:text-foreground">Features</Link>
-            <Link href="/about" className="text-sm font-medium text-muted transition-colors hover:text-foreground">About</Link>
+            <Link href="/" className="relative text-sm font-medium text-muted transition-colors hover:text-foreground group py-1">
+              Home
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+            </Link>
+            <Link href="/#features" className="relative text-sm font-medium text-muted transition-colors hover:text-foreground group py-1">
+              Features
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+            </Link>
+            <Link href="/about" className="relative text-sm font-medium text-muted transition-colors hover:text-foreground group py-1">
+              About
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+            </Link>
           </div>
         </nav>
 
@@ -64,14 +73,17 @@ export function LandingNavbar() {
         <div className="absolute top-full left-0 right-0 mt-3 glass rounded-2xl shadow-xl overflow-hidden md:hidden animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col p-4">
             <nav className="flex flex-col gap-1 mb-4">
-              <Link href="/" className="px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Home
+              <Link href="/" className="group relative overflow-hidden px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="relative z-10">Home</span>
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/#features" className="px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Features
+              <Link href="/#features" className="group relative overflow-hidden px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="relative z-10">Features</span>
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/about" className="px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                About
+              <Link href="/about" className="group relative overflow-hidden px-4 py-3 text-base font-medium text-muted hover:bg-surface-hover hover:text-foreground rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="relative z-10">About</span>
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             </nav>
             <div className="flex flex-col gap-3 pt-4 border-t border-border">

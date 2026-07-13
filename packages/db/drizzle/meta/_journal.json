@@ -57,6 +57,20 @@
       "when": 1783790626602,
       "tag": "0007_amusing_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783913321873,
+      "tag": "0008_sudden_pepper_potts",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783915499145,
+      "tag": "0009_steep_ricochet",
+      "breakpoints": true
     }
   ]
 }

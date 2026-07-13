@@ -164,7 +164,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
   min-height: 100vh;
-  transition: background-color 250ms ease, color 200ms ease;
 }
 
 h1, h2, h3, h4, h5, h6 {

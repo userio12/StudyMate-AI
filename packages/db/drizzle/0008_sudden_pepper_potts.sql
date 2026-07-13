@@ -1,0 +1,1 @@
+CREATE INDEX "idx_conversations_user_created" ON "conversations" USING btree ("user_id","created_at");

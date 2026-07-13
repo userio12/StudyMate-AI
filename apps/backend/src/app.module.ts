@@ -16,6 +16,10 @@ import { RoomsModule } from './rooms/rooms.module.js';
 import { AnalyticsModule } from './analytics/analytics.module.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
 import { HealthController } from './health.controller.js';
+import { SubjectsModule } from './subjects/subjects.module.js';
+import { TasksModule } from './tasks/tasks.module.js';
+import { StudySessionsModule } from './study-sessions/study-sessions.module.js';
+import { GoalsModule } from './goals/goals.module.js';
 
 @Module({
   imports: [
@@ -41,6 +45,10 @@ import { HealthController } from './health.controller.js';
     RoomsModule,
     AnalyticsModule,
     WebhooksModule,
+    SubjectsModule,
+    TasksModule,
+    StudySessionsModule,
+    GoalsModule,
   ],
   controllers: [HealthController],
   providers: [

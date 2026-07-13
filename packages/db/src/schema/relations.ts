@@ -12,7 +12,10 @@ import { roomMembers } from './room-members.js';
 import { roomMessages } from './room-messages.js';
 import { conversationDocuments } from './conversation-documents.js';
 import { quizDocuments } from './quiz-documents.js';
-
+import { subjects } from './subjects.js';
+import { tasks } from './tasks.js';
+import { studySessions } from './study-sessions.js';
+import { goals } from './goals.js';
 export const usersRelations = relations(users, ({ many }) => ({
   documents: many(documents),
   conversations: many(conversations),
@@ -139,5 +142,48 @@ export const quizDocumentsRelations = relations(quizDocuments, ({ one }) => ({
   document: one(documents, {
     fields: [quizDocuments.documentId],
     references: [documents.id],
+  }),
+}));
+
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  user: one(users, {
+    fields: [subjects.userId],
+    references: [users.id],
+  }),
+  tasks: many(tasks),
+  studySessions: many(studySessions),
+}));
+
+export const tasksRelations = relations(tasks, ({ one, many }) => ({
+  user: one(users, {
+    fields: [tasks.userId],
+    references: [users.id],
+  }),
+  subject: one(subjects, {
+    fields: [tasks.subjectId],
+    references: [subjects.id],
+  }),
+  studySessions: many(studySessions),
+}));
+
+export const studySessionsRelations = relations(studySessions, ({ one }) => ({
+  user: one(users, {
+    fields: [studySessions.userId],
+    references: [users.id],
+  }),
+  subject: one(subjects, {
+    fields: [studySessions.subjectId],
+    references: [subjects.id],
+  }),
+  task: one(tasks, {
+    fields: [studySessions.taskId],
+    references: [tasks.id],
+  }),
+}));
+
+export const goalsRelations = relations(goals, ({ one }) => ({
+  user: one(users, {
+    fields: [goals.userId],
+    references: [users.id],
   }),
 }));

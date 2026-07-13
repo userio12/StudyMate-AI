@@ -5,13 +5,15 @@ import { usePathname } from 'next/navigation';
 import { cn, isActiveRoute } from '@/lib/utils';
 import { useUiStore } from '@/store/ui-store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileLines, faCommentDots, faGraduationCap, faUsers, faTableColumns, faXmark, faWandMagicSparkles, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faFileLines, faCommentDots, faGraduationCap, faUsers, faTableColumns, faXmark, faWandMagicSparkles, faGear, faListCheck, faChartLine, faBrain } from '@fortawesome/free-solid-svg-icons';
 import { DashboardSidebar } from './dashboard-shell';
 import { UserButton } from '@clerk/nextjs';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview',      icon: faTableColumns },
+  { href: '/dashboard', label: 'Dashboard',     icon: faTableColumns },
   { href: '/documents', label: 'Documents',     icon: faFileLines },
+  { href: '/tasks',     label: 'Tasks',         icon: faListCheck },
+  { href: '/analytics', label: 'Analytics',     icon: faChartLine },
   { href: '/chat',      label: 'Chat',          icon: faCommentDots },
   { href: '/quiz',      label: 'Quiz',          icon: faGraduationCap },
   { href: '/rooms',     label: 'Study Rooms',   icon: faUsers },
@@ -32,7 +34,7 @@ export function Sidebar() {
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/50 px-5">
         <Link href="/dashboard" className="group flex items-center gap-2.5">
           <div className="relative h-8 w-8 rounded-lg brand-gradient flex items-center justify-center transition-all duration-300 group-hover:scale-105">
-            <span className="text-white font-bold text-sm">S</span>
+            <FontAwesomeIcon icon={faBrain} className="text-white w-4 h-4" />
           </div>
           <span className="font-bold text-foreground tracking-tight">StudyMate-AI</span>
         </Link>
