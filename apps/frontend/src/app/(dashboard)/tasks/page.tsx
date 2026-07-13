@@ -58,34 +58,34 @@ export default function TasksPage() {
   const completedTasks = taskList.filter((t: any) => t.status === 'completed');
 
   return (
-    <div className="w-full h-full p-8 animate-message-appear flex flex-col gap-8 max-w-6xl mx-auto overflow-y-auto custom-scrollbar">
+    <div className="w-full h-full p-6 animate-message-appear flex flex-col gap-6 max-w-6xl mx-auto overflow-y-auto custom-scrollbar">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 shrink-0">
         <div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">Task Flow</h1>
-          <p className="text-muted-fg">Your personal productivity pipeline.</p>
+          <h1 className="text-2xl font-bold gradient-text mb-1">Task Flow</h1>
+          <p className="text-sm text-muted-fg">Your personal productivity pipeline.</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-fg bg-surface-1 px-4 py-2 rounded-full border border-border shadow-sm">
-            <span className="text-success font-bold mr-2 text-lg leading-none">{stats?.tasksCompleted || 0}</span>
-            <span className="font-medium">Tasks Completed</span>
+        <div className="flex items-center gap-3">
+          <div className="text-sm text-muted-fg bg-surface-1 px-3 py-1.5 rounded-full border border-border shadow-sm flex items-center">
+            <span className="text-success font-bold mr-2 text-base leading-none">{stats?.tasksCompleted || 0}</span>
+            <span className="font-medium text-[13px]">Tasks Completed</span>
           </div>
           <Button 
             onClick={() => setIsCreateDialogOpen(true)}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white rounded-full px-6 shadow-brand transition-transform hover:scale-105"
+            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white rounded-full px-5 py-2 text-sm shadow-brand transition-transform hover:scale-105"
           >
-            <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+            <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
             <span className="font-semibold">New Task</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Column: Active Focus & Up Next */}
-        <div className="flex-1 flex flex-col gap-10">
+        <div className="flex-1 flex flex-col gap-6">
           
           {/* Active Focus Zone */}
-          <div className="bg-surface-1/40 border border-brand-500/20 p-8 rounded-[2rem] relative overflow-hidden group shadow-lg">
+          <div className="bg-surface-1/40 border border-brand-500/20 p-6 rounded-[1.5rem] relative overflow-hidden group shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent pointer-events-none"></div>
             
             <div className="relative z-10">

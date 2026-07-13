@@ -74,26 +74,26 @@ export default function RoomsPage() {
     <div className="pb-10">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 mb-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl border border-border/50 bg-surface-1/40 p-5 sm:p-6 lg:p-8 mb-8 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
         
-        <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-6 items-center justify-between">
           <div className="flex-1 w-full text-center lg:text-left">
-            <div className="inline-flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 mb-6">
-              <FontAwesomeIcon icon={faUsers} className="w-8 h-8 text-emerald-400" />
+            <div className="inline-flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 mb-4">
+              <FontAwesomeIcon icon={faUsers} className="w-6 h-6 text-emerald-400" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground mb-4">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground mb-3">
               Study Rooms
             </h1>
-            <p className="text-base sm:text-lg text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-sm sm:text-[15px] text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
               Study together in real-time. Create a new multiplayer room to collaborate with peers, or join an existing session using an invite code.
             </p>
             
             {/* Presence Toggle */}
             {mounted && (
-              <div className="mt-6 inline-flex items-center gap-3 bg-surface-2/50 border border-border/50 rounded-xl p-2 pr-4 w-auto">
+              <div className="mt-5 inline-flex items-center gap-3 bg-surface-2/50 border border-border/50 rounded-xl p-2 pr-4 w-auto">
                 <button aria-label="Action" type="button"
                   onClick={() => setPresence(presence === 'online' ? 'offline' : 'online')}
                   className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${presence === 'online' ? 'bg-emerald-500' : 'bg-surface-3'}`}

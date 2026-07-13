@@ -58,7 +58,7 @@ function QuestionCardRoot({
   return (
     <div className="glass-card overflow-hidden">
       {/* Header */}
-      <div className="flex items-start gap-4 border-b border-border p-6">
+      <div className="flex items-start gap-3 border-b border-border p-5">
         {questionNumber != null && (
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl brand-gradient text-sm font-bold text-white brand-glow">
             {questionNumber}
@@ -70,7 +70,7 @@ function QuestionCardRoot({
         </div>
       </div>
 
-      <div className="p-6 space-y-4">
+      <div className="p-5 space-y-4">
         {/* Multiple choice options */}
         {options && (
           <div className="space-y-2.5">
@@ -84,8 +84,8 @@ function QuestionCardRoot({
                   onClick={() => handleSelect(option)}
                   disabled={submitted}
                   className={cn(
-                    'flex w-full items-center gap-3.5 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-all duration-200',
-                    'min-h-[52px]',
+                    'flex w-full items-center gap-3.5 rounded-xl border px-3.5 py-3 text-left text-[14px] font-medium transition-all duration-200',
+                    'min-h-[48px]',
                     isSelected
                       ? 'brand-gradient border-transparent text-white brand-glow'
                       : 'border-border bg-surface-1 text-slate-300 hover:border-border-bright hover:bg-surface-2 hover:text-slate-100',

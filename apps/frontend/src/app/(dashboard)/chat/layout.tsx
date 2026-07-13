@@ -34,7 +34,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-8">
+        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-4">
           <div className="space-y-1">
             <p className="px-3 text-xs font-semibold text-muted tracking-wider uppercase mb-2">Your Chats</p>
             <ConversationList conversations={conversations} onCreate={handleCreate} />

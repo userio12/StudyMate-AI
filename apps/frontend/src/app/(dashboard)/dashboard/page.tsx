@@ -42,10 +42,10 @@ export default function DashboardPage() {
     }));
 
   return (
-    <article className="space-y-10 pb-10">
+    <article className="space-y-8 pb-8">
       {/* ── Massive Hero Banner ────────────────────────────────────────────── */}
       <ScrollReveal delay={0}>
-        <header className="relative overflow-hidden rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-12 shadow-2xl glass group">
+        <header className="relative overflow-hidden rounded-2xl border border-border/50 bg-surface-1/40 p-5 sm:p-8 shadow-2xl glass group">
           {/* Animated Background Gradients */}
           <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-violet-500/10 opacity-70" />
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
@@ -69,20 +69,20 @@ export default function DashboardPage() {
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted font-medium mb-10 max-w-2xl leading-relaxed">
+            <p className="text-base md:text-lg text-muted font-medium mb-8 max-w-2xl leading-relaxed">
               Your AI study companion is ready. Upload a new document, jump back into an active chat, or test your knowledge with a quiz.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <NextLink href="/documents" className="w-full sm:w-auto">
-                <button type="button" className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
-                  <FontAwesomeIcon icon={faFileLines} className="w-4 h-4" /> Upload PDF
+                <button type="button" className="w-full group relative inline-flex items-center justify-center gap-2 rounded-xl brand-gradient px-5 py-2.5 text-[13px] font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] overflow-hidden">
+                  <FontAwesomeIcon icon={faFileLines} className="w-3.5 h-3.5" /> Upload PDF
                 </button>
               </NextLink>
               
               <NextLink href="/chat" className="w-full sm:w-auto">
-                <button type="button" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-6 py-3 text-sm font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
-                  <FontAwesomeIcon icon={faCommentDots} className="w-4 h-4 text-brand-400" /> Start Chatting
+                <button type="button" className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/50 px-5 py-2.5 text-[13px] font-bold text-foreground transition-all duration-300 hover:bg-surface-3 hover:border-border-bright backdrop-blur-sm">
+                  <FontAwesomeIcon icon={faCommentDots} className="w-3.5 h-3.5 text-brand-400" /> Start Chatting
                 </button>
               </NextLink>
             </div>
@@ -97,7 +97,7 @@ export default function DashboardPage() {
             <FontAwesomeIcon icon={faArrowRight} className="w-4 h-4 text-brand-500" /> Quick Actions
           </h2>
           
-          <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {[
               {
                 href: '/documents', icon: faFileLines, title: 'Process Document',
@@ -138,14 +138,14 @@ export default function DashboardPage() {
               <NextLink
                 key={href}
                 href={href}
-                className={`group flex flex-col p-6 rounded-2xl border border-border/60 bg-surface-1/40 glass transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl ${color}`}
+                className={`group flex flex-col p-4 rounded-2xl border border-border/60 bg-surface-1/40 glass transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-xl ${color}`}
               >
-                <div className={`mb-6 inline-flex h-10 w-10 items-center justify-center rounded-xl ${bg} transition-transform duration-300 group-hover:scale-110`}>
-                  <FontAwesomeIcon icon={icon} className={`text-xl ${iconColor}`} />
+                <div className={`mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg ${bg} transition-transform duration-300 group-hover:scale-110`}>
+                  <FontAwesomeIcon icon={icon} className={`text-base ${iconColor}`} />
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-foreground tracking-tight">{title}</p>
-                  <p className="text-sm text-muted mt-1">{desc}</p>
+                  <p className="text-[15px] font-bold text-foreground tracking-tight">{title}</p>
+                  <p className="text-xs text-muted mt-0.5">{desc}</p>
                 </div>
               </NextLink>
             ))}
@@ -165,7 +165,7 @@ export default function DashboardPage() {
             </NextLink>
           </div>
           
-          <div className="glass bg-surface-1/40 border border-border/60 rounded-3xl p-6 md:p-8">
+          <div className="glass bg-surface-1/40 border border-border/60 rounded-2xl p-5 md:p-6">
             {tasksLoading ? (
               <div className="text-center text-muted text-sm p-4 animate-pulse">Loading tasks...</div>
             ) : (!tasks || tasks.filter(t => t.status !== 'completed').length === 0) ? (
@@ -179,7 +179,7 @@ export default function DashboardPage() {
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {tasks.filter(t => t.status !== 'completed').slice(0, 3).map((task) => (
-                  <div key={task.id} className="p-5 rounded-2xl bg-surface-2 border border-border/50 flex flex-col hover:border-emerald-500/30 transition-colors">
+                  <div key={task.id} className="p-4 rounded-xl bg-surface-2 border border-border/50 flex flex-col hover:border-emerald-500/30 transition-colors">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold text-foreground truncate mr-2">{task.title}</h4>
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-surface-3 text-muted">
@@ -231,13 +231,13 @@ export default function DashboardPage() {
 
           {/* Recent Activity - Spans 2 columns */}
           <ScrollReveal delay={300} direction="up" className="lg:col-span-2">
-            <div className="glass bg-surface-1/40 border border-border/60 rounded-3xl p-6 md:p-8 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-8">
+            <div className="glass bg-surface-1/40 border border-border/60 rounded-2xl p-5 md:p-6 h-full flex flex-col">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-xl font-extrabold text-foreground tracking-tight">
+                  <h3 className="text-lg font-extrabold text-foreground tracking-tight">
                     Recent Activity
                   </h3>
-                  <p className="text-sm text-muted mt-1">Your study sessions this week</p>
+                  <p className="text-xs text-muted mt-0.5">Your study sessions this week</p>
                 </div>
               </div>
               <div className="flex-1">
@@ -248,14 +248,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Month Based Calendar Stats - Full Width */}
-        <ScrollReveal delay={400} direction="up" className="mt-8">
-          <div className="glass bg-surface-1/40 border border-border/60 rounded-3xl p-6 md:p-8">
-            <div className="flex items-center justify-between mb-8">
+        <ScrollReveal delay={400} direction="up" className="mt-6">
+          <div className="glass bg-surface-1/40 border border-border/60 rounded-2xl p-5 md:p-6">
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="text-xl font-extrabold text-foreground tracking-tight">
+                <h3 className="text-lg font-extrabold text-foreground tracking-tight">
                   Study Consistency
                 </h3>
-                <p className="text-sm text-muted mt-1">Your 28-day activity calendar</p>
+                <p className="text-xs text-muted mt-0.5">Your 28-day activity calendar</p>
               </div>
             </div>
             <div className="flex items-center justify-center bg-surface-2 rounded-2xl border border-white/5 py-4">

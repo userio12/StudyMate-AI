@@ -35,7 +35,7 @@ export default async function HomePage() {
       <main className="flex-1">
 
         {/* ── Hero Section ──────────────────────────────────────── */}
-        <section className="relative overflow-hidden pt-32 pb-20 md:pt-48 md:pb-32 px-4 sm:px-6">
+        <section className="relative overflow-hidden pt-24 pb-16 md:pt-36 md:pb-24 px-4 sm:px-6">
           {/* Cinematic Lighting Orbs */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/15 blur-[120px] rounded-full pointer-events-none" />
           <div className="absolute top-1/4 left-0 w-[400px] h-[400px] bg-violet-500/10 blur-[100px] rounded-full pointer-events-none" />
@@ -71,17 +71,17 @@ export default async function HomePage() {
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <p className="mx-auto mt-8 max-w-2xl text-lg md:text-xl leading-relaxed text-muted font-medium">
+              <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed text-muted font-medium">
                 Upload your PDFs, chat with your materials using RAG-powered citations,
                 and generate adaptive quizzes — all in one beautiful workspace.
               </p>
             </ScrollReveal>
 
             <ScrollReveal delay={300}>
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/sign-up"
-                  className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] overflow-hidden w-full sm:w-auto"
+                  className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-5 py-2.5 text-[14px] font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] overflow-hidden w-full sm:w-auto"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="relative z-10 flex items-center gap-2">
@@ -92,7 +92,7 @@ export default async function HomePage() {
                   href="https://github.com/userio12/StudyMate-AI"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/50 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-surface-2 hover:border-border-bright w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/50 px-5 py-2.5 text-[14px] font-semibold text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-surface-2 hover:border-border-bright w-full sm:w-auto"
                 >
                   <FontAwesomeIcon icon={faGithub} className="w-5 h-5" /> View on GitHub
                 </a>

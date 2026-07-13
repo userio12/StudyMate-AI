@@ -128,7 +128,7 @@ export function PomodoroWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 glass-card w-72 rounded-3xl overflow-hidden shadow-2xl animate-message-appear flex flex-col">
+    <div className="fixed bottom-6 right-6 z-50 glass-card w-64 rounded-3xl overflow-hidden shadow-2xl animate-message-appear flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-white/5">
         <div className="flex items-center gap-2 text-primary font-bold">
@@ -149,9 +149,9 @@ export function PomodoroWidget() {
       </div>
 
       {/* Body */}
-      <div className="p-6 flex flex-col items-center">
+      <div className="p-4 flex flex-col items-center">
         {activeTask && !showSettings && (
-          <div className="w-full bg-brand-500/10 border border-brand-500/30 rounded-xl p-3 mb-6 flex flex-col gap-2">
+          <div className="w-full bg-brand-500/10 border border-brand-500/30 rounded-xl p-3 mb-4 flex flex-col gap-2">
             <span className="text-xs text-brand-500 font-semibold uppercase tracking-wider">Current Task</span>
             <div className="flex justify-between items-center gap-2">
               <span className="text-sm font-medium truncate">{activeTask.title}</span>
@@ -191,7 +191,7 @@ export function PomodoroWidget() {
         ) : (
           <>
             {/* Modes */}
-            <div className="flex bg-surface-2 p-1 rounded-full w-full justify-between mb-8 animate-in fade-in duration-200">
+            <div className="flex bg-surface-2 p-1 rounded-full w-full justify-between mb-5 animate-in fade-in duration-200">
               {(Object.keys(MODES) as Array<keyof typeof MODES>).map((m) => (
                 <button
                   key={m}
@@ -207,22 +207,22 @@ export function PomodoroWidget() {
             </div>
 
             {/* Timer Display */}
-            <div className="relative w-40 h-40 flex items-center justify-center mb-8 animate-in fade-in duration-200">
+            <div className="relative w-32 h-32 flex items-center justify-center mb-6 animate-in fade-in duration-200">
               <svg className="absolute inset-0 w-full h-full -rotate-90">
-                <circle cx="80" cy="80" r="76" className="stroke-surface-3" strokeWidth="6" fill="none" />
+                <circle cx="64" cy="64" r="60" className="stroke-surface-3" strokeWidth="6" fill="none" />
                 <circle
-                  cx="80"
-                  cy="80"
-                  r="76"
+                  cx="64"
+                  cy="64"
+                  r="60"
                   className={cn("stroke-primary transition-all duration-1000 ease-linear")}
                   strokeWidth="6"
                   fill="none"
-                  strokeDasharray={76 * 2 * Math.PI}
-                  strokeDashoffset={-(76 * 2 * Math.PI * progress) / 100}
+                  strokeDasharray={60 * 2 * Math.PI}
+                  strokeDashoffset={-(60 * 2 * Math.PI * progress) / 100}
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="font-mono text-4xl font-bold tracking-tighter">{formatTime(timeLeft)}</span>
+              <span className="font-mono text-3xl font-bold tracking-tighter">{formatTime(timeLeft)}</span>
             </div>
 
             {/* Controls */}
@@ -240,10 +240,10 @@ export function PomodoroWidget() {
               </Button>
               <Button
                 size="lg"
-                className="h-14 w-14 rounded-full bg-primary hover:bg-primary-dark shadow-brand text-white"
+                className="h-12 w-12 rounded-full bg-primary hover:bg-primary-dark shadow-brand text-white"
                 onClick={() => setIsRunning(!isRunning)}
               >
-                {isRunning ? <FontAwesomeIcon icon={faPause} className="w-6 h-6" /> : <FontAwesomeIcon icon={faPlay} className="w-6 h-6 ml-1" />}
+                {isRunning ? <FontAwesomeIcon icon={faPause} className="w-5 h-5" /> : <FontAwesomeIcon icon={faPlay} className="w-5 h-5 ml-1" />}
               </Button>
             </div>
           </>

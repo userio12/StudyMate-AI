@@ -8,7 +8,7 @@ import { useMounted } from '@/hooks/use-mounted';
 /** Root shell — full-height dark flex container with animated mesh background */
 export function DashboardShell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-200">
+    <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground transition-colors duration-200">
       {children}
     </div>
   );
@@ -34,7 +34,7 @@ export function DashboardSidebar({ children, className }: { children: ReactNode;
       <aside
         className={cn(
           // Always visible on desktop — floating panel with margins
-          'fixed left-0 top-0 z-40 flex h-screen w-60 flex-col p-4',
+          'fixed left-0 top-0 z-40 flex h-screen w-56 flex-col p-4',
           // Mobile: slide in/out
           'transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)]',
           '-translate-x-full lg:translate-x-0',
@@ -55,7 +55,7 @@ export function DashboardNavbar({ children, className }: { children: ReactNode; 
   return (
     <header
       className={cn(
-        'sticky top-0 z-20 flex h-16 items-center gap-4 px-6',
+        'sticky top-0 z-20 flex h-14 items-center gap-4 px-4 bg-background/50 backdrop-blur-md border-b border-border/50',
         className,
       )}
     >
@@ -67,7 +67,7 @@ export function DashboardNavbar({ children, className }: { children: ReactNode; 
 /** Main content area — offset by sidebar width on desktop */
 export function DashboardContent({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex flex-1 flex-col lg:ml-60', className)}>
+    <div className={cn('flex flex-1 flex-col min-w-0 lg:ml-56', className)}>
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ export function DashboardContent({ children, className }: { children: ReactNode;
 /** Page content wrapper with scroll area */
 export function DashboardMain({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <main className={cn('flex-1 overflow-auto p-6 md:p-8', className)}>
+    <main className={cn('flex-1 overflow-auto relative flex flex-col p-4 sm:p-6 md:p-8', className)}>
       {children}
     </main>
   );

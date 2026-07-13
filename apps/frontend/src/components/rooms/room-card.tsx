@@ -33,12 +33,12 @@ export function RoomCard({ id, name, inviteCode, createdAt, isOwner, onDelete }:
   return (
     <Link
       href={`/rooms/${id}`}
-      className="glass-card group block px-5 py-4 hover:border-border-bright hover:bg-surface-2 hover:shadow-md transition-all duration-300"
+      className="glass-card group block px-4 py-3 hover:border-border-bright hover:bg-surface-2 hover:shadow-md transition-all duration-300"
     >
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Gradient avatar */}
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${grad} text-white text-[13px] font-bold brand-glow group-hover:scale-105 transition-transform duration-300`}>
+          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${grad} text-white text-[11px] font-bold brand-glow group-hover:scale-105 transition-transform duration-300`}>
             {initials}
           </div>
 

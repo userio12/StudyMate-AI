@@ -46,7 +46,7 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
   };
 
   return (
-    <div className="relative flex w-full items-end gap-2 rounded-2xl bg-surface-2 border border-border/40 p-1.5 transition-all duration-300 focus-within:border-brand-500/50 focus-within:ring-1 focus-within:ring-brand-500/20">
+    <div className="relative flex w-full items-end gap-2 rounded-[20px] bg-surface-2 border border-border/40 p-1.5 transition-all duration-300 focus-within:border-brand-500/50 focus-within:ring-1 focus-within:ring-brand-500/20">
       <textarea
         ref={textareaRef}
         value={value}
@@ -56,7 +56,7 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
         placeholder={placeholder}
         rows={1}
         disabled={isLoading}
-        className="max-h-[200px] min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
+        className="max-h-[200px] min-h-[36px] flex-1 resize-none bg-transparent px-3 py-2 text-[14px] text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
         aria-label="Chat input"
       />
 
@@ -64,7 +64,7 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
         onClick={handleSend}
         disabled={!isLoading && !value.trim()}
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 mb-0.5 mr-0.5',
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 mb-[2px] mr-[2px]',
           (value.trim() || isLoading)
             ? 'bg-foreground text-background hover:bg-foreground/90 active:scale-95'
             : 'bg-surface-2 text-muted cursor-not-allowed opacity-70',
@@ -72,9 +72,9 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
         aria-label={isLoading ? "Stop generating" : "Send message"}
       >
         {isLoading ? (
-          <FontAwesomeIcon icon={faStop} className="w-4 h-4 text-background" />
+          <FontAwesomeIcon icon={faStop} className="w-3.5 h-3.5 text-background" />
         ) : (
-          <FontAwesomeIcon icon={faArrowUp} className="w-[18px] h-[18px]" />
+          <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4" />
         )}
       </button>
     </div>

@@ -75,18 +75,18 @@ export default function QuizPage() {
     <div className="pb-10">
       
       {/* ── Hero Control Panel ────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-surface-1/40 p-6 sm:p-8 lg:p-10 mb-10 shadow-lg glass group">
+      <header className="relative overflow-hidden rounded-2xl border border-border/50 bg-surface-1/40 p-5 sm:p-6 lg:p-8 mb-8 shadow-lg glass group">
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-brand-500/10 opacity-70" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-500/20 blur-[100px] rounded-full pointer-events-none transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
         
-        <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-6 items-center justify-between">
           <div className="flex-1 w-full text-center lg:text-left">
-            <div className="inline-flex items-center justify-center rounded-2xl bg-violet-500/10 border border-violet-500/20 p-4 mb-6">
-              <FontAwesomeIcon icon={faGraduationCap} className="w-8 h-8 text-violet-400" />
+            <div className="inline-flex items-center justify-center rounded-xl bg-violet-500/10 border border-violet-500/20 p-3 mb-4">
+              <FontAwesomeIcon icon={faGraduationCap} className="w-6 h-6 text-violet-400" />
             </div>
-            <div className="flex flex-col lg:flex-row items-center gap-4 mb-4 justify-center lg:justify-start">
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+            <div className="flex flex-col lg:flex-row items-center gap-4 mb-3 justify-center lg:justify-start">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                 Adaptive Quizzes
               </h1>
               <div className="hidden lg:block">
@@ -97,7 +97,7 @@ export default function QuizPage() {
                 />
               </div>
             </div>
-            <p className="text-base sm:text-lg text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-sm sm:text-[15px] text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
               Test your knowledge. Our AI dynamically generates challenging, adaptive quizzes directly from your uploaded study materials.
             </p>
           </div>

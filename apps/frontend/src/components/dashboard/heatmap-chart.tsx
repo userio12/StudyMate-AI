@@ -35,7 +35,7 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
     const daysInThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday
 
-    const monthName = today.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    const monthName = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
     // Calculate Streaks
     // We want to count consecutive days leading up to today where duration > 0.
@@ -103,39 +103,39 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
   const todayStr = toDateString(new Date());
 
   return (
-    <div className="w-full flex flex-col p-1 sm:p-4 space-y-8">
+    <div className="w-full max-w-md mx-auto flex flex-col p-1 space-y-4">
       {/* Streaks Header */}
-      <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4">
-        <div className="flex-1 flex items-center gap-4 bg-surface-1/50 border border-white/5 rounded-2xl p-5 shadow-lg">
-          <div className="w-12 h-12 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center">
-            <FontAwesomeIcon icon={faFire} className="text-2xl" />
+      <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3">
+        <div className="flex-1 flex items-center gap-4 bg-surface-1/50 border border-white/5 rounded-2xl p-4 shadow-lg">
+          <div className="w-10 h-10 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center">
+            <FontAwesomeIcon icon={faFire} className="text-xl" />
           </div>
           <div>
-            <p className="text-xs text-muted-fg font-bold uppercase tracking-wider mb-1">Current Streak</p>
-            <p className="text-2xl font-black text-foreground tracking-tight">{currentStreak} <span className="text-base font-medium text-muted">Days</span></p>
+            <p className="text-[11px] text-muted-fg font-bold uppercase tracking-wider mb-0.5">Current Streak</p>
+            <p className="text-xl font-black text-foreground tracking-tight">{currentStreak} <span className="text-sm font-medium text-muted">Days</span></p>
           </div>
         </div>
 
-        <div className="flex-1 flex items-center gap-4 bg-surface-1/50 border border-white/5 rounded-2xl p-5 shadow-lg">
-          <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
-            <FontAwesomeIcon icon={faBullseye} className="text-2xl" />
+        <div className="flex-1 flex items-center gap-4 bg-surface-1/50 border border-white/5 rounded-2xl p-4 shadow-lg">
+          <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+            <FontAwesomeIcon icon={faBullseye} className="text-xl" />
           </div>
           <div>
-            <p className="text-xs text-muted-fg font-bold uppercase tracking-wider mb-1">Monthly Consistency</p>
-            <p className="text-2xl font-black text-foreground tracking-tight">{activeDaysThisMonth} <span className="text-base font-medium text-muted">/ {daysInMonth} Days</span></p>
+            <p className="text-[11px] text-muted-fg font-bold uppercase tracking-wider mb-0.5">Monthly Consistency</p>
+            <p className="text-xl font-black text-foreground tracking-tight">{activeDaysThisMonth} <span className="text-sm font-medium text-muted">/ {daysInMonth} Days</span></p>
           </div>
         </div>
       </div>
 
       {/* Calendar View */}
-      <div className="flex flex-col bg-surface-1/20 p-6 rounded-3xl border border-white/5">
-        <div className="flex justify-between items-center mb-6 px-2">
-          <h4 className="font-extrabold text-xl text-foreground tracking-tight">{currentMonthName}</h4>
+      <div className="flex flex-col bg-surface-1/20 p-3 rounded-xl border border-white/5">
+        <div className="flex justify-between items-center mb-2 px-1">
+          <h4 className="font-bold text-base text-foreground tracking-tight">{currentMonthName}</h4>
         </div>
         
-        <div className="grid grid-cols-7 gap-2 sm:gap-3">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {weekDays.map(wd => (
-            <div key={wd} className="text-center text-xs font-black text-muted-fg uppercase tracking-widest mb-2">
+            <div key={wd} className="text-center text-[10px] font-bold text-muted-fg uppercase tracking-widest mb-1.5">
               {wd}
             </div>
           ))}
@@ -163,9 +163,9 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
               <div
                 key={cell.date}
                 className={cn(
-                  'w-full aspect-square rounded-xl sm:rounded-2xl transition-all duration-300 flex items-center justify-center relative group text-sm sm:text-base border cursor-default',
+                  'w-full aspect-square rounded-lg transition-all duration-300 flex items-center justify-center relative group text-xs border cursor-default',
                   colorClass,
-                  isToday && 'ring-2 ring-brand-500 ring-offset-2 ring-offset-surface-0'
+                  isToday && 'ring-2 ring-brand-500 ring-offset-1 ring-offset-surface-0'
                 )}
               >
                 <span>{cell.day}</span>
@@ -177,7 +177,7 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
                       {duration >= MIN_ACTIVE_MINUTES ? `${duration} mins studied` : cell.isFuture ? 'Upcoming' : duration > 0 ? `${duration} mins (Goal: ${MIN_ACTIVE_MINUTES}m)` : 'No activity'}
                     </span>
                     <span className="text-muted-fg text-[10px] font-medium uppercase tracking-wider">
-                      {new Date(cell.date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                      {new Date(cell.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                     </span>
                   </div>
                   <div className="w-2 h-2 bg-surface-0 border-r border-b border-white/10 rotate-45 -mt-1 z-0" />

@@ -21,23 +21,24 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
+
 export function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
   const isUser = role === 'user';
 
   return (
     <div className={cn('flex gap-3 animate-message-appear', isUser ? 'justify-end' : 'justify-start')}>
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
-          <FontAwesomeIcon icon={faRobot} className="w-[18px] h-[18px]" />
+        <div className="flex h-7 w-7 mt-0.5 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
+          <FontAwesomeIcon icon={faRobot} className="w-3.5 h-3.5" />
         </div>
       )}
 
       <div className={cn('max-w-[75%]', isUser && 'order-first')}>
         <div
           className={cn(
-            'rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm',
+            'rounded-2xl px-3.5 py-2.5 text-[14px] leading-snug shadow-sm',
             isUser
-              ? 'bg-brand-500 text-white'
+              ? 'bg-brand-500 text-white rounded-tr-sm'
               : 'bg-surface-2 border border-border/40 text-foreground',
           )}
         >
@@ -65,8 +66,8 @@ export function ChatMessage({ role, content, citations, isStreaming }: ChatMessa
       </div>
 
       {isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-foreground">
-          <FontAwesomeIcon icon={faUser} className="w-[18px] h-[18px]" />
+        <div className="flex h-7 w-7 mt-0.5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-foreground">
+          <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" />
         </div>
       )}
     </div>

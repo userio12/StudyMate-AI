@@ -53,7 +53,7 @@ export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 
 
   if (isLoading) {
     return (
-      <div className={cn("glass-card p-6 flex flex-col items-center justify-center h-full min-h-[120px] space-y-3", className)}>
+      <div className={cn("glass-card p-5 flex flex-col items-center justify-center h-full min-h-[120px] space-y-3", className)}>
         <FontAwesomeIcon icon={faSpinner} className="w-6 h-6 text-brand-500 animate-spin" />
         <span className="text-sm font-medium text-muted tracking-wide animate-pulse">Loading stats...</span>
       </div>
@@ -62,7 +62,7 @@ export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 
 
   return (
     <div className={cn(
-      'group glass-card relative overflow-hidden p-6 cursor-default transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
+      'group glass-card relative overflow-hidden p-5 cursor-default transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
       accent.border,
       className
     )}>
@@ -70,7 +70,7 @@ export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 
       <div className="relative flex items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="label-caps text-muted">{label}</p>
-          <p className="text-4xl font-extrabold text-foreground leading-none tracking-tight mt-2 mb-2">
+          <p className="text-3xl font-extrabold text-foreground leading-none tracking-tight mt-2 mb-2">
             {typeof value === 'number' ? <AnimatedNumber value={value} /> : value}
           </p>
           {trend && (

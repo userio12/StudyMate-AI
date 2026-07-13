@@ -94,7 +94,7 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
         }}
       >
         <div className={cn(
-          'glass-card relative overflow-hidden px-5 py-4 transition-all duration-300',
+          'glass-card relative overflow-hidden px-4 py-3 transition-all duration-300',
           isReady && 'hover:bg-surface-2 hover:border-border-bright hover:shadow-md',
         )}>
           {/* Progress Bar */}
@@ -109,14 +109,14 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
 
           <div className="relative flex items-center justify-between gap-4">
             {/* File icon */}
-            <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className={cn(
-                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors duration-300',
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-300',
                 isReady ? 'bg-brand-500/10 group-hover:bg-brand-500/20' : isProcessing ? 'bg-brand-500/10' : 'bg-surface-2',
               )}>
                 <FontAwesomeIcon
                   icon={Icon}
-                  className={cn("w-4 h-4", cfg.iconClass, cfg.spin && 'animate-spin')}
+                  className={cn("w-3.5 h-3.5", cfg.iconClass, cfg.spin && 'animate-spin')}
                 />
               </div>
 
@@ -125,13 +125,13 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
                   {isPinned && (
                     <FontAwesomeIcon icon={faThumbTack} className="w-3 h-3 text-brand-400 -rotate-45" />
                   )}
-                  <p className="text-base font-bold text-foreground truncate leading-tight group-hover:text-brand-300 transition-colors">
+                  <p className="text-[15px] font-bold text-foreground truncate leading-tight group-hover:text-brand-300 transition-colors">
                     {title}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 mt-1.5">
+                <div className="flex items-center gap-3 mt-1">
                   <p className="text-xs text-muted">{formatRelativeTime(createdAt)}</p>
-                  <Badge variant={cfg.badge} className="px-2 py-0.5 text-[10px]">
+                  <Badge variant={cfg.badge} className="px-1.5 py-0 text-[10px]">
                   {isProcessing && (
                     <span className="text-brand-300 font-medium mr-1">{progress ?? 0}%</span>
                   )}

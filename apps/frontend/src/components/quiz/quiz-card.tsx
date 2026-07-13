@@ -46,12 +46,12 @@ export function QuizCard({ id, title, difficulty, questionCount, isPinned, creat
           }
         }}
       >
-        <div className="glass-card flex flex-col p-4 hover:border-border-bright hover:bg-surface-2 transition-all duration-300 relative overflow-hidden h-full">
+        <div className="glass-card flex flex-col p-3 hover:border-border-bright hover:bg-surface-2 transition-all duration-300 relative overflow-hidden h-full">
           
           <div className="flex items-start justify-between gap-3 flex-1">
             <div className="flex items-start gap-3 flex-1 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 group-hover:bg-violet-500/15 transition-colors">
-                <FontAwesomeIcon icon={faGraduationCap} className="text-violet-300 w-4 h-4" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 group-hover:bg-violet-500/15 transition-colors">
+                <FontAwesomeIcon icon={faGraduationCap} className="text-violet-300 w-3.5 h-3.5" />
               </div>
 
               <div className="flex-1 min-w-0">

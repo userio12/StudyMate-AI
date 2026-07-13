@@ -172,7 +172,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
 
   if (messages.length === 0 && !error && !isStreaming) {
     return (
-      <div className="flex h-full flex-col relative overflow-hidden bg-background">
+      <div className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-background">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 z-10 bg-surface/60 backdrop-blur-xl border-b border-white/5 sticky top-0">
@@ -237,7 +237,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
   }
 
   return (
-    <div className="flex h-full flex-col relative bg-background">
+    <div className="absolute inset-0 z-10 flex flex-col bg-background">
       {/* Premium Sticky Header */}
       <div className="flex items-center justify-between px-6 py-4 z-30 bg-surface/70 backdrop-blur-xl border-b border-white/5 sticky top-0 shadow-sm">
         <PersonaBadge
