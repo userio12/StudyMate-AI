@@ -175,7 +175,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
       <div className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-background">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 z-10 bg-surface/60 backdrop-blur-xl border-b border-white/5 sticky top-0">
+        <div className="flex items-center justify-between px-6 py-4 z-10 bg-surface/60 backdrop-blur-xl border-b border-white/5">
           <PersonaBadge
             persona={persona}
             label={personaLabel}
@@ -239,7 +239,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
   return (
     <div className="absolute inset-0 z-10 flex flex-col bg-background">
       {/* Premium Sticky Header */}
-      <div className="flex items-center justify-between px-6 py-4 z-30 bg-surface/70 backdrop-blur-xl border-b border-white/5 sticky top-0 shadow-sm">
+      <div className="flex items-center justify-between px-6 py-4 z-30 bg-surface/70 backdrop-blur-xl border-b border-white/5 shadow-sm">
         <PersonaBadge
           persona={persona}
           label={personaLabel}
@@ -250,7 +250,7 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
         </button>
       </div>
 
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pb-[180px] pt-4 relative z-10">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pb-[280px] pt-4 relative z-10">
         <div className="mx-auto flex w-full max-w-3xl flex-col space-y-6">
           {messages.map((msg) => (
             <ChatMessage

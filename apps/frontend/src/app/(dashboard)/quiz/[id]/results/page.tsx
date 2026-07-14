@@ -190,6 +190,7 @@ function ResultsContent({ quizId }: { quizId: string }) {
         defaultDifficulty={defaultDifficulty} 
         onGenerate={handleGenerateQuiz} 
         generating={generating} 
+        documents={documents}
       />
     </div>
   );

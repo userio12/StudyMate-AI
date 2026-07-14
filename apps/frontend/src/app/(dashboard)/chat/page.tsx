@@ -10,7 +10,7 @@ export default function ChatPage() {
 
   const handleCreated = (id: string) => {
     mutate(); // Refresh the sidebar conversation list
-    router.replace(`/chat/${id}`); // Seamlessly update URL without full reload
+    window.history.replaceState(null, '', `/chat/${id}`); // Seamlessly update URL without React unmounting
   };
 
   return (

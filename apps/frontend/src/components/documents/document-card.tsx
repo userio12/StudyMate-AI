@@ -72,6 +72,7 @@ export function DocumentCard({ id, title, status, progress, isPinned, createdAt,
     try {
       const { id: chatId } = await api.post<{ id: string }>('/chat/conversations', {
         title: `Chat: ${title}`,
+        documentIds: [id],
       });
       router.push(`/chat/${chatId}`);
     } catch (err) {

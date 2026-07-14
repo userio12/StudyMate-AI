@@ -9,7 +9,8 @@ interface GenerateQuizModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultDifficulty: DifficultyLevel;
-  onGenerate: (difficulty: DifficultyLevel, topic?: string) => Promise<void>;
+  documents: { id: string; title: string }[];
+  onGenerate: (difficulty: DifficultyLevel, topic?: string, documentId?: string) => Promise<void>;
   generating: boolean;
 }
 
@@ -17,14 +18,20 @@ export function GenerateQuizModal({
   open,
   onOpenChange,
   defaultDifficulty,
+  documents,
   onGenerate,
   generating,
 }: GenerateQuizModalProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>(defaultDifficulty);
   const [topic, setTopic] = useState('');
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string>('all');
 
   const handleGenerate = async () => {
-    await onGenerate(selectedDifficulty, topic.trim() || undefined);
+    await onGenerate(
+      selectedDifficulty,
+      topic.trim() || undefined,
+      selectedDocumentId === 'all' ? undefined : selectedDocumentId
+    );
   };
 
   return (
@@ -37,6 +44,31 @@ export function GenerateQuizModal({
       </DialogHeader>
 
       <div className="space-y-6">
+        <div className="space-y-3">
+          <div className="text-sm font-medium text-foreground">
+            Source Material
+          </div>
+          <Select 
+            value={selectedDocumentId} 
+            onValueChange={setSelectedDocumentId}
+            disabled={generating || documents.length === 0}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a document" />
+            </SelectTrigger>
+            <SelectContent disablePortal>
+              <SelectItem value="all">
+                <span className="font-medium text-brand-400">All Documents</span>
+              </SelectItem>
+              {documents.map(doc => (
+                <SelectItem key={doc.id} value={doc.id}>
+                  {doc.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-3">
           <div className="text-sm font-medium text-foreground">
             Difficulty Level

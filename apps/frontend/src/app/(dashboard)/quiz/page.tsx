@@ -43,7 +43,7 @@ export default function QuizPage() {
     adaptive: 'Adaptive',
   };
 
-  const handleGenerate = async (difficulty: DifficultyLevel, topic?: string, questionCount?: number) => {
+  const handleGenerate = async (difficulty: DifficultyLevel, topic?: string, documentId?: string, questionCount?: number) => {
     const readyDocs = documents.filter((d) => d.status === 'ready');
     if (readyDocs.length === 0) {
       toast.error('Upload and process at least one document first');
@@ -53,8 +53,10 @@ export default function QuizPage() {
 
     setGenerating(true);
     try {
+      const documentIds = documentId ? [documentId] : readyDocs.map((d) => d.id);
+      
       await api.post('/quiz/generate', {
-        documentIds: readyDocs.map((d) => d.id),
+        documentIds,
         difficulty,
         questionCount,
         topic,
@@ -118,7 +120,8 @@ export default function QuizPage() {
       <GenerateQuizModal 
         open={modalOpen} 
         onOpenChange={setModalOpen} 
-        defaultDifficulty={defaultDifficulty} 
+        defaultDifficulty={defaultDifficulty}
+        documents={documents.filter((d) => d.status === 'ready')}
         onGenerate={handleGenerate} 
         generating={generating} 
       />

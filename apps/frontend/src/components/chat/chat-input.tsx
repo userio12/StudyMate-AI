@@ -33,7 +33,9 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (!isLoading) {
+        handleSend();
+      }
     }
   };
 
@@ -55,7 +57,6 @@ export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message St
         onInput={handleInput}
         placeholder={placeholder}
         rows={1}
-        disabled={isLoading}
         className="max-h-[200px] min-h-[36px] flex-1 resize-none bg-transparent px-3 py-2 text-[14px] text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
         aria-label="Chat input"
       />
