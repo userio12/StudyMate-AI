@@ -11,21 +11,29 @@ users
   │
   ├── documents (1:N)
   │     │
-  │     └── chunks (1:N) ──── vector(768) embedding
+  │     └── chunks (1:N) ──── vector(768) embedding (hnsw)
   │
-  ├── conversations (1:N)
+  ├── conversations (1:N) ─── conversation_documents (N:M) ─── documents
   │     │
   │     └── messages (1:N) ──── jsonb citations
   │
-  ├── quizzes (1:N)
+  ├── quizzes (1:N) ───────── quiz_documents (N:M) ─────────── documents
   │     │
-  │     ├── quiz_questions (1:N) ──── references chunks.sourceChunkId
+  │     ├── quiz_questions (1:N) ──── references chunks.id
   │     │
   │     └── quiz_attempts (1:N) ──── jsonb answers
   │
-  └── rooms (N:M via room_members)
-        │
-        └── room_messages (1:N)
+  ├── rooms (N:M via room_members)
+  │     │
+  │     └── room_messages (1:N)
+  │
+  ├── subjects (1:N)
+  │     │
+  │     ├── tasks (1:N)
+  │     │
+  │     └── study_sessions (1:N)
+  │
+  └── goals (1:N)
 ```
 
 ## Table Definitions
@@ -34,18 +42,21 @@ users
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK`, `default gen_random_uuid()` | Internal primary key |
-| `clerk_id` | `varchar(255)` | `NOT NULL`, `UNIQUE` | Clerk user ID |
-| `email` | `varchar(255)` | `NOT NULL` | User email |
-| `name` | `varchar(255)` | `NOT NULL` | Display name |
-| `avatar_url` | `varchar(512)` | Nullable | Profile image URL |
+| `id` | `text` | `PK` | Internal primary key |
+| `clerk_id` | `text` | `NOT NULL`, `UNIQUE` | Clerk user ID |
+| `email` | `text` | `NOT NULL`, `UNIQUE` | User email |
+| `name` | `text` | Nullable | Display name |
+| `avatar_url` | `text` | Nullable | Profile image URL |
+| `session_count` | `integer` | `NOT NULL`, `default 0` | Total study sessions |
+| `last_active_at` | `timestamptz` | Nullable | |
+| `metadata` | `jsonb` | `default {}` | |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
-| `updated_at` | `timestamptz` | `NOT NULL`, `auto-update` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
-CREATE UNIQUE INDEX idx_users_clerk_id ON users (clerk_id);
-CREATE INDEX idx_users_email ON users (email);
+CREATE UNIQUE INDEX idx_users_email ON users (email);
+CREATE INDEX idx_users_clerk_id ON users (clerk_id);
 ```
 
 ---
@@ -54,22 +65,24 @@ CREATE INDEX idx_users_email ON users (email);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `user_id` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
-| `title` | `varchar(255)` | `NOT NULL` | Original filename |
-| `s3_key` | `varchar(512)` | `NOT NULL` | S3 object key |
-| `file_size` | `integer` | Nullable | Size in bytes |
+| `id` | `text` | `PK` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
+| `title` | `text` | `NOT NULL` | Document title |
+| `file_name` | `text` | `NOT NULL` | Original filename |
+| `file_size` | `integer` | `NOT NULL` | Size in bytes |
+| `mime_type` | `text` | `NOT NULL` | MIME type |
+| `s3_key` | `text` | `NOT NULL` | S3 object key |
+| `status` | `document_status` | `NOT NULL`, `default 'pending'` | `pending` \| `processing` \| `ready` \| `error` |
 | `page_count` | `integer` | Nullable | Number of PDF pages |
-| `status` | `varchar(20)` | `NOT NULL`, `default 'processing'` | `processing` | `ready` | `error` |
-| `error_message` | `text` | Nullable | Error details if status=error |
+| `progress` | `integer` | `default 0` | Processing progress percentage |
+| `is_pinned` | `boolean` | `NOT NULL`, `default false` | Pin state |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
-| `updated_at` | `timestamptz` | `NOT NULL`, `auto-update` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
 CREATE INDEX idx_documents_user_id ON documents (user_id);
 CREATE INDEX idx_documents_status ON documents (status);
-CREATE INDEX idx_documents_user_status ON documents (user_id, status);
 ```
 
 ---
@@ -78,38 +91,21 @@ CREATE INDEX idx_documents_user_status ON documents (user_id, status);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `document_id` | `uuid` | `NOT NULL`, `FK → documents.id`, `ON DELETE CASCADE` | Parent document |
+| `id` | `text` | `PK` | |
+| `document_id` | `text` | `NOT NULL`, `FK → documents.id`, `ON DELETE CASCADE` | Parent document |
 | `content` | `text` | `NOT NULL` | Chunk text content |
-| `embedding` | `vector(768)` | `NOT NULL` | Gemini embedding vector |
 | `page_number` | `integer` | Nullable | Source PDF page |
+| `heading` | `text` | Nullable | |
 | `chunk_index` | `integer` | `NOT NULL` | Order within document |
-| `metadata` | `jsonb` | `NOT NULL`, `default '{}'` | Heading, section hierarchy |
+| `token_count` | `integer` | `NOT NULL` | |
+| `embedding` | `vector(768)` | Nullable | Gemini embedding vector |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
--- Vector similarity search index (IVFFlat with 100 lists)
-CREATE INDEX idx_chunks_embedding ON chunks
-  USING ivfflat (embedding vector_cosine_ops)
-  WITH (lists = 100);
-
--- Filter by document for search scoping
 CREATE INDEX idx_chunks_document_id ON chunks (document_id);
-
--- Full-text search for keyword fallback
-CREATE INDEX idx_chunks_content_fts ON chunks
-  USING gin (to_tsvector('english', content));
-```
-
-**Sample `metadata` JSON:**
-```json
-{
-  "heading": "Chapter 3: Neural Networks",
-  "subheading": "3.1 Backpropagation",
-  "tokenCount": 480,
-  "pageRange": [42, 43]
-}
+CREATE INDEX idx_chunks_content_gin ON chunks USING gin (to_tsvector('english', content));
+CREATE INDEX idx_chunks_embedding ON chunks USING hnsw (embedding vector_cosine_ops);
 ```
 
 ---
@@ -118,18 +114,28 @@ CREATE INDEX idx_chunks_content_fts ON chunks
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `user_id` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
-| `document_id` | `uuid` | `FK → documents.id`, `ON DELETE SET NULL` | Optional linked doc |
-| `title` | `varchar(255)` | `NOT NULL`, `default 'New Conversation'` | |
+| `id` | `text` | `PK` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
+| `title` | `text` | `NOT NULL` | |
+| `is_pinned` | `boolean` | `NOT NULL`, `default false` | |
+| `last_message_at` | `timestamptz` | Nullable | |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
-| `updated_at` | `timestamptz` | `NOT NULL`, `auto-update` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
 CREATE INDEX idx_conversations_user_id ON conversations (user_id);
-CREATE INDEX idx_conversations_updated ON conversations (user_id, updated_at DESC);
+CREATE INDEX idx_conversations_user_created ON conversations (user_id, created_at);
 ```
+
+---
+
+### `conversation_documents` (Junction Table)
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `conversation_id` | `text` | `PK`, `FK → conversations.id`, `ON DELETE CASCADE` | |
+| `document_id` | `text` | `PK`, `FK → documents.id`, `ON DELETE CASCADE` | |
 
 ---
 
@@ -137,28 +143,18 @@ CREATE INDEX idx_conversations_updated ON conversations (user_id, updated_at DES
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `conversation_id` | `uuid` | `NOT NULL`, `FK → conversations.id`, `ON DELETE CASCADE` | Parent conversation |
-| `role` | `varchar(20)` | `NOT NULL` | `user` | `assistant` |
+| `id` | `text` | `PK` | |
+| `conversation_id` | `text` | `NOT NULL`, `FK → conversations.id`, `ON DELETE CASCADE` | Parent conversation |
+| `role` | `message_role` | `NOT NULL` | `user` \| `assistant` \| `system` |
 | `content` | `text` | `NOT NULL` | Message text in markdown |
-| `citations` | `jsonb` | `NOT NULL`, `default '[]'` | Array of citation objects |
+| `citations` | `jsonb` | `default '[]'` | Array of citation objects |
+| `token_count` | `integer` | Nullable | |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
 CREATE INDEX idx_messages_conversation_id ON messages (conversation_id);
-CREATE INDEX idx_messages_created ON messages (conversation_id, created_at);
-```
-
-**Sample `citations` JSON:**
-```json
-[
-  {
-    "chunkId": "chunk-042-...",
-    "pageNumber": 42,
-    "excerpt": "Backpropagation computes the gradient of the loss function..."
-  }
-]
+CREATE INDEX idx_messages_created_at ON messages (created_at);
 ```
 
 ---
@@ -167,13 +163,28 @@ CREATE INDEX idx_messages_created ON messages (conversation_id, created_at);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `user_id` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
-| `document_id` | `uuid` | `NOT NULL`, `FK → documents.id`, `ON DELETE CASCADE` | Source document |
-| `title` | `varchar(255)` | `NOT NULL` | Auto-generated title |
-| `difficulty` | `varchar(20)` | `NOT NULL`, `default 'medium'` | `easy` | `medium` | `hard` |
-| `question_count` | `integer` | `NOT NULL`, `default 5` | Number of questions |
+| `id` | `text` | `PK` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Owner |
+| `title` | `text` | `NOT NULL` | Auto-generated title |
+| `difficulty` | `difficulty_level` | `NOT NULL` | `beginner` \| `intermediate` \| `advanced` |
+| `question_count` | `integer` | `NOT NULL` | Number of questions |
+| `time_limit` | `integer` | Nullable | Time limit in seconds |
+| `is_pinned` | `boolean` | `NOT NULL`, `default false` | |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+
+**Indexes:**
+```sql
+CREATE INDEX idx_quizzes_user_id ON quizzes (user_id);
+```
+
+---
+
+### `quiz_documents` (Junction Table)
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `quiz_id` | `text` | `PK`, `FK → quizzes.id`, `ON DELETE CASCADE` | |
+| `document_id` | `text` | `PK`, `FK → documents.id`, `ON DELETE CASCADE` | |
 
 ---
 
@@ -181,30 +192,20 @@ CREATE INDEX idx_messages_created ON messages (conversation_id, created_at);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `quiz_id` | `uuid` | `NOT NULL`, `FK → quizzes.id`, `ON DELETE CASCADE` | Parent quiz |
+| `id` | `text` | `PK` | |
+| `quiz_id` | `text` | `NOT NULL`, `FK → quizzes.id`, `ON DELETE CASCADE` | Parent quiz |
 | `question` | `text` | `NOT NULL` | Question text |
 | `options` | `jsonb` | `NOT NULL` | Array of `{label, text}` objects |
-| `correct_answer` | `varchar(1)` | `NOT NULL` | `A` | `B` | `C` | `D` |
+| `correct_answer` | `text` | `NOT NULL` | `A`, `B`, `C`, `D` |
 | `explanation` | `text` | `NOT NULL` | Explanation of correct answer |
-| `source_chunk_id` | `uuid` | `FK → chunks.id`, `ON DELETE SET NULL` | Source material |
+| `source_chunk_id` | `text` | `FK → chunks.id`, `ON DELETE SET NULL` | Source material |
 | `order_index` | `integer` | `NOT NULL` | Position in quiz |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
 CREATE INDEX idx_quiz_questions_quiz_id ON quiz_questions (quiz_id);
-CREATE INDEX idx_quiz_questions_source ON quiz_questions (source_chunk_id);
-```
-
-**Sample `options` JSON:**
-```json
-[
-  { "label": "A", "text": "Initialize network weights" },
-  { "label": "B", "text": "Compute gradients via the chain rule" },
-  { "label": "C", "text": "Apply activation functions" },
-  { "label": "D", "text": "Normalize input data" }
-]
+CREATE INDEX idx_quiz_questions_source_chunk_id ON quiz_questions (source_chunk_id);
 ```
 
 ---
@@ -213,9 +214,9 @@ CREATE INDEX idx_quiz_questions_source ON quiz_questions (source_chunk_id);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `user_id` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | User who attempted |
-| `quiz_id` | `uuid` | `NOT NULL`, `FK → quizzes.id`, `ON DELETE CASCADE` | Quiz attempted |
+| `id` | `text` | `PK` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | User who attempted |
+| `quiz_id` | `text` | `NOT NULL`, `FK → quizzes.id`, `ON DELETE CASCADE` | Quiz attempted |
 | `score` | `integer` | `NOT NULL`, `default 0` | Correct answers |
 | `total` | `integer` | `NOT NULL` | Total questions |
 | `answers` | `jsonb` | `NOT NULL` | Array of answer objects |
@@ -224,17 +225,8 @@ CREATE INDEX idx_quiz_questions_source ON quiz_questions (source_chunk_id);
 
 **Indexes:**
 ```sql
-CREATE INDEX idx_quiz_attempts_user ON quiz_attempts (user_id);
-CREATE INDEX idx_quiz_attempts_quiz ON quiz_attempts (quiz_id);
-CREATE INDEX idx_quiz_attempts_user_score ON quiz_attempts (user_id, score DESC);
-```
-
-**Sample `answers` JSON:**
-```json
-[
-  { "questionId": "q-001-...", "selectedAnswer": "B", "isCorrect": true },
-  { "questionId": "q-002-...", "selectedAnswer": "A", "isCorrect": false }
-]
+CREATE INDEX idx_quiz_attempts_user_id ON quiz_attempts (user_id);
+CREATE INDEX idx_quiz_attempts_quiz_id ON quiz_attempts (quiz_id);
 ```
 
 ---
@@ -243,17 +235,15 @@ CREATE INDEX idx_quiz_attempts_user_score ON quiz_attempts (user_id, score DESC)
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `name` | `varchar(255)` | `NOT NULL` | Room display name |
-| `description` | `text` | Nullable | Room purpose |
-| `created_by` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Creator |
-| `invite_code` | `varchar(50)` | `NOT NULL`, `UNIQUE` | Shareable join code |
+| `id` | `text` | `PK` | |
+| `name` | `text` | `NOT NULL` | Room display name |
+| `invite_code` | `text` | `NOT NULL`, `UNIQUE` | Shareable join code |
+| `created_by` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | Creator |
 | `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
-| `updated_at` | `timestamptz` | `NOT NULL`, `auto-update` | |
 
 **Indexes:**
 ```sql
-CREATE UNIQUE INDEX idx_rooms_invite_code ON rooms (invite_code);
+CREATE INDEX idx_rooms_created_by ON rooms (created_by);
 ```
 
 ---
@@ -262,67 +252,112 @@ CREATE UNIQUE INDEX idx_rooms_invite_code ON rooms (invite_code);
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| `id` | `uuid` | `PK` | |
-| `room_id` | `uuid` | `NOT NULL`, `FK → rooms.id`, `ON DELETE CASCADE` | |
-| `user_id` | `uuid` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | |
-| `role` | `varchar(20)` | `NOT NULL`, `default 'member'` | `admin` | `member` |
+| `id` | `text` | `PK` | |
+| `room_id` | `text` | `NOT NULL`, `FK → rooms.id`, `ON DELETE CASCADE` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | |
+| `role` | `member_role` | `NOT NULL`, `default 'member'` | `owner` \| `member` |
 | `joined_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 **Indexes:**
 ```sql
-CREATE UNIQUE INDEX idx_room_members_unique ON room_members (room_id, user_id);
-CREATE INDEX idx_room_members_user ON room_members (user_id);
+CREATE INDEX idx_room_members_room_id ON room_members (room_id);
+CREATE INDEX idx_room_members_user_id ON room_members (user_id);
+CREATE UNIQUE INDEX idx_room_members_room_user_unique ON room_members (room_id, user_id);
 ```
+
+---
+
+### `room_messages`
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `text` | `PK` | |
+| `room_id` | `text` | `NOT NULL`, `FK → rooms.id`, `ON DELETE CASCADE` | |
+| `user_id` | `text` | `NOT NULL`, `FK → users.id`, `ON DELETE CASCADE` | |
+| `content` | `text` | `NOT NULL` | |
+| `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+
+**Indexes:**
+```sql
+CREATE INDEX idx_room_messages_room_id ON room_messages (room_id);
+CREATE INDEX idx_room_messages_created_at ON room_messages (created_at);
+```
+
+---
+
+### `subjects`
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | `PK`, `default gen_random_uuid()` | |
+| `user_id` | `text` | `NOT NULL` | String Clerk ID |
+| `name` | `varchar(255)` | `NOT NULL` | |
+| `color` | `varchar(50)` | Nullable | |
+| `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+
+---
+
+### `tasks`
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | `PK`, `default gen_random_uuid()` | |
+| `user_id` | `text` | `NOT NULL` | String Clerk ID |
+| `subject_id` | `uuid` | `FK → subjects.id`, `ON DELETE SET NULL` | |
+| `title` | `varchar(255)` | `NOT NULL` | |
+| `description` | `text` | Nullable | |
+| `status` | `varchar(50)` | `NOT NULL`, `default 'pending'` | |
+| `due_date` | `timestamp` | Nullable | |
+| `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+
+---
+
+### `study_sessions`
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | `PK`, `default gen_random_uuid()` | |
+| `user_id` | `text` | `NOT NULL` | String Clerk ID |
+| `subject_id` | `uuid` | `FK → subjects.id`, `ON DELETE SET NULL` | |
+| `task_id` | `uuid` | `FK → tasks.id`, `ON DELETE SET NULL` | |
+| `duration_minutes` | `integer` | `NOT NULL` | |
+| `type` | `varchar(50)` | `NOT NULL` | |
+| `completed_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+
+---
+
+### `goals`
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | `PK`, `default gen_random_uuid()` | |
+| `user_id` | `text` | `NOT NULL` | String Clerk ID |
+| `title` | `varchar(255)` | `NOT NULL` | |
+| `target_hours` | `integer` | `NOT NULL` | |
+| `current_hours` | `integer` | `NOT NULL`, `default 0` | |
+| `deadline` | `timestamp` | Nullable | |
+| `status` | `varchar(50)` | `NOT NULL`, `default 'active'` | |
+| `created_at` | `timestamptz` | `NOT NULL`, `default now()` | |
+| `updated_at` | `timestamptz` | `NOT NULL`, `default now()` | |
 
 ---
 
 ## Vector Search Query
 
-The core RAG query using pgvector cosine similarity:
+The core RAG query using pgvector cosine similarity with HNSW:
 
 ```sql
 SELECT
   id,
   content,
   page_number,
-  metadata,
+  heading,
   1 - (embedding <=> :query_embedding) AS similarity
 FROM chunks
 WHERE document_id = ANY(:document_ids)
 ORDER BY embedding <=> :query_embedding
-LIMIT 5;
-```
-
-Hybrid search (vector + keyword) with Reciprocal Ranked Fusion (RRF):
-
-```sql
-WITH vector_results AS (
-  SELECT id, content, page_number,
-    1 - (embedding <=> :query_embedding) AS score
-  FROM chunks
-  WHERE document_id = ANY(:document_ids)
-  ORDER BY embedding <=> :query_embedding
-  LIMIT 20
-),
-keyword_results AS (
-  SELECT id, content, page_number,
-    ts_rank(to_tsvector('english', content),
-            plainto_tsquery('english', :query_text)) AS score
-  FROM chunks
-  WHERE document_id = ANY(:document_ids)
-    AND to_tsvector('english', content) @@ plainto_tsquery('english', :query_text)
-  ORDER BY score DESC
-  LIMIT 20
-),
-rrf AS (
-  SELECT id, content, page_number,
-    COALESCE(1.0 / (60 + ROW_NUMBER() OVER (ORDER BY v.score DESC)), 0) +
-    COALESCE(1.0 / (60 + ROW_NUMBER() OVER (ORDER BY k.score DESC)), 0) AS rrf_score
-  FROM vector_results v
-  FULL OUTER JOIN keyword_results k USING (id)
-)
-SELECT * FROM rrf
-ORDER BY rrf_score DESC
 LIMIT 5;
 ```
 

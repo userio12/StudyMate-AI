@@ -123,7 +123,9 @@ export class QuizService {
 
     const documentIds = quiz.documents?.map(d => d.documentId) || [];
 
-    return { ...quiz, documentIds, questions, attempts };
+    const sanitizedQuestions = questions.map(({ correctAnswer, explanation, ...q }) => q);
+
+    return { ...quiz, documentIds, questions: sanitizedQuestions, attempts };
   }
 
   async updateQuiz(id: string, userId: string, data: { title?: string; isPinned?: boolean }) {

@@ -141,22 +141,27 @@ export function ChatInterface({ conversationId, initialMessages, continuity, onC
     
     let currentStream = '';
     let lastRenderTime = 0;
+    const currentCitations: any[] = [];
 
     await api.streamPost(
       `/chat/conversations/${activeConversationId}/message`,
       { content, searchProvider, chatProvider, chatModel: openRouterChatModel },
-      (token) => {
-        currentStream += token;
-        const now = Date.now();
-        if (now - lastRenderTime > 35) {
-          setStreamingContent(currentStream);
-          lastRenderTime = now;
+      (event) => {
+        if (event.type === 'token') {
+          currentStream += event.data;
+          const now = Date.now();
+          if (now - lastRenderTime > 35) {
+            setStreamingContent(currentStream);
+            lastRenderTime = now;
+          }
+        } else if (event.type === 'citation') {
+          currentCitations.push(event.chunk);
         }
       },
       () => {
         setMessages((prev) => [
           ...prev,
-          { id: crypto.randomUUID(), role: 'assistant', content: currentStream },
+          { id: crypto.randomUUID(), role: 'assistant', content: currentStream, citations: currentCitations },
         ]);
         setStreamingContent('');
         setIsStreaming(false);

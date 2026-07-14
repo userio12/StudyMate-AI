@@ -139,7 +139,7 @@ export function useApiClient() {
     async streamPost(
       path: string,
       body: unknown,
-      onToken: (token: string) => void,
+      onEvent: (event: any) => void,
       onComplete?: () => void,
       onError?: (error: Error) => void,
       signal?: AbortSignal,
@@ -196,9 +196,9 @@ export function useApiClient() {
               }
 
               try {
-                onToken(JSON.parse(data) as string);
+                onEvent(JSON.parse(data));
               } catch {
-                onToken(data);
+                onEvent({ type: 'token', data });
               }
             }
           }

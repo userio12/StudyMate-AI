@@ -11,6 +11,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
+    let errors: any[] | undefined = undefined;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -19,17 +20,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = res;
       } else if (typeof res === 'object' && res !== null) {
         const msg = (res as Record<string, unknown>).message;
-        message = Array.isArray(msg) ? msg[0] ?? message : (msg as string) ?? message;
+        if (Array.isArray(msg)) {
+          errors = msg;
+          message = 'Validation failed';
+        } else {
+          message = (msg as string) ?? message;
+        }
       }
     } else if (exception instanceof Error) {
       message = exception.message;
       this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
     }
 
-    response.status(status).json({
-      statusCode: status,
-      message,
-      timestamp: new Date().toISOString(),
-    });
+    const payload: any = { status, message };
+    if (errors) {
+      payload.errors = errors;
+    }
+
+    response.status(status).json(payload);
   }
 }

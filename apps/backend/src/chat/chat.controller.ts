@@ -73,8 +73,8 @@ export class ChatController {
         body.searchProvider,
         body.chatProvider,
         body.chatModel,
-        (token: string) => {
-          res.write(encoder.encode(`data: ${JSON.stringify(token)}\n\n`));
+        (payload: any) => {
+          res.write(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
         },
         abortController.signal,
       );

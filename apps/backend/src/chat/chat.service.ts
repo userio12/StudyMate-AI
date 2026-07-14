@@ -81,7 +81,7 @@ export class ChatService {
     searchProvider: 'duckduckgo' | 'tavily' | 'off' | undefined,
     chatProvider: string | undefined,
     chatModel: string | undefined,
-    onToken: (token: string) => void,
+    onToken: (payload: any) => void,
     signal?: AbortSignal,
   ): Promise<string> {
     const conv = await this.getConversation(conversationId, userId);
@@ -112,6 +112,9 @@ export class ChatService {
     }));
 
     const fullResponse: string[] = [];
+    let buffer = '';
+    const citationRegex = /\[citation:(\d+)\]/g;
+    const emittedCitations = new Set<string>();
 
     for await (const token of this.llm.streamChat(
       history,
@@ -122,7 +125,21 @@ export class ChatService {
       signal,
     )) {
       fullResponse.push(token);
-      onToken(token);
+      onToken({ type: 'token', data: token });
+      
+      buffer += token;
+      let match;
+      while ((match = citationRegex.exec(buffer)) !== null) {
+        const indexStr = match[1];
+        if (indexStr && !emittedCitations.has(indexStr)) {
+          emittedCitations.add(indexStr);
+          const index = parseInt(indexStr) - 1;
+          const source = sources[index];
+          if (source) {
+            onToken({ type: 'citation', chunk: source });
+          }
+        }
+      }
     }
 
     if (signal?.aborted) return '';
