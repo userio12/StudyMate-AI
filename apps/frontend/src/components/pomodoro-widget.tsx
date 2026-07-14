@@ -9,33 +9,41 @@ import { useApiClient } from '@/lib/api-client';
 import { useSWRConfig } from 'swr';
 import { useActiveTask } from '@/lib/ActiveTaskContext';
 
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
+
 export function PomodoroWidget() {
   const { activeTask, setActiveTask } = useActiveTask();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [mode, setMode] = useState<'pomodoro' | 'shortBreak' | 'longBreak'>('pomodoro');
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isRunning, setIsRunning] = useState(false);
-  const [settings, setSettings] = useState({ pomodoro: 25, shortBreak: 5, longBreak: 15 });
-
-  useEffect(() => {
-    const saved = localStorage.getItem('pomodoroSettings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setSettings(parsed);
-        if (mode === 'pomodoro') setTimeLeft(parsed.pomodoro * 60);
-      } catch(e) {}
+  const [settings, setSettings] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('pomodoroSettings_v1');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch(e) {}
+      }
     }
-  }, []);
+    return { pomodoro: 25, shortBreak: 5, longBreak: 15 };
+  });
+  const [timeLeft, setTimeLeft] = useState(settings.pomodoro * 60);
+  const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
+  // Derive isOpen and isMinimized from activeTask (React recommended pattern)
+  const prevActiveTaskRef = useRef(activeTask);
+  if (activeTask !== prevActiveTaskRef.current) {
+    prevActiveTaskRef.current = activeTask;
     if (activeTask) {
-      setIsOpen(true);
+      if (!isOpen) setIsOpen(true);
       if (isMinimized) setIsMinimized(false);
     }
-  }, [activeTask]);
+  }
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const api = useApiClient();
@@ -50,26 +58,30 @@ export function PomodoroWidget() {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            setIsRunning(false);
+            if (mode === 'pomodoro') {
+              api.post('/study-sessions', {
+                durationMinutes: settings.pomodoro,
+                type: 'pomodoro',
+                taskId: activeTask?.id || undefined,
+              }).then(() => {
+                mutate('/analytics/stats');
+              }).catch(console.error);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
-    } else if (timeLeft === 0) {
-      setIsRunning(false);
-      // Play sound here ideally
-      if (mode === 'pomodoro') {
-        api.post('/study-sessions', {
-          durationMinutes: settings.pomodoro,
-          type: 'pomodoro',
-          taskId: activeTask?.id || undefined,
-        }).then(() => {
-          mutate('/analytics/stats');
-        }).catch(console.error);
-      }
     }
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isRunning, timeLeft, mode, api, mutate]);
+  }, [isRunning, timeLeft, mode, api, mutate, activeTask?.id, settings.pomodoro]);
 
   const handleModeChange = (newMode: keyof typeof MODES) => {
     setMode(newMode);
@@ -78,15 +90,9 @@ export function PomodoroWidget() {
   };
 
   const saveSettings = () => {
-    localStorage.setItem('pomodoroSettings', JSON.stringify(settings));
+    localStorage.setItem('pomodoroSettings_v1', JSON.stringify(settings));
     setTimeLeft(MODES[mode].time);
     setShowSettings(false);
-  };
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const progress = ((MODES[mode].time - timeLeft) / MODES[mode].time) * 100;
@@ -173,15 +179,15 @@ export function PomodoroWidget() {
             <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-fg">Focus</span>
-                <input type="number" min="1" max="120" value={settings.pomodoro} onChange={(e) => setSettings({...settings, pomodoro: parseInt(e.target.value) || 25})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
+                <input aria-label="Focus time" type="number" min="1" max="120" value={settings.pomodoro} onChange={(e) => setSettings({...settings, pomodoro: parseInt(e.target.value) || 25})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-fg">Short Break</span>
-                <input type="number" min="1" max="60" value={settings.shortBreak} onChange={(e) => setSettings({...settings, shortBreak: parseInt(e.target.value) || 5})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
+                <input aria-label="Short break time" type="number" min="1" max="60" value={settings.shortBreak} onChange={(e) => setSettings({...settings, shortBreak: parseInt(e.target.value) || 5})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-fg">Long Break</span>
-                <input type="number" min="1" max="60" value={settings.longBreak} onChange={(e) => setSettings({...settings, longBreak: parseInt(e.target.value) || 15})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
+                <input aria-label="Long break time" type="number" min="1" max="60" value={settings.longBreak} onChange={(e) => setSettings({...settings, longBreak: parseInt(e.target.value) || 15})} className="w-16 bg-surface-3 rounded-lg px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-primary text-center" />
               </div>
             </div>
             <Button onClick={saveSettings} className="w-full mt-4 gap-2">
@@ -194,6 +200,7 @@ export function PomodoroWidget() {
             <div className="flex bg-surface-2 p-1 rounded-full w-full justify-between mb-5 animate-in fade-in duration-200">
               {(Object.keys(MODES) as Array<keyof typeof MODES>).map((m) => (
                 <button
+                  type="button"
                   key={m}
                   onClick={() => handleModeChange(m)}
                   className={cn(

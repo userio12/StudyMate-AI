@@ -1,0 +1,195 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - banner [ref=e6]:
+      - link "StudyMate-AI" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e12]:
+        - generic [ref=e13]:
+          - link "Home" [ref=e14] [cursor=pointer]:
+            - /url: /
+          - link "Features" [ref=e15] [cursor=pointer]:
+            - /url: /#features
+          - link "About" [ref=e16] [cursor=pointer]:
+            - /url: /about
+      - generic [ref=e17]:
+        - link "Log in" [ref=e18] [cursor=pointer]:
+          - /url: /sign-in
+        - link "Sign up" [ref=e19] [cursor=pointer]:
+          - /url: /sign-up
+    - main [ref=e20]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: AI STUDY PLATFORM FOR STUDENTS
+        - heading "Upload your notes. Learn it smarter. Understand it deeper. Pass your exams. Remember it longer. Study more effectively." [level=1] [ref=e29]:
+          - text: Upload your notes.
+          - generic [ref=e30]:
+            - generic [ref=e31]: Learn it smarter.
+            - generic [ref=e32]: Understand it deeper.
+            - generic [ref=e33]: Pass your exams.
+            - generic [ref=e34]: Remember it longer.
+            - generic [ref=e35]: Study more effectively.
+        - paragraph [ref=e37]: Upload your PDFs, chat with your materials using RAG-powered citations, and generate adaptive quizzes — all in one beautiful workspace.
+        - generic [ref=e39]:
+          - link [ref=e40] [cursor=pointer]:
+            - /url: /sign-up
+          - link "View on GitHub" [ref=e45] [cursor=pointer]:
+            - /url: https://github.com/userio12/StudyMate-AI
+        - generic [ref=e49]:
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Powered by Gemini 2.0
+            - paragraph [ref=e56]: Lightning Fast AI
+          - generic [ref=e61]:
+            - paragraph [ref=e62]: 100% Private
+            - paragraph [ref=e63]: Your data is encrypted
+          - generic [ref=e68]:
+            - paragraph [ref=e69]: Open Source
+            - paragraph [ref=e70]: MIT License
+        - generic [ref=e74]:
+          - generic [ref=e75]: studymate.ai/dashboard
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]: StudyMate-AI
+              - generic [ref=e90]:
+                - generic [ref=e91]: Documents
+                - generic [ref=e94]: Chat
+                - generic [ref=e97]: Quiz
+            - generic [ref=e100]:
+              - generic [ref=e104]: Can you summarize the key takeaways from the machine learning lecture?
+              - generic [ref=e105]:
+                - paragraph [ref=e106]: "Sure! Here are the core concepts from your lecture notes:"
+                - list [ref=e107]:
+                  - listitem [ref=e108]:
+                    - strong [ref=e109]: "Supervised Learning:"
+                    - text: Training models on labeled data to predict outcomes.
+                  - listitem [ref=e110]:
+                    - strong [ref=e111]: "Neural Networks:"
+                    - text: Computing systems inspired by the biological brain's architecture.
+                - generic [ref=e112]: cs-lecture-4.pdf (pg. 12)
+              - generic [ref=e116]: Ask a follow-up question...
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]: Platform Features
+          - heading "Everything you need, all in one place" [level=2] [ref=e128]
+          - paragraph [ref=e130]: Built for the way brains actually learn. A full AI study stack in one seamless experience — no juggling between tools.
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]: Instant Indexing
+            - heading "Document Processing" [level=3] [ref=e138]
+            - paragraph [ref=e139]: Drag and drop your PDFs. We automatically extract, chunk, and embed every single page into a semantic vector store for instant retrieval.
+            - link "Try it now" [ref=e141] [cursor=pointer]:
+              - /url: /sign-up
+          - generic [ref=e144]:
+            - generic [ref=e145]: Zero Hallucinations
+            - heading "AI Chat with Citations" [level=3] [ref=e150]
+            - paragraph [ref=e151]: Ask complex questions and get answers firmly grounded in your own materials, complete with precise page-level source citations.
+            - link "Try it now" [ref=e153] [cursor=pointer]:
+              - /url: /sign-up
+          - generic [ref=e156]:
+            - generic [ref=e157]: Auto-Grading
+            - heading "Adaptive Quizzes" [level=3] [ref=e162]
+            - paragraph [ref=e163]: Automatically generate rigorous multiple-choice, true/false, and short-answer quizzes. Download beautiful PDF reports of your results.
+            - link "Try it now" [ref=e165] [cursor=pointer]:
+              - /url: /sign-up
+          - generic [ref=e168]:
+            - generic [ref=e169]: Live Sync
+            - heading "Real-Time Study Rooms" [level=3] [ref=e174]
+            - paragraph [ref=e175]: Collaborate with peers in low-latency live workspaces. Share documents, chat, and tackle complex study materials together.
+            - link "Try it now" [ref=e177] [cursor=pointer]:
+              - /url: /sign-up
+      - generic [ref=e182]:
+        - generic [ref=e183]:
+          - generic [ref=e184]: Workflow
+          - heading "From upload to insight in minutes" [level=2] [ref=e188]
+        - generic [ref=e189]:
+          - generic [ref=e191]:
+            - generic [ref=e192]: "01"
+            - heading "Upload your PDFs" [level=3] [ref=e194]
+            - paragraph [ref=e195]: Drop in lecture notes, textbooks, or research papers. We process them instantly.
+          - generic [ref=e196]:
+            - generic [ref=e197]: "02"
+            - heading "Ask anything" [level=3] [ref=e199]
+            - paragraph [ref=e200]: Chat naturally with your materials. Get answers backed by exact page citations.
+          - generic [ref=e201]:
+            - generic [ref=e202]: "03"
+            - heading "Test yourself" [level=3] [ref=e204]
+            - paragraph [ref=e205]: Generate adaptive quizzes that target your weak points and reinforce memory.
+      - generic [ref=e212]:
+        - heading "Ready to revolutionize your study routine?" [level=2] [ref=e213]
+        - paragraph [ref=e214]: Join thousands of students and researchers saving hours every week with AI-powered insights.
+        - generic [ref=e215]:
+          - link "Create your free account" [ref=e216] [cursor=pointer]:
+            - /url: /sign-up
+          - paragraph [ref=e219]: No credit card required.
+    - contentinfo [ref=e220]:
+      - generic [ref=e221]:
+        - generic [ref=e222]:
+          - generic [ref=e223]:
+            - link "StudyMate AI-powered" [ref=e224] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e228]:
+                - generic [ref=e229]: StudyMate
+                - generic [ref=e230]: AI-powered
+            - paragraph [ref=e231]: Your ultimate AI companion for smarter, faster learning. Upload your documents, chat with citations, and generate adaptive quizzes.
+            - generic [ref=e232]:
+              - link "GitHub" [ref=e233] [cursor=pointer]:
+                - /url: https://github.com/userio12/StudyMate-AI
+              - link "Twitter" [ref=e236] [cursor=pointer]:
+                - /url: https://twitter.com
+              - link "Discord" [ref=e239] [cursor=pointer]:
+                - /url: https://discord.com
+              - link "Facebook" [ref=e242] [cursor=pointer]:
+                - /url: https://facebook.com
+              - link "Email" [ref=e245] [cursor=pointer]:
+                - /url: mailto:hello@studymate.ai
+          - generic [ref=e249]:
+            - heading "Product" [level=3] [ref=e250]
+            - list [ref=e251]:
+              - listitem [ref=e252]:
+                - link "Features" [ref=e253] [cursor=pointer]:
+                  - /url: /#features
+              - listitem [ref=e254]:
+                - link "Get Started" [ref=e255] [cursor=pointer]:
+                  - /url: /sign-up
+              - listitem [ref=e256]:
+                - link "About Us" [ref=e257] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e258]:
+                - link "Changelog" [ref=e259] [cursor=pointer]:
+                  - /url: https://github.com/userio12/StudyMate-AI/releases
+          - generic [ref=e260]:
+            - heading "Resources" [level=3] [ref=e261]
+            - list [ref=e262]:
+              - listitem [ref=e263]:
+                - link "Documentation" [ref=e264] [cursor=pointer]:
+                  - /url: https://github.com/userio12/StudyMate-AI#readme
+              - listitem [ref=e265]:
+                - link "Blog" [ref=e266] [cursor=pointer]:
+                  - /url: https://github.com/userio12/StudyMate-AI
+              - listitem [ref=e267]:
+                - link "Community" [ref=e268] [cursor=pointer]:
+                  - /url: https://github.com/userio12/StudyMate-AI/discussions
+              - listitem [ref=e269]:
+                - link "Open Source" [ref=e270] [cursor=pointer]:
+                  - /url: https://github.com/userio12/StudyMate-AI
+          - generic [ref=e271]:
+            - heading "Legal" [level=3] [ref=e272]
+            - list [ref=e273]:
+              - listitem [ref=e274]:
+                - link "Privacy Policy" [ref=e275] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e276]:
+                - link "Terms of Service" [ref=e277] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e278]:
+                - link "Cookie Policy" [ref=e279] [cursor=pointer]:
+                  - /url: /cookies
+        - generic [ref=e280]:
+          - paragraph [ref=e281]: © 2026 StudyMate-AI. All rights reserved.
+          - generic [ref=e282]:
+            - generic [ref=e283]: Built with
+            - generic [ref=e284]: Next.js
+            - generic [ref=e285]: "&"
+            - generic [ref=e286]: Google Gemini
+  - region "Notifications alt+T"
+  - alert [ref=e287]

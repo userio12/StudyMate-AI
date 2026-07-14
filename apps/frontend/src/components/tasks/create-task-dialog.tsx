@@ -13,41 +13,38 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    isSubmitting: false,
+    error: ''
+  });
   
   const api = useApiClient();
   const { mutate } = useSWRConfig();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!form.title.trim()) return;
 
     try {
-      setIsSubmitting(true);
-      setError('');
+      setForm(prev => ({ ...prev, isSubmitting: true, error: '' }));
       
       await api.post('/tasks', {
-        title,
-        description,
-        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+        title: form.title,
+        description: form.description,
+        dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : null,
       });
       
       // Refresh the tasks list on the page
       await mutate('/tasks');
       
       // Reset form and close dialog
-      setTitle('');
-      setDescription('');
-      setDueDate('');
+      setForm({ title: '', description: '', dueDate: '', isSubmitting: false, error: '' });
       onOpenChange(false);
     } catch (err: any) {
-      setError(err.message || 'Failed to create task');
-    } finally {
-      setIsSubmitting(false);
+      setForm(prev => ({ ...prev, error: err.message || 'Failed to create task', isSubmitting: false }));
     }
   };
 
@@ -61,9 +58,9 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
-        {error && (
+        {form.error && (
           <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
-            {error}
+            {form.error}
           </div>
         )}
         
@@ -73,8 +70,8 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
           </label>
           <Input
             id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder="e.g. Read Chapter 4"
             required
             autoFocus
@@ -87,8 +84,8 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
           </label>
           <Input
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="Additional details..."
           />
         </div>
@@ -100,8 +97,8 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
           <Input
             id="dueDate"
             type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            value={form.dueDate}
+            onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
             className="text-foreground min-h-[40px] [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
           />
         </div>
@@ -111,16 +108,16 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
             type="button" 
             variant="ghost" 
             onClick={() => onOpenChange(false)}
-            disabled={isSubmitting}
+            disabled={form.isSubmitting}
           >
             Cancel
           </Button>
           <Button 
             type="submit" 
-            disabled={!title.trim() || isSubmitting}
+            disabled={!form.title.trim() || form.isSubmitting}
             className="bg-brand-500 hover:bg-brand-400 text-white min-w-[100px]"
           >
-            {isSubmitting ? 'Creating...' : 'Create Task'}
+            {form.isSubmitting ? 'Creating...' : 'Create Task'}
           </Button>
         </div>
       </form>

@@ -191,7 +191,7 @@ export default function DashboardPage() {
                     )}
                     {task.dueDate && (
                       <p className="text-xs font-semibold mt-auto text-brand-400 pt-2">
-                        Due: {new Date(task.dueDate).toLocaleDateString()}
+                        Due: {mounted ? new Date(task.dueDate).toLocaleDateString() : ''}
                       </p>
                     )}
                   </div>

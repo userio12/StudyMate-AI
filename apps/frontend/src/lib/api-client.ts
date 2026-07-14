@@ -144,35 +144,35 @@ export function useApiClient() {
       onError?: (error: Error) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const token = await getCachedToken.get();
-
-      const response = await fetch(`${BASE_URL}${path}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(body),
-        signal,
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) getCachedToken.invalidate();
-        const errBody = await response.json().catch(() => ({ message: 'Stream failed' }));
-        onError?.(new ApiError(response.status, errBody.message ?? 'Stream failed'));
-        return;
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        onError?.(new Error('No response body'));
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      let buffer = '';
-
       try {
+        const token = await getCachedToken.get();
+
+        const response = await fetch(`${BASE_URL}${path}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(body),
+          signal,
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) getCachedToken.invalidate();
+          const errBody = await response.json().catch(() => ({ message: 'Stream failed' }));
+          onError?.(new ApiError(response.status, errBody.message ?? 'Stream failed'));
+          return;
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          onError?.(new Error('No response body'));
+          return;
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -190,20 +190,14 @@ export function useApiClient() {
                 return;
               }
 
-              // FIX BUG-29: Handle [ERROR] frames sent by the backend on stream failure.
-              // Previously these were passed to onToken() and displayed as chat content.
               if (data.startsWith('[ERROR]')) {
                 onError?.(new Error(data.slice(7).trim()));
                 return;
               }
 
-              // FIX BUG-03 (frontend side): The backend now JSON.stringify()s each token
-              // before sending, so we JSON.parse() here to recover the original string
-              // including any embedded newlines.
               try {
                 onToken(JSON.parse(data) as string);
               } catch {
-                // Fallback for any non-JSON frames
                 onToken(data);
               }
             }

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFire, faBullseye } from '@fortawesome/free-solid-svg-icons';
+import { useMounted } from '@/hooks/use-mounted';
 
 interface HeatmapData {
   date: string; // YYYY-MM-DD
@@ -21,86 +22,72 @@ const toDateString = (d: Date) => {
 const MIN_ACTIVE_MINUTES = 15;
 
 export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
-  const { 
-    calendarCells, 
-    currentStreak, 
-    activeDaysThisMonth, 
-    daysInMonth,
-    currentMonthName
-  } = useMemo(() => {
-    const today = new Date();
-    // Use local time
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const daysInThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday
+  const mounted = useMounted();
+  const today = new Date();
+  
+  // Use local time
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  const daysInThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday
 
-    const monthName = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const currentMonthName = mounted ? today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
 
-    // Calculate Streaks
-    // We want to count consecutive days leading up to today where duration > 0.
-    // Ensure data is sorted descending.
-    const sortedData = [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Calculate Streaks
+  const dataMap = new Map<string, HeatmapData>();
+  for (const d of data) {
+    dataMap.set(d.date, d);
+  }
+  
+  let currentStreak = 0;
+  let checkDate = new Date();
+  let foundBreak = false;
+
+  while (!foundBreak) {
+    const dStr = toDateString(checkDate);
+    const rec = dataMap.get(dStr);
     
-    let currentStreakCount = 0;
-    let checkDate = new Date();
-    let foundBreak = false;
-
-    while (!foundBreak) {
-      const dStr = toDateString(checkDate);
-      const rec = sortedData.find(d => d.date === dStr);
-      
-      if (rec && rec.duration >= MIN_ACTIVE_MINUTES) {
-        currentStreakCount++;
+    if (rec && rec.duration >= MIN_ACTIVE_MINUTES) {
+      currentStreak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      // If it's today and duration < 15, we can still check yesterday
+      // because the user might just haven't studied enough yet today!
+      if (dStr === toDateString(today)) {
         checkDate.setDate(checkDate.getDate() - 1);
       } else {
-        // If it's today and duration < 15, we can still check yesterday
-        // because the user might just haven't studied enough yet today!
-        if (dStr === toDateString(today)) {
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else {
-          foundBreak = true;
-        }
+        foundBreak = true;
       }
     }
+  }
 
-    // Calculate Active Days This Month
-    let activeDaysCount = 0;
-    for (let i = 1; i <= daysInThisMonth; i++) {
-      const dStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const rec = sortedData.find(d => d.date === dStr);
-      if (rec && rec.duration >= MIN_ACTIVE_MINUTES) {
-        activeDaysCount++;
-      }
+  // Calculate Active Days This Month
+  let activeDaysThisMonth = 0;
+  for (let i = 1; i <= daysInThisMonth; i++) {
+    const dStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    const rec = dataMap.get(dStr);
+    if (rec && rec.duration >= MIN_ACTIVE_MINUTES) {
+      activeDaysThisMonth++;
     }
+  }
 
-    const cells: Array<{ date: string; day: number; isFuture: boolean } | null> = [];
-    
-    // Add empty slots for the days before the 1st of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      cells.push(null);
-    }
+  const calendarCells: Array<{ date: string; day: number; isFuture: boolean } | null> = [];
+  
+  // Add empty slots for the days before the 1st of the month
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    calendarCells.push(null);
+  }
 
-    const todayStr = toDateString(today);
+  const todayStr = toDateString(today);
 
-    // Add actual days of the month
-    for (let i = 1; i <= daysInThisMonth; i++) {
-      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const isFuture = dateStr > todayStr;
-      cells.push({ date: dateStr, day: i, isFuture });
-    }
-
-    return { 
-      calendarCells: cells, 
-      currentStreak: currentStreakCount, 
-      activeDaysThisMonth: activeDaysCount, 
-      daysInMonth: daysInThisMonth,
-      currentMonthName: monthName
-    };
-  }, [data]);
+  // Add actual days of the month
+  for (let i = 1; i <= daysInThisMonth; i++) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    const isFuture = dateStr > todayStr;
+    calendarCells.push({ date: dateStr, day: i, isFuture });
+  }
 
   const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  const todayStr = toDateString(new Date());
 
   return (
     <div className="w-full max-w-md mx-auto flex flex-col p-1 space-y-4">
@@ -122,7 +109,7 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
           </div>
           <div>
             <p className="text-[11px] text-muted-fg font-bold uppercase tracking-wider mb-0.5">Monthly Consistency</p>
-            <p className="text-xl font-black text-foreground tracking-tight">{activeDaysThisMonth} <span className="text-sm font-medium text-muted">/ {daysInMonth} Days</span></p>
+            <p className="text-xl font-black text-foreground tracking-tight">{activeDaysThisMonth} <span className="text-sm font-medium text-muted">/ {daysInThisMonth} Days</span></p>
           </div>
         </div>
       </div>
@@ -145,7 +132,7 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
               return <div key={`empty-${idx}`} className="w-full aspect-square" />;
             }
 
-            const record = data.find((d) => d.date === cell.date);
+            const record = dataMap.get(cell.date);
             const duration = record?.duration || 0;
             const isToday = cell.date === todayStr;
 
@@ -177,7 +164,7 @@ export function StudyHeatmap({ data }: { data: HeatmapData[] }) {
                       {duration >= MIN_ACTIVE_MINUTES ? `${duration} mins studied` : cell.isFuture ? 'Upcoming' : duration > 0 ? `${duration} mins (Goal: ${MIN_ACTIVE_MINUTES}m)` : 'No activity'}
                     </span>
                     <span className="text-muted-fg text-[10px] font-medium uppercase tracking-wider">
-                      {new Date(cell.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                      {mounted ? new Date(cell.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : ''}
                     </span>
                   </div>
                   <div className="w-2 h-2 bg-surface-0 border-r border-b border-white/10 rotate-45 -mt-1 z-0" />

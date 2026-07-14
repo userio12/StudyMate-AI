@@ -1,0 +1,147 @@
+- generic [active] [ref=f14e1]:
+  - link "Skip to main content" [ref=f14e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f14e4]:
+    - complementary [ref=f14e5]:
+      - generic [ref=f14e6]:
+        - link "StudyMate-AI" [ref=f14e8] [cursor=pointer]:
+          - /url: /dashboard
+        - navigation "Main navigation" [ref=f14e13]:
+          - generic [ref=f14e14]:
+            - link "Dashboard" [ref=f14e15] [cursor=pointer]:
+              - /url: /dashboard
+            - link "Documents" [ref=f14e18] [cursor=pointer]:
+              - /url: /documents
+            - link "Tasks" [ref=f14e21] [cursor=pointer]:
+              - /url: /tasks
+            - link "Analytics" [ref=f14e24] [cursor=pointer]:
+              - /url: /analytics
+            - link "Chat" [ref=f14e27] [cursor=pointer]:
+              - /url: /chat
+            - link "Quiz" [ref=f14e30] [cursor=pointer]:
+              - /url: /quiz
+            - link "Study Rooms" [ref=f14e33] [cursor=pointer]:
+              - /url: /rooms
+            - link "Settings" [ref=f14e36] [cursor=pointer]:
+              - /url: /settings
+        - generic [ref=f14e39]:
+          - generic [ref=f14e43]:
+            - paragraph [ref=f14e44]: Google Gemini
+            - paragraph [ref=f14e45]: Intelligence engine
+          - paragraph [ref=f14e47]: Your account
+    - main [ref=f14e49]:
+      - article [ref=f14e50]:
+        - generic [ref=f14e54]:
+          - paragraph [ref=f14e55]: Good evening
+          - heading "Welcome back, there" [level=1] [ref=f14e57]
+          - paragraph [ref=f14e58]: Your AI study companion is ready. Upload a new document, jump back into an active chat, or test your knowledge with a quiz.
+          - generic [ref=f14e59]:
+            - link [ref=f14e60] [cursor=pointer]:
+              - /url: /documents
+              - button "Upload PDF" [ref=f14e61]
+            - link [ref=f14e64] [cursor=pointer]:
+              - /url: /chat
+              - button "Start Chatting" [ref=f14e65]
+        - region "Quick actions" [ref=f14e69]:
+          - heading "Quick Actions" [level=2] [ref=f14e70]
+          - generic [ref=f14e73]:
+            - link [ref=f14e74] [cursor=pointer]:
+              - /url: /documents
+              - generic [ref=f14e78]:
+                - paragraph [ref=f14e79]: Process Document
+                - paragraph [ref=f14e80]: Extract & Embed PDF
+            - link [ref=f14e81] [cursor=pointer]:
+              - /url: /chat
+              - generic [ref=f14e85]:
+                - paragraph [ref=f14e86]: Ask Questions
+                - paragraph [ref=f14e87]: Chat with citations
+            - link [ref=f14e88] [cursor=pointer]:
+              - /url: /quiz
+              - generic [ref=f14e92]:
+                - paragraph [ref=f14e93]: Take a Quiz
+                - paragraph [ref=f14e94]: Test your knowledge
+            - link [ref=f14e95] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=f14e99]:
+                - paragraph [ref=f14e100]: Manage Tasks
+                - paragraph [ref=f14e101]: Track assignments
+            - link [ref=f14e102] [cursor=pointer]:
+              - /url: /rooms
+              - generic [ref=f14e106]:
+                - paragraph [ref=f14e107]: Study Rooms
+                - paragraph [ref=f14e108]: Collaborate live
+        - region "Active pipeline" [ref=f14e110]:
+          - generic [ref=f14e111]:
+            - heading "Active Pipeline" [level=2] [ref=f14e112]
+            - link "Open Task Flow →" [ref=f14e115] [cursor=pointer]:
+              - /url: /tasks
+          - generic [ref=f14e116]: Loading tasks...
+        - region "Analytics" [ref=f14e118]:
+          - heading "Study Analytics" [level=2] [ref=f14e119]
+          - generic [ref=f14e122]:
+            - generic [ref=f14e123]:
+              - generic [ref=f14e124]: Loading stats...
+              - generic [ref=f14e128]: Loading stats...
+            - generic [ref=f14e133]:
+              - generic [ref=f14e135]:
+                - heading "Recent Activity" [level=3] [ref=f14e136]
+                - paragraph [ref=f14e137]: Your study sessions this week
+              - generic [ref=f14e138]: Loading activity...
+          - generic [ref=f14e144]:
+            - generic [ref=f14e146]:
+              - heading "Study Consistency" [level=3] [ref=f14e147]
+              - paragraph [ref=f14e148]: Your 28-day activity calendar
+            - generic [ref=f14e150]:
+              - generic [ref=f14e151]:
+                - generic [ref=f14e156]:
+                  - paragraph [ref=f14e157]: Current Streak
+                  - paragraph [ref=f14e158]: 0 Days
+                - generic [ref=f14e163]:
+                  - paragraph [ref=f14e164]: Monthly Consistency
+                  - paragraph [ref=f14e165]:
+                    - text: "0"
+                    - generic [ref=f14e166]: / 31 Days
+              - generic [ref=f14e167]:
+                - heading "July 2026" [level=4] [ref=f14e169]
+                - generic [ref=f14e170]:
+                  - generic [ref=f14e171]: Su
+                  - generic [ref=f14e172]: Mo
+                  - generic [ref=f14e173]: Tu
+                  - generic [ref=f14e174]: We
+                  - generic [ref=f14e175]: Th
+                  - generic [ref=f14e176]: Fr
+                  - generic [ref=f14e177]: Sa
+                  - generic [ref=f14e181]: "1"
+                  - generic [ref=f14e183]: "2"
+                  - generic [ref=f14e185]: "3"
+                  - generic [ref=f14e187]: "4"
+                  - generic [ref=f14e189]: "5"
+                  - generic [ref=f14e191]: "6"
+                  - generic [ref=f14e193]: "7"
+                  - generic [ref=f14e195]: "8"
+                  - generic [ref=f14e197]: "9"
+                  - generic [ref=f14e199]: "10"
+                  - generic [ref=f14e201]: "11"
+                  - generic [ref=f14e203]: "12"
+                  - generic [ref=f14e205]: "13"
+                  - generic [ref=f14e207]: "14"
+                  - generic [ref=f14e209]: "15"
+                  - generic [ref=f14e211]: "16"
+                  - generic [ref=f14e213]: "17"
+                  - generic [ref=f14e215]: "18"
+                  - generic [ref=f14e217]: "19"
+                  - generic [ref=f14e219]: "20"
+                  - generic [ref=f14e221]: "21"
+                  - generic [ref=f14e223]: "22"
+                  - generic [ref=f14e225]: "23"
+                  - generic [ref=f14e227]: "24"
+                  - generic [ref=f14e229]: "25"
+                  - generic [ref=f14e231]: "26"
+                  - generic [ref=f14e233]: "27"
+                  - generic [ref=f14e235]: "28"
+                  - generic [ref=f14e237]: "29"
+                  - generic [ref=f14e239]: "30"
+                  - generic [ref=f14e241]: "31"
+    - button [ref=f14e243]
+  - region "Notifications alt+T"
+  - alert [ref=f14e246]

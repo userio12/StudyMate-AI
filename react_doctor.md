@@ -1,105 +1,60 @@
 <!-- react-doctor:summary -->
 
-**React Doctor** found **50 issues** in 23 files · 50 warnings · score 61 / 100 (Needs work) · full project
+**React Doctor** found **28 issues** in 10 files · 4 errors & 24 warnings · score 56 / 100 (Critical) · full project
 
-<details><summary>50 warnings</summary>
+**Errors**
+
+- ❌ [`src/components/pomodoro-widget.tsx:27`](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L27) **React Compiler can't optimize this** `set-state-in-effect`
+- ❌ [`src/components/pomodoro-widget.tsx:35`](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L35) **React Compiler can't optimize this** `set-state-in-effect`
+- ❌ [`src/components/pomodoro-widget.tsx:56`](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L56) **React Compiler can't optimize this** `set-state-in-effect`
+- ❌ [`src/components/tasks/create-task-dialog.tsx:29`](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/tasks/create-task-dialog.tsx#L29) **React Compiler doesn't support this syntax** `todo`
+
+<details><summary>24 warnings</summary>
 
 **`package.json`**
-- ⚠️ [L0](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/package.json#L0) `unused-dependency`
+- ⚠️ [L0](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/package.json#L0) `unused-dependency`
 
 **`src/app/(dashboard)/dashboard/page.tsx`**
-- ⚠️ [L32](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/dashboard/page.tsx#L32) Locale/timezone formatting during render `no-locale-format-in-render`
+- ⚠️ [L194](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/app/(dashboard)/dashboard/page.tsx#L194) Locale/timezone formatting during render `no-locale-format-in-render`
 
 **`src/app/(dashboard)/quiz/[id]/page.tsx`**
-- ⚠️ [L31](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/quiz/[id]/page.tsx#L31) Client-side redirect for navigation `nextjs-no-client-side-redirect`
+- ⚠️ [L31](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/app/(dashboard)/quiz/[id]/page.tsx#L31) Client-side redirect for navigation `nextjs-no-client-side-redirect`
 
-**`src/app/(dashboard)/settings/page.tsx`**
-- ⚠️ [L29](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L29) Pure function rebuilt every render `prefer-module-scope-pure-function`
-- ⚠️ [L32](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L32) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L79](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L79) Plain img ships unoptimized images `nextjs-no-img-element`
-- ⚠️ [L146](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L146) Label missing associated control `label-has-associated-control`
-- ⚠️ [L162](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L162) Label missing associated control `label-has-associated-control`
-- ⚠️ [L184](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L184) Label missing associated control `label-has-associated-control`
-- ⚠️ [L200](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L200) Label missing associated control `label-has-associated-control`
-- ⚠️ [L222](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/app/(dashboard)/settings/page.tsx#L222) Label missing associated control `label-has-associated-control`
+**`src/app/(dashboard)/tasks/page.tsx`**
+- ⚠️ [L107](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/app/(dashboard)/tasks/page.tsx#L107) Locale/timezone formatting during render `no-locale-format-in-render`
+- ⚠️ [L147](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/app/(dashboard)/tasks/page.tsx#L147) Button missing explicit type `button-has-type`
+- ⚠️ [L158](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/app/(dashboard)/tasks/page.tsx#L158) Locale/timezone formatting during render `no-locale-format-in-render`
 
-**`src/components/chat/chat-interface.tsx`**
-- ⚠️ [L93](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/chat/chat-interface.tsx#L93) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L175](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/chat/chat-interface.tsx#L175) Array index used as a key `no-array-index-as-key`
-
-**`src/components/chat/chat-message.tsx`**
-- ⚠️ [L24](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/chat/chat-message.tsx#L24) Redundant manual memoization `react-compiler-no-manual-memoization`
-
-**`src/components/dashboard-shell.tsx`**
-- ⚠️ [L26](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/dashboard-shell.tsx#L26) Click handler missing keyboard handler `click-events-have-key-events`
-- ⚠️ [L26](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/dashboard-shell.tsx#L26) Interaction on static element `no-static-element-interactions`
+**`src/components/dashboard/heatmap-chart.tsx`**
+- ⚠️ [L30](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/heatmap-chart.tsx#L30) Redundant manual memoization `react-compiler-no-manual-memoization`
+- ⚠️ [L38](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/heatmap-chart.tsx#L38) Locale/timezone formatting during render `no-locale-format-in-render`
+- ⚠️ [L51](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/heatmap-chart.tsx#L51) array.find() inside a loop `js-index-maps`
+- ⚠️ [L71](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/heatmap-chart.tsx#L71) array.find() inside a loop `js-index-maps`
+- ⚠️ [L180](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/heatmap-chart.tsx#L180) Locale/timezone formatting during render `no-locale-format-in-render`
 
 **`src/components/dashboard/weak-topics-chart.tsx`**
-- ⚠️ [L57](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/dashboard/weak-topics-chart.tsx#L57) Array index used as a key `no-array-index-as-key`
+- ⚠️ [L0](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/dashboard/weak-topics-chart.tsx#L0) `unused-file`
 
-**`src/components/documents/upload-zone.tsx`**
-- ⚠️ [L23](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/documents/upload-zone.tsx#L23) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L65](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/documents/upload-zone.tsx#L65) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L99](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/documents/upload-zone.tsx#L99) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L104](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/documents/upload-zone.tsx#L104) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L186](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/documents/upload-zone.tsx#L186) Bouncy easing animation `no-inline-bounce-easing`
+**`src/components/pomodoro-widget.tsx`**
+- ⚠️ [L31](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L31) Missing effect dependencies `exhaustive-deps`
+- ⚠️ [L38](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L38) Missing effect dependencies `exhaustive-deps`
+- ⚠️ [L72](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L72) Missing effect dependencies `exhaustive-deps`
+- ⚠️ [L81](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L81) Unversioned localStorage key `client-localstorage-no-version`
+- ⚠️ [L86](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L86) Pure function rebuilt every render `prefer-module-scope-pure-function`
+- ⚠️ [L176](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L176) Control missing accessible label `control-has-associated-label`
+- ⚠️ [L180](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L180) Control missing accessible label `control-has-associated-label`
+- ⚠️ [L184](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L184) Control missing accessible label `control-has-associated-label`
+- ⚠️ [L196](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/pomodoro-widget.tsx#L196) Button missing explicit type `button-has-type`
 
-**`src/components/features.tsx`**
-- ⚠️ [L73](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/features.tsx#L73) Array index used as a key `no-array-index-as-key`
-
-**`src/components/footer.tsx`**
-- ⚠️ [L36](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/footer.tsx#L36) Control missing accessible label `control-has-associated-label`
-- ⚠️ [L39](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/footer.tsx#L39) Control missing accessible label `control-has-associated-label`
-- ⚠️ [L42](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/footer.tsx#L42) Control missing accessible label `control-has-associated-label`
-- ⚠️ [L45](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/footer.tsx#L45) Control missing accessible label `control-has-associated-label`
-- ⚠️ [L48](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/footer.tsx#L48) Control missing accessible label `control-has-associated-label`
-
-**`src/components/quiz/generate-quiz-modal.tsx`**
-- ⚠️ [L41](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/quiz/generate-quiz-modal.tsx#L41) Label missing associated control `label-has-associated-control`
-- ⚠️ [L74](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/quiz/generate-quiz-modal.tsx#L74) Label missing associated control `label-has-associated-control`
-
-**`src/components/quiz/question-card.tsx`**
-- ⚠️ [L83](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/quiz/question-card.tsx#L83) Array index used as a key `no-array-index-as-key`
-
-**`src/components/quiz/score-circle.tsx`**
-- ⚠️ [L83](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/quiz/score-circle.tsx#L83) Bouncy easing animation `no-inline-bounce-easing`
-- ⚠️ [L83](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/quiz/score-circle.tsx#L83) Transition duration too long `no-long-transition-duration`
+**`src/components/tasks/create-task-dialog.tsx`**
+- ⚠️ [L15](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/tasks/create-task-dialog.tsx#L15) Many related useState calls `prefer-useReducer`
 
 **`src/components/ui/dialog.tsx`**
-- ⚠️ [L32](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/dialog.tsx#L32) Effect re-subscribes on a changing callback `prefer-use-effect-event`
-- ⚠️ [L38](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/dialog.tsx#L38) Click handler missing keyboard handler `click-events-have-key-events`
-- ⚠️ [L38](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/dialog.tsx#L38) Interaction on static element `no-static-element-interactions`
-- ⚠️ [L42](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/dialog.tsx#L42) Dialog without accessible name `dialog-has-accessible-name`
-- ⚠️ [L46](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/dialog.tsx#L46) Custom modal instead of dialog `prefer-html-dialog`
+- ⚠️ [L52](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/components/ui/dialog.tsx#L52) Handler on non-interactive element `no-noninteractive-element-interactions`
 
-**`src/components/ui/skeleton.tsx`**
-- ⚠️ [L7](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/skeleton.tsx#L7) `unused-export`
-- ⚠️ [L16](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/components/ui/skeleton.tsx#L16) `unused-export`
-
-**`src/hooks/use-documents.ts`**
-- ⚠️ [L57](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-documents.ts#L57) `unused-export`
-
-**`src/hooks/use-quiz.ts`**
-- ⚠️ [L48](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-quiz.ts#L48) `unused-export`
-
-**`src/hooks/use-relationship.ts`**
-- ⚠️ [L23](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-relationship.ts#L23) Redundant manual memoization `react-compiler-no-manual-memoization`
-
-**`src/hooks/use-room-chat.ts`**
-- ⚠️ [L137](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-room-chat.ts#L137) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L141](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-room-chat.ts#L141) Redundant manual memoization `react-compiler-no-manual-memoization`
-- ⚠️ [L149](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-room-chat.ts#L149) Redundant manual memoization `react-compiler-no-manual-memoization`
-
-**`src/hooks/use-trust-level.ts`**
-- ⚠️ [L31](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-trust-level.ts#L31) Unversioned localStorage key `client-localstorage-no-version`
-- ⚠️ [L81](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/hooks/use-trust-level.ts#L81) Redundant manual memoization `react-compiler-no-manual-memoization`
-
-**`src/lib/api-client.ts`**
-- ⚠️ [L60](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/lib/api-client.ts#L60) Redundant manual memoization `react-compiler-no-manual-memoization`
-
-**`src/lib/utils.ts`**
-- ⚠️ [L19](https://github.com/userio12/StudyMate-AI/blob/5d2ee31f00fd4e44cba33b8a5e394a0c0b623473/apps/frontend/src/lib/utils.ts#L19) Intl formatter rebuilt each call `js-hoist-intl`
+**`src/lib/ActiveTaskContext.tsx`**
+- ⚠️ [L27](https://github.com/userio12/StudyMate-AI/blob/e8abc5dcae0bf929a6599b907443d7bf74817adf/apps/frontend/src/lib/ActiveTaskContext.tsx#L27) Non-component export in component file `only-export-components`
 
 </details>
 
-<sub>Reviewed by [React Doctor](https://react.doctor) for commit `5d2ee31`. See inline comments for fixes.</sub>
+<sub>Reviewed by [React Doctor](https://react.doctor) for commit `e8abc5d`. See inline comments for fixes.</sub>

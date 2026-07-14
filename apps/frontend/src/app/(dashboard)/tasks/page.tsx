@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
+import { useMounted } from '@/hooks/use-mounted';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheckCircle, faCalendarDays, faPlay, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ export default function TasksPage() {
   const api = useApiClient();
   const { setActiveTask } = useActiveTask();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const mounted = useMounted();
   
   const { data: tasks, error, isLoading, mutate } = useSWR('/tasks', async (url) => {
     return api.get<any[]>(url);
@@ -104,7 +106,7 @@ export default function TasksPage() {
                         <h3 className="text-2xl font-bold text-foreground mb-3">{t.title}</h3>
                         <div className="flex flex-wrap items-center gap-3">
                           {t.subject && <span className="text-xs font-semibold text-brand-400 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-full">{t.subject.name}</span>}
-                          {t.dueDate && <span className="text-xs font-medium text-warning flex items-center gap-1.5"><FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5"/> Due {new Date(t.dueDate).toLocaleDateString()}</span>}
+                          {t.dueDate && <span className="text-xs font-medium text-warning flex items-center gap-1.5"><FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5"/> Due {mounted ? new Date(t.dueDate).toLocaleDateString() : ''}</span>}
                         </div>
                       </div>
                       <Button 
@@ -145,6 +147,7 @@ export default function TasksPage() {
                    <div key={t.id} className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl bg-surface-1 border border-border hover:border-brand-500/40 hover:bg-surface-2/50 transition-all hover:translate-x-2 shadow-sm">
                      <div className="flex items-center gap-5 w-full">
                        <button 
+                         type="button"
                          onClick={() => handleStartFocus(t)}
                          className="shrink-0 w-14 h-14 rounded-full bg-surface-3 flex items-center justify-center text-muted-fg group-hover:bg-brand-500 group-hover:text-white transition-all group-hover:shadow-[0_0_20px_rgba(var(--brand-500-rgb),0.4)] group-hover:scale-110"
                          title="Push to Active Focus"
@@ -155,7 +158,7 @@ export default function TasksPage() {
                          <h3 className="font-semibold text-lg text-foreground mb-1.5 truncate pr-4">{t.title}</h3>
                          <div className="flex flex-wrap items-center gap-3 text-xs">
                            {t.subject && <span className="text-muted-fg font-medium bg-surface-3 px-2.5 py-1 rounded-md">{t.subject.name}</span>}
-                           {t.dueDate && <span className="flex items-center gap-1.5 text-muted-fg"><FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5 opacity-70"/> {new Date(t.dueDate).toLocaleDateString()}</span>}
+                           {t.dueDate && <span className="flex items-center gap-1.5 text-muted-fg"><FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5 opacity-70"/> {mounted ? new Date(t.dueDate).toLocaleDateString() : ''}</span>}
                          </div>
                        </div>
                      </div>

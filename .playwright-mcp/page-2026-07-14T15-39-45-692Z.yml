@@ -1,0 +1,45 @@
+- generic [active] [ref=f17e1]:
+  - link "Skip to main content" [ref=f17e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f17e4]:
+    - complementary [ref=f17e5]:
+      - generic [ref=f17e6]:
+        - link "StudyMate-AI" [ref=f17e8] [cursor=pointer]:
+          - /url: /dashboard
+        - navigation "Main navigation" [ref=f17e13]:
+          - generic [ref=f17e14]:
+            - link "Dashboard" [ref=f17e15] [cursor=pointer]:
+              - /url: /dashboard
+            - link "Documents" [ref=f17e18] [cursor=pointer]:
+              - /url: /documents
+            - link "Tasks" [ref=f17e21] [cursor=pointer]:
+              - /url: /tasks
+            - link "Analytics" [ref=f17e24] [cursor=pointer]:
+              - /url: /analytics
+            - link "Chat" [ref=f17e27] [cursor=pointer]:
+              - /url: /chat
+            - link "Quiz" [ref=f17e30] [cursor=pointer]:
+              - /url: /quiz
+            - link "Study Rooms" [ref=f17e33] [cursor=pointer]:
+              - /url: /rooms
+            - link "Settings" [ref=f17e36] [cursor=pointer]:
+              - /url: /settings
+        - generic [ref=f17e39]:
+          - generic [ref=f17e43]:
+            - paragraph [ref=f17e44]: Google Gemini
+            - paragraph [ref=f17e45]: Intelligence engine
+          - paragraph [ref=f17e47]: Your account
+    - main [ref=f17e49]:
+      - generic [ref=f17e50]:
+        - generic [ref=f17e53]:
+          - generic [ref=f17e54]:
+            - heading "Study Rooms" [level=1] [ref=f17e58]
+            - paragraph [ref=f17e59]: Study together in real-time. Create a new multiplayer room to collaborate with peers, or join an existing session using an invite code.
+          - generic [ref=f17e60]:
+            - button "Create New Room" [ref=f17e61]
+            - button "Join with Code" [ref=f17e65]
+        - generic [ref=f17e68]:
+          - heading "Active Rooms" [level=2] [ref=f17e70]
+          - paragraph [ref=f17e76]: Loading study rooms...
+    - button [ref=f17e77]
+  - region "Notifications alt+T"
