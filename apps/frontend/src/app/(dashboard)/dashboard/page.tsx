@@ -9,11 +9,11 @@ export default async function DashboardPage() {
   
   try {
     const [analytics, tasks] = await Promise.all([
-      apiServer<any>('/analytics'),
+      apiServer<any>('/analytics/stats'),
       apiServer<any[]>('/tasks'),
     ]);
     fallback = { 
-      '/analytics': analytics,
+      '/analytics/stats': analytics,
       '/tasks': tasks
     };
   } catch (err) {
