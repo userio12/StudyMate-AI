@@ -10,8 +10,8 @@
 | **ORM** | Drizzle ORM | Type-safe SQL, pgvector support, no hidden queries |
 | **Database** | Supabase Postgres | Managed Postgres with pgvector extension |
 | **Auth** | Clerk SDK | JWT verification, session management, webhook sync |
-| **AI** | Google Gemini | Embeddings (`text-embedding-004`) + Chat (`gemini-2.0-flash`) |
-| **Storage** | AWS S3 | Presigned URLs for direct upload, CDN-compatible |
+| **AI** | OpenRouter / OpenAI / Gemini | Fallback orchestrator for Embeddings + Chat |
+| **Storage** | Supabase Storage | Presigned URLs for direct upload, CDN-compatible |
 | **Validation** | Zod | Runtime validation, shared schemas with frontend |
 | **Documentation** | Swagger/OpenAPI | Auto-generated from NestJS decorators |
 
@@ -121,12 +121,12 @@ NestJS provides a fixed architecture that scales well:
 
 WebSockets are reserved for **study rooms** where bidirectional real-time communication is required.
 
-### Why Gemini over OpenAI?
+### AI Fallback Orchestrator (Why multiple providers?)
 
-- **Cost**: Gemini is significantly cheaper for both embeddings and chat
-- **Context window**: 1M+ tokens for Gemini 2.0 Flash vs 128K for GPT-4o
-- **Embedding dimension**: 768 (vs 1536 for OpenAI) — smaller vectors, faster queries
-- **Streaming**: First-token latency is competitive with OpenAI
+- **Reliability**: Uses an orchestrator pattern falling back from OpenRouter → Gemini → NVIDIA if a provider rate limits.
+- **Cost / Context Window**: Gemini 2.0 Flash is preferred due to low cost and 1M+ context window.
+- **Embedding dimension**: 768 (vs 1536 for OpenAI) — smaller vectors, faster queries.
+- **Streaming**: All providers are wrapped in a unified API compatible with OpenAI SDK.
 
 ## Environment Variables
 
@@ -136,11 +136,12 @@ PORT=4000
 NODE_ENV=development
 DATABASE_URL=postgresql://postgres:password@db.xxxxx.supabase.co:6543/postgres
 CLERK_SECRET_KEY=sk_test_xxxx
+OPENROUTER_API_KEY=sk-or-v1-xxxx
 GEMINI_API_KEY=AIzaSyxxxx
-AWS_ACCESS_KEY_ID=AKIAxxxx
-AWS_SECRET_ACCESS_KEY=xxxx
-AWS_REGION=ap-south-1
-AWS_S3_BUCKET=studymate-ai-uploads
+NVIDIA_API_KEY=nvapi-xxxx
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhxxxx
+SUPABASE_STORAGE_BUCKET=studymate-ai-uploads
 FRONTEND_URL=http://localhost:3000
 
 # Optional

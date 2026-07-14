@@ -21,8 +21,8 @@
                           │              │         │              │
                           ▼              ▼         ▼              ▼
                    ┌──────────┐   ┌────────┐ ┌────────┐   ┌──────────┐
-                   │ Supabase │   │ AWS S3 │ │ Gemini │   │  Clerk   │
-                   │ Postgres │   │ Storage│ │   AI   │   │   Auth   │
+                   │ Supabase │   │Supabase│ │ OpenAI │   │  Clerk   │
+                   │ Postgres │   │ Storage│ │  API   │   │   Auth   │
                    │+pgvector │   └────────┘ └────────┘   └──────────┘
                    └──────────┘
 ```
@@ -91,7 +91,7 @@ HTTP Request
 │  Data Layer                                                 │
 │  ┌──────────┐ ┌──────────────┐ ┌────────────────────────┐  │
 │  │ Storage  │ │   Database   │ │   External APIs        │  │
-│  │ (S3)     │ │ (Drizzle+SQ) │ │ (Gemini, Clerk, S3)    │  │
+│  │(Supabase)│ │ (Drizzle+SQ) │ │ (OpenAI, Clerk)        │  │
 │  └──────────┘ └──────────────┘ └────────────────────────┘  │
 └────────────────────────────────────────────────────────────┘
 ```
@@ -137,41 +137,41 @@ Browser Request
 ### 1. Upload PDF → Ready for Chat
 
 ```
-User              Frontend              Backend               S3            Supabase        Gemini
- │                   │                     │                   │               │              │
- │ Drop PDF          │                     │                   │               │              │
- ├──────────────────▶│                     │                   │               │              │
- │                   │ POST /upload-url    │                   │               │              │
- │                   ├────────────────────▶│                   │               │              │
- │                   │                     │ Generate Presigned│               │              │
- │                   │                     │ URL ─────────────▶│               │              │
- │                   │ { presignedUrl }    │                   │               │              │
- │                   │◄────────────────────┤                   │               │              │
- │                   │                     │                   │               │              │
- │                   │ PUT (file) ────────────────────────────▶│               │              │
- │                   │                     │                   │               │              │
- │                   │ POST /:id/process   │                   │               │              │
- │                   ├────────────────────▶│                   │               │              │
- │                   │                     │ status=processing │               │              │
+User              Frontend              Backend            Supabase        AI Provider
+ │                   │                     │                   │               │
+ │ Drop PDF          │                     │                   │               │
+ ├──────────────────▶│                     │                   │               │
+ │                   │ POST /upload-url    │                   │               │
+ │                   ├────────────────────▶│                   │               │
+ │                   │                     │ Generate Presigned│               │
+ │                   │                     │ URL ─────────────▶│               │
+ │                   │ { presignedUrl }    │                   │               │
+ │                   │◄────────────────────┤                   │               │
+ │                   │                     │                   │               │
+ │                   │ PUT (file) ────────────────────────────▶│               │
+ │                   │                     │                   │               │
+ │                   │ POST /:id/process   │                   │               │
+ │                   ├────────────────────▶│                   │               │
+ │                   │                     │ status=processing │               │
  │                   │                     │──────────────────────────────────▶               │
- │                   │                     │ Download PDF ◄────│               │              │
- │                   │                     │ Extract text      │               │              │
- │                   │                     │ Semantic chunking │               │              │
- │                   │                     │ (heading-aware)   │               │              │
- │                   │                     │ For each chunk:   │               │              │
+ │                   │                     │ Download PDF ◄────│               │
+ │                   │                     │ Extract text      │               │
+ │                   │                     │ Semantic chunking │               │
+ │                   │                     │ (heading-aware)   │               │
+ │                   │                     │ For each chunk:   │               │
  │                   │                     │  embed ─────────────────────────────────────────▶│
  │                   │                     │  ◄─ embedding ──────────────────────────────────│
  │                   │                     │  INSERT chunk ──────────────────▶               │
  │                   │                     │ status=ready ──────────────────▶               │
- │                   │◄─ { status: ready } │                   │               │              │
- │◄──────────────────┤                     │                   │               │              │
- │ Ready to chat     │                     │                   │               │              │
+ │                   │◄─ { status: ready } │                   │               │
+ │◄──────────────────┤                     │                   │               │
+ │ Ready to chat     │                     │                   │               │
 ```
 
 ### 2. Chat with RAG
 
 ```
-User              Frontend              Backend            Supabase          Gemini
+User              Frontend              Backend            Supabase       AI Provider
  │                   │                     │                   │               │
  │ Type question     │                     │                   │               │
  ├──────────────────▶│                     │                   │               │
@@ -214,7 +214,7 @@ User              Frontend              Backend            Supabase          Gem
 ### 3. Quiz Generation & Attempt
 
 ```
-User              Frontend              Backend            Supabase          Gemini
+User              Frontend              Backend            Supabase       AI Provider
  │                   │                     │                   │               │
  │ Generate quiz     │                     │                   │               │
  ├──────────────────▶│                     │                   │               │
@@ -256,7 +256,7 @@ User              Frontend              Backend            Supabase          Gem
 - Chat message endpoint (`POST /api/chat/message`)
 - Single POST request returns a stream of events
 - Events: `token` | `citation` | `done`
-- Backend pushes tokens as Gemini generates them
+- Backend pushes tokens as the AI provider generates them
 - Frontend reads via `ReadableStream`
 
 ### WebSockets (Socket.IO)
@@ -267,8 +267,8 @@ User              Frontend              Backend            Supabase          Gem
 
 ### Presigned URL Upload
 - Frontend requests upload URL from backend
-- Backend generates S3 presigned URL (valid for 5 min)
-- Frontend uploads directly to S3
+- Backend generates Supabase Storage presigned URL (valid for 5 min)
+- Frontend uploads directly to Supabase Storage
 - Frontend notifies backend to process
 - Avoids server-side file buffering
 
@@ -337,7 +337,7 @@ Error categories:
 
 | Component | Strategy | Expected Performance |
 |---|---|---|
-| **Vector search** | IVFFlat index with 100 lists | <50ms for 100K chunks |
+| **Vector search** | HNSW index with pgvector | <10ms for 100K chunks |
 | **PDF processing** | Background async pipeline | 5-15s for 100-page PDF |
 | **Chat streaming** | SSE with Gemini streaming | First token < 1s |
 | **File upload** | Direct-to-S3 presigned URL | ~2s for 10MB file |

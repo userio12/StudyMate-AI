@@ -4,9 +4,6 @@
 
 ```
 /                           Landing page (public, SSR)
-├── /features               Features page (public)
-├── /privacy                Privacy policy (public)
-├── /terms                  Terms of service (public)
 │
 ├── /sign-in                Clerk sign-in (public)
 ├── /sign-up                Clerk sign-up (public)
@@ -44,12 +41,7 @@ app/
 ├── error.tsx                          Global error boundary
 ├── loading.tsx                        Global loading state
 │
-├── (marketing)/                       Route group: no dashboard layout
-│   ├── layout.tsx                     Marketing layout (public navbar + footer)
-│   ├── page.tsx                       / (landing)
-│   ├── features/page.tsx              /features
-│   ├── privacy/page.tsx               /privacy
-│   └── terms/page.tsx                 /terms
+├── page.tsx                           Landing page (redirect to /dashboard if signed in)
 │
 ├── (auth)/                            Route group: auth pages
 │   ├── layout.tsx                     Centered layout
@@ -93,35 +85,6 @@ app/
 
 ## Route Group Layouts
 
-### Marketing Layout (Public)
-
-```typescript
-// app/(marketing)/layout.tsx
-export default function MarketingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <>
-      <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Logo />
-          <div className="flex items-center gap-4">
-            <Link href="/features">Features</Link>
-            <Link href="/sign-in">Sign In</Link>
-            <Button asChild>
-              <Link href="/sign-up">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
-}
-```
 
 ### Dashboard Layout (Protected)
 
