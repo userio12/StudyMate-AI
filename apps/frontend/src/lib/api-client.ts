@@ -1,5 +1,8 @@
+'use client';
+
 import { useAuth } from '@clerk/nextjs';
 import { useState, useCallback, useMemo, useRef } from 'react';
+import { CLERK_JWT_TEMPLATE } from './constants';
 
 export class ApiError extends Error {
   constructor(
@@ -16,7 +19,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 // FIX BUG-26: Extract the Clerk JWT template name as a shared constant so it
 // cannot be accidentally mistyped in different files (previously hardcoded in
 // both api-client.ts and use-room-chat.ts independently).
-export const CLERK_JWT_TEMPLATE = 'studymate-ai';
+
 
 async function request<T>(
   path: string,

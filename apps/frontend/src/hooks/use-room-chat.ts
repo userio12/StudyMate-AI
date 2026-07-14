@@ -5,7 +5,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import useSWR from 'swr';
 import type { Socket } from 'socket.io-client';
-import { useApiClient, CLERK_JWT_TEMPLATE } from '@/lib/api-client';
+import { useApiClient } from '@/lib/api-client';
+import { CLERK_JWT_TEMPLATE } from '@/lib/constants';
 import { getSocket, disconnectSocket } from '@/lib/websocket';
 import { useUiStore } from '@/store/ui-store';
 

@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { CLERK_JWT_TEMPLATE } from './api-client';
+import { CLERK_JWT_TEMPLATE } from './constants';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
