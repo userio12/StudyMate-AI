@@ -91,8 +91,10 @@ export class EmbeddingsService {
   private model: GenerativeModel;
 
   constructor() {
-    this.model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-      .getGenerativeModel({ model: 'text-embedding-004' });
+    this.model = new OpenAI({ 
+      apiKey: process.env.OPENROUTER_API_KEY, 
+      baseURL: 'https://openrouter.ai/api/v1' 
+    });
   }
 
   async embed(text: string): Promise<number[]> {
@@ -208,16 +210,22 @@ async streamResponse(
   prompt: string,
   res: Response,
 ): Promise<{ citations: Citation[]; fullContent: string }> {
-  const genModel = new GoogleGenerativeAI(API_KEY)
-    .getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const ai = new OpenAI({ 
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1'
+  });
 
-  const result = await genModel.generateContentStream(prompt);
+  const result = await ai.chat.completions.create({
+    model: 'google/gemini-2.5-flash',
+    messages: [{ role: 'user', content: prompt }],
+    stream: true
+  });
 
   let fullContent = '';
   const citations: Citation[] = [];
 
-  for await (const chunk of result.stream) {
-    const text = chunk.text();
+  for await (const chunk of result) {
+    const text = chunk.choices[0]?.delta?.content || '';
     fullContent += text;
 
     // Stream token to client
@@ -272,8 +280,8 @@ async processDocument(documentId: string) {
     .where(eq(documents.id, documentId));
 
   try {
-    // 1. Download from S3
-    const pdfBuffer = await this.storage.download(document.s3Key);
+    // 1. Download from Supabase Storage
+    const pdfBuffer = await this.storage.download(document.storagePath);
 
     // 2. Extract text
     const pages = await this.pdfProcessor.extractText(pdfBuffer);
@@ -321,11 +329,11 @@ uploaded ──► processing ──► ready
 
 | Operation | Expected Time | Optimization |
 |---|---|---|
-| PDF upload (10MB) | ~2s | Direct-to-S3 presigned URL |
+| PDF upload (10MB) | ~2s | Direct-to-Supabase presigned URL |
 | Text extraction (100 pages) | ~3s | pdf-parse sync |
 | Semantic chunking (100 pages) | <100ms | Stream-based processing |
-| Embedding (200 chunks) | ~5s | Gemini batch API |
-| Vector search (100K chunks) | <50ms | IVFFlat index, 100 lists |
+| Embedding (200 chunks) | ~5s | OpenRouter / OpenAI batch API |
+| Vector search (100K chunks) | <50ms | HNSW index, m=16, ef_construction=64 |
 | LLM streaming (500 tokens) | ~3s first token | Gemini 2.0 Flash |
 | Full pipeline (100 pages) | ~10s | Runs asynchronously |
 

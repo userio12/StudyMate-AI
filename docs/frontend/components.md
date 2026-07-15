@@ -24,6 +24,14 @@ All shadcn components are copied to `components/ui/` and can be freely modified.
 | `Skeleton` | `variant="card"`, `"chat"` | Loading states |
 | `Tooltip` | `side="top"`, `delayDuration={0}` | Citations |
 
+### Iconography (Lucide)
+
+We have fully migrated from Heroicons and FontAwesome to **Lucide Icons** (`lucide-react`). Lucide is tree-shakeable, aligns perfectly with shadcn/ui, and provides a highly consistent stroke-based aesthetic.
+
+```tsx
+import { FileText, MessageSquare, Brain, Users } from 'lucide-react';
+```
+
 ## Composition Patterns
 
 Use **compound components** to avoid boolean prop proliferation. Components with 3+ state booleans should be split into named sub-components.

@@ -11,11 +11,22 @@ export const EMBEDDING_MODEL = 'text-embedding-004' as const;
 /** Output dimensions for text-embedding-004 */
 export const EMBEDDING_DIMENSIONS = 768 as const;
 
-/** Gemini chat model for streaming Q&A */
-export const CHAT_MODEL = 'gemini-2.0-flash' as const;
+/** Gemini chat model for streaming Q&A (via OpenRouter) */
+export const CHAT_MODEL = 'google/gemini-2.5-flash' as const;
 
 /** Default question count when generating quizzes */
 export const DEFAULT_QUIZ_QUESTION_COUNT = 5;
+```
+
+## Authentication Tokens
+
+```typescript
+/** 
+ * JWT Template name configured in the Clerk dashboard.
+ * This MUST match the template name used to sign custom claims 
+ * that are sent to the NestJS backend.
+ */
+export const CLERK_JWT_TEMPLATE = 'studymate-custom-jwt';
 ```
 
 ## Document Chunking

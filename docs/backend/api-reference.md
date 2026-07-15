@@ -40,7 +40,7 @@ Readiness probe. Returns 200 when the server can accept traffic (DB connected, e
 
 ### `POST /api/documents/upload-url`
 
-Get a presigned S3 URL for direct file upload.
+Get a presigned Supabase Storage URL for direct file upload.
 
 **Request Body:**
 ```json
@@ -61,8 +61,8 @@ Get a presigned S3 URL for direct file upload.
 {
   "data": {
     "documentId": "a1b2c3d4-...",
-    "presignedUrl": "https://studymate-ai-uploads.s3.amazonaws.com/.../ml-notes.pdf?X-Amz-Signature=...",
-    "s3Key": "uploads/user_abc/ml-notes.pdf",
+    "presignedUrl": "https://xxxxx.supabase.co/storage/v1/object/sign/studymate-ai-uploads/.../ml-notes.pdf?token=...",
+    "storagePath": "uploads/user_abc/ml-notes.pdf",
     "expiresIn": 300
   }
 }

@@ -18,11 +18,11 @@ By uploading study materials (PDFs), you unlock a suite of intelligent features:
 
 StudyMate AI is engineered as a modern full-stack monorepo powered by **Turborepo** and **pnpm**.
 
-- **Frontend (`apps/frontend`)**: Next.js 15 (App Router), Tailwind CSS v4, React 19, Framer Motion, Recharts.
-- **Backend (`apps/backend`)**: NestJS, Socket.IO, Google Gemini integrations, AI orchestration (RAG).
-- **Database (`packages/db`)**: PostgreSQL with `pgvector` for semantic search, managed via Drizzle ORM.
+- **Frontend (`apps/frontend`)**: Next.js 15 (App Router, Turbopack), Tailwind CSS v4, Shadcn UI, Lucide Icons, React 19, Framer Motion, Recharts.
+- **Backend (`apps/backend`)**: NestJS, Socket.IO, OpenRouter/OpenAI SDK shim (multi-provider fallback), AI orchestration (RAG).
+- **Database (`packages/db`)**: PostgreSQL with `pgvector` (HNSW indexing) for semantic search, managed via Drizzle ORM.
 - **Shared (`packages/shared`)**: Shared types, Zod validation schemas, and common constants used across front/back applications.
-- **Auth & Storage**: Clerk for identity management, AWS S3 (via presigned URLs) for document storage.
+- **Auth & Storage**: Clerk for identity management, Supabase Storage (via presigned URLs) for document storage.
 
 ## 🚀 Quick Start & Setup
 

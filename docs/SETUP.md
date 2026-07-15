@@ -12,8 +12,8 @@ Before you begin, ensure you have the following installed:
 
 You will also need active accounts for the following services (free tiers are sufficient):
 - **Clerk**: For authentication.
-- **Google AI Studio**: For Gemini API keys.
-- **AWS S3**: For document storage.
+- **OpenRouter / Google AI Studio**: For AI API keys (multi-provider orchestrator).
+- **Supabase**: For PostgreSQL database (pgvector) and Supabase Storage.
 
 ## 🛠️ Installation
 
@@ -42,14 +42,15 @@ You need to set up environment variables for the frontend, backend, and database
    ```
 
 2. **Backend (`apps/backend/.env`)**
-   Create the file and add your database URL, Gemini API key, AWS S3 credentials, and Clerk keys:
+   Create the file and add your database URL, API keys, Supabase credentials, and Clerk keys:
    ```env
    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/studymate
+   OPENROUTER_API_KEY=sk-or-v1-...
    GEMINI_API_KEY=your_gemini_api_key_here
-   AWS_ACCESS_KEY_ID=your_aws_key
-   AWS_SECRET_ACCESS_KEY=your_aws_secret
-   AWS_REGION=us-east-1
-   AWS_S3_BUCKET=your-studymate-bucket
+   NVIDIA_API_KEY=nvapi-...
+   SUPABASE_URL=https://xxxxx.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=eyJh...
+   SUPABASE_STORAGE_BUCKET=studymate-ai-uploads
    CLERK_SECRET_KEY=sk_test_...
    FRONTEND_URL=http://localhost:3000
    ```

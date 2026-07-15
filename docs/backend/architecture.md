@@ -36,8 +36,8 @@ export class DocumentsModule {}
 export class DocumentsService {
   constructor(
     private db: DatabaseService,     // Drizzle client
-    private storage: StorageService,  // S3 operations
-    private ai: AiService,            // Gemini + PDF processing
+    private storage: StorageService,  // Supabase Storage operations
+    private ai: AiService,            // OpenRouter / OpenAI API + PDF processing
     private config: ConfigService,    // Typed environment
   ) {}
 }
@@ -230,11 +230,11 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   DATABASE_URL: z.string().url(),
   CLERK_SECRET_KEY: z.string().min(1),
-  GEMINI_API_KEY: z.string().min(1),
-  AWS_ACCESS_KEY_ID: z.string().min(1),
-  AWS_SECRET_ACCESS_KEY: z.string().min(1),
-  AWS_REGION: z.string().min(1),
-  AWS_S3_BUCKET: z.string().min(1),
+  OPENROUTER_API_KEY: z.string().min(1),
+  NVIDIA_API_KEY: z.string().optional(),
+  SUPABASE_URL: z.string().url(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  SUPABASE_STORAGE_BUCKET: z.string().min(1),
   FRONTEND_URL: z.string().url(),
   SENTRY_DSN: z.string().optional(),
   REDIS_URL: z.string().optional(),

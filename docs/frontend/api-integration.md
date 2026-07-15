@@ -137,6 +137,16 @@ export function useApiClient() {
 }
 ```
 
+## RSC Boundary Resolution (Constants)
+
+```typescript
+// lib/constants.ts
+// IMPORTANT: Isolated into a plain file without 'use client' or React hook dependencies
+export const CLERK_JWT_TEMPLATE = 'studymate-custom-jwt';
+```
+
+By isolating constants like `CLERK_JWT_TEMPLATE` into a dedicated file without React dependencies, we prevent hook poisoning in Server Components (RSCs). If a constant is exported from a file that also exports hooks or uses client directives, importing it into a Server Component will cause the build to fail (React compiler boundary errors).
+
 ## Typed Hooks
 
 Each domain has a dedicated hook that wraps the API client with proper types:

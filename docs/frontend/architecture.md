@@ -12,6 +12,14 @@
 | Quiz (`/quiz/[id]`) | Client Component | Interactive quiz state |
 | Rooms (`/rooms/[id]`) | Client Component | WebSocket connection |
 
+## Turbopack Development
+
+We use **Turbopack** for the local development server to drastically reduce HMR times and cold starts.
+```bash
+next dev --turbo
+```
+Turbopack replaces Webpack in development, offering sub-second updates even in large component trees. Ensure that any custom Next.js configurations in `next.config.ts` are Turbopack-compatible.
+
 ## Layout Hierarchy
 
 ```
