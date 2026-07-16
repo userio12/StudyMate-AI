@@ -26,11 +26,19 @@ import { GoalsModule } from './goals/goals.module.js';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          url: config.get('REDIS_URL'),
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisUrl = new URL(config.get('REDIS_URL') as string);
+        return {
+          connection: {
+            host: redisUrl.hostname,
+            port: parseInt(redisUrl.port, 10),
+            username: redisUrl.username || 'default',
+            password: redisUrl.password,
+            tls: { rejectUnauthorized: false },
+            family: 0,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     ConfigModule,

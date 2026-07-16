@@ -1,4 +1,4 @@
-export const EMBEDDING_MODEL = 'gemini-embedding-2' as const;
+export const EMBEDDING_MODEL = 'text-embedding-004' as const;
 export const CHAT_MODEL = 'deepseek/deepseek-chat' as const; // OpenRouter default
 export const EMBEDDING_DIMENSIONS = 768 as const;
 export const MAX_CHUNK_LENGTH = 1024 as const;

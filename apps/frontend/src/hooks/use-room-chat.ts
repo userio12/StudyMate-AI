@@ -6,7 +6,7 @@ import { useAuth } from '@clerk/nextjs';
 import useSWR from 'swr';
 import type { Socket } from 'socket.io-client';
 import { useApiClient } from '@/lib/api-client';
-import { CLERK_JWT_TEMPLATE } from '@/lib/constants';
+
 import { getSocket, disconnectSocket } from '@/lib/websocket';
 import { useUiStore } from '@/store/ui-store';
 
@@ -57,7 +57,7 @@ export function useRoomChat(roomId: string) {
     // FIX BUG-30: Pass a token-getter function to getSocket() instead of a static
     // token string. The SocketManager uses it as a callback that is invoked on
     // every connection attempt (including reconnects), so the token stays fresh.
-    const tokenGetter = () => getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+    const tokenGetter = () => getToken().then((t) => t ?? null);
 
     const socket = getSocket(tokenGetter);
     if (cancelled) {

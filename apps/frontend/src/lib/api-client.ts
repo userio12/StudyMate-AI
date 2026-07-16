@@ -2,7 +2,7 @@
 
 import { useAuth } from '@clerk/nextjs';
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { CLERK_JWT_TEMPLATE } from './constants';
+
 
 export class ApiError extends Error {
   constructor(
@@ -73,7 +73,7 @@ export function useApiClient() {
       return cachedTokenRef.current;
     }
     lastFetchedRef.current = now;
-    cachedTokenRef.current = await getToken({ template: CLERK_JWT_TEMPLATE }).then((t) => t ?? null);
+    cachedTokenRef.current = await getToken().then((t) => t ?? null);
     return cachedTokenRef.current;
   };
 

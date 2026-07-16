@@ -1,11 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
-import { CLERK_JWT_TEMPLATE } from './constants';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 export async function apiServer<T>(path: string, options: RequestInit = {}): Promise<T> {
   const { getToken } = await auth();
-  const token = await getToken({ template: CLERK_JWT_TEMPLATE });
+  const token = await getToken();
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

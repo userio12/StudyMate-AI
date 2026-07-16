@@ -7,7 +7,10 @@ export class RedisIoAdapter extends IoAdapter {
   private adapterConstructor: ReturnType<typeof createAdapter> | undefined;
 
   async connectToRedis(redisUrl: string): Promise<void> {
-    const pubClient = new Redis(redisUrl, { family: 4 });
+    const pubClient = new Redis(redisUrl, { 
+      family: 0,
+      tls: { rejectUnauthorized: false }
+    });
     const subClient = pubClient.duplicate();
 
     await Promise.all([

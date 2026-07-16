@@ -12,7 +12,7 @@ export class ChatLlmService {
   async *streamChat(
     messages: Array<{ role: string; content: string }>,
     contextChunks: string[],
-    searchProvider: 'duckduckgo' | 'tavily' | 'off' = 'duckduckgo',
+    searchProvider: 'duckduckgo' | 'tavily' | 'off' = 'tavily',
     chatProvider?: string,
     chatModel?: string,
     signal?: AbortSignal,

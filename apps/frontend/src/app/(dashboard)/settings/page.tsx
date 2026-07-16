@@ -116,8 +116,8 @@ export default function SettingsPage() {
                 <SelectValue placeholder="Select a search provider" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="duckduckgo" className="cursor-pointer">DuckDuckGo (Free, Default)</SelectItem>
-                <SelectItem value="tavily" className="cursor-pointer">Tavily (Requires API Key)</SelectItem>
+                <SelectItem value="duckduckgo" className="cursor-pointer">DuckDuckGo (Free, Rate-Limited)</SelectItem>
+                <SelectItem value="tavily" className="cursor-pointer">Tavily (Premium, Default)</SelectItem>
                 <SelectItem value="off" className="cursor-pointer text-red-400">Off (Disable Web Search)</SelectItem>
               </SelectContent>
             </Select>
