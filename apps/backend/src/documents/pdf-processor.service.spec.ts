@@ -1,28 +1,38 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PdfProcessorService } from './pdf-processor.service.js';
 
+import { DatabaseService } from './../database/database.service.js';
+import { StorageService } from './../storage/storage.service.js';
+import { EmbeddingsService } from './../ai/embeddings.service.js';
+import { AiService } from './../ai/ai.service.js';
+
 class MockDb {
-  query = { documents: { findFirst: async () => null } };
-  insert = () => ({ values: async () => {} });
-  update = () => ({ set: () => ({ where: async () => {} }) });
+  query = { documents: { findFirst: () => Promise.resolve(null) } };
+  insert = () => ({ values: () => Promise.resolve() });
+  update = () => ({ set: () => ({ where: () => Promise.resolve() }) });
 }
 
 class MockStorage {
-  generateDownloadUrl = async () => 'https://example.com/test.pdf';
+  generateDownloadUrl = () => Promise.resolve('https://example.com/test.pdf');
 }
 
 class MockEmbeddings {
-  embedBatch = async (texts: string[]) => texts.map(() => Array(768).fill(0.1));
+  embedBatch = (texts: string[]) => Promise.resolve(texts.map(() => Array(768).fill(0.1)));
+}
+
+class MockAiService {
+  executeWithFallback = (fn: any) => Promise.resolve(fn({}, 'Mock'));
 }
 
 describe('PdfProcessorService', () => {
   let service: PdfProcessorService;
 
   beforeEach(() => {
-    const db = new MockDb() as any;
-    const storage = new MockStorage() as any;
-    const embeddings = new MockEmbeddings() as any;
-    service = new PdfProcessorService(db, storage, embeddings);
+    const db = new MockDb() as unknown as DatabaseService;
+    const storage = new MockStorage() as unknown as StorageService;
+    const embeddings = new MockEmbeddings() as unknown as EmbeddingsService;
+    const ai = new MockAiService() as unknown as AiService;
+    service = new PdfProcessorService(db, storage, embeddings, ai);
   });
 
   describe('semanticChunk', () => {

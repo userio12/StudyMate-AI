@@ -1,5 +1,15 @@
 import { SignUp } from '@clerk/nextjs';
 
+
 export default function SignUpPage() {
-  return <SignUp />;
+  return (
+    <SignUp
+      appearance={{
+        elements: {
+          rootBox: 'w-full',
+          card: 'w-full max-w-full'
+        }
+      }}
+    />
+  );
 }

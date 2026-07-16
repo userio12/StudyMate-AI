@@ -1,0 +1,48 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+
+interface WordRotatorProps {
+  words: string[];
+  interval?: number;
+  className?: string;
+  wrapperClassName?: string;
+}
+
+export function WordRotator({ words, interval = 4000, className, wrapperClassName }: WordRotatorProps) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((current) => (current + 1) % words.length);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [words, interval]);
+
+  return (
+    <span className={cn("inline-grid overflow-hidden py-2 -my-2", wrapperClassName)}>
+      {words.map((word, i) => {
+        const isActive = i === index;
+        const isPrev = i === (index - 1 + words.length) % words.length;
+        
+        return (
+          <span
+            key={word}
+            className={cn(
+              "col-start-1 row-start-1 transition-all duration-1000 ease-in-out",
+              isActive 
+                ? "translate-y-0 opacity-100" 
+                : isPrev 
+                  ? "-translate-y-full opacity-0" // Slide up to exit
+                  : "translate-y-full opacity-0", // Staged below to enter (slide up)
+              className
+            )}
+          >
+            {word}
+          </span>
+        );
+      })}
+    </span>
+  );
+}

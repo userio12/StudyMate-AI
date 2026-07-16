@@ -2,21 +2,27 @@
 
 import { useState, useRef, type KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
-import { Send, Loader2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp, faStop } from '@fortawesome/free-solid-svg-icons';
 
 interface ChatInputProps {
   onSend: (content: string) => void;
   isLoading?: boolean;
+  onStop?: () => void;
   placeholder?: string;
 }
 
-export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...' }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, onStop, placeholder = 'Message StudyMate-AI...' }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
+    if (isLoading) {
+      onStop?.();
+      return;
+    }
     const trimmed = value.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed) return;
     onSend(trimmed);
     setValue('');
     if (textareaRef.current) {
@@ -27,7 +33,9 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (!isLoading) {
+        handleSend();
+      }
     }
   };
 
@@ -40,7 +48,7 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
   };
 
   return (
-    <div className="flex items-end gap-2 rounded-2xl border border-parchment-300 bg-parchment-50 p-3 focus-within:border-terracotta-500 dark:border-navy-700 dark:bg-navy-800">
+    <div className="relative flex w-full items-end gap-2 rounded-[20px] bg-surface-2 border border-border/40 p-1.5 transition-all duration-300 focus-within:border-brand-500/50 focus-within:ring-1 focus-within:ring-brand-500/20">
       <textarea
         ref={textareaRef}
         value={value}
@@ -49,23 +57,26 @@ export function ChatInput({ onSend, isLoading, placeholder = 'Ask a question...'
         onInput={handleInput}
         placeholder={placeholder}
         rows={1}
-        disabled={isLoading}
-        className="max-h-[200px] min-h-[24px] flex-1 resize-none bg-transparent text-sm text-navy-800 placeholder:text-navy-400 focus:outline-none dark:text-parchment-100 dark:placeholder:text-parchment-500"
+        className="max-h-[200px] min-h-[36px] flex-1 resize-none bg-transparent px-3 py-2 text-[14px] text-foreground placeholder:text-muted/60 border-none outline-none focus:outline-none focus:ring-0 leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-3"
         aria-label="Chat input"
       />
 
-      <button
+      <button type="button"
         onClick={handleSend}
-        disabled={!value.trim() || isLoading}
+        disabled={!isLoading && !value.trim()}
         className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors',
-          value.trim() && !isLoading
-            ? 'bg-terracotta-500 text-white hover:bg-terracotta-600'
-            : 'bg-parchment-200 text-navy-400 dark:bg-navy-700 dark:text-parchment-500',
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 mb-[2px] mr-[2px]',
+          (value.trim() || isLoading)
+            ? 'bg-foreground text-background hover:bg-foreground/90 active:scale-95'
+            : 'bg-surface-2 text-muted cursor-not-allowed opacity-70',
         )}
-        aria-label="Send message"
+        aria-label={isLoading ? "Stop generating" : "Send message"}
       >
-        {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+        {isLoading ? (
+          <FontAwesomeIcon icon={faStop} className="w-3.5 h-3.5 text-background" />
+        ) : (
+          <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4" />
+        )}
       </button>
     </div>
   );

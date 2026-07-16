@@ -1,17 +1,15 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
 export default function QuizLoading() {
   return (
-    <div className="animate-pulse">
-      <div className="h-8 w-32 rounded bg-parchment-300 dark:bg-navy-700" />
-      <div className="mt-2 h-4 w-56 rounded bg-parchment-300 dark:bg-navy-700" />
-
-      <div className="mt-6 space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-48 rounded-xl bg-parchment-200 dark:bg-navy-800"
-          />
-        ))}
+    <div className="flex flex-col h-[50vh] items-center justify-center space-y-4">
+      <div className="rounded-full bg-surface-1/40 p-5 glass border border-border/50 shadow-xl">
+         <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
+      <p className="text-lg font-bold text-foreground tracking-tight animate-pulse">
+        Loading your quizzes...
+      </p>
     </div>
   );
 }

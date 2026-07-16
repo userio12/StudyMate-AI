@@ -1,11 +1,14 @@
 'use client';
 
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import useSWR from 'swr';
 import type { Socket } from 'socket.io-client';
 import { useApiClient } from '@/lib/api-client';
+
 import { getSocket, disconnectSocket } from '@/lib/websocket';
+import { useUiStore } from '@/store/ui-store';
 
 interface ChatMessage {
   id: string;
@@ -21,8 +24,13 @@ export function useRoomChat(roomId: string) {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const { presence } = useUiStore();
   const socketRef = useRef<Socket | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // FIX BUG-27: Track whether the socket was actually acquired so disconnectSocket()
+  // is only called if getSocket() was successfully called, preventing the refCount
+  // from going negative on rapid mount/unmount before token fetch completes.
+  const socketAcquired = useRef(false);
 
   const { data: history } = useSWR(
     roomId ? `/rooms/${roomId}/messages` : null,
@@ -31,84 +39,119 @@ export function useRoomChat(roomId: string) {
 
   useEffect(() => {
     if (history) {
-      setMessages(history.reverse());
+      const timer = setTimeout(() => {
+        setMessages([...history].reverse());
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [history]);
 
   useEffect(() => {
     let cancelled = false;
+    socketAcquired.current = false;
 
-    async function connect() {
-      const token = await getToken({ template: 'studymate-ai' });
-      if (!token || cancelled) return;
+    // FIX BUG-26: Use the shared CLERK_JWT_TEMPLATE constant from api-client
+    // instead of a hardcoded string. This ensures both auth mechanisms (REST API
+    // and WebSocket) always use the same template name.
+    //
+    // FIX BUG-30: Pass a token-getter function to getSocket() instead of a static
+    // token string. The SocketManager uses it as a callback that is invoked on
+    // every connection attempt (including reconnects), so the token stays fresh.
+    const tokenGetter = () => getToken().then((t) => t ?? null);
 
-      const socket = getSocket(token);
-      socketRef.current = socket;
-
-      socket.on('connect', () => setIsConnected(true));
-      socket.on('disconnect', () => setIsConnected(false));
-      socket.emit('join:room', { roomId });
-
-      socket.on('message:received', (msg: ChatMessage) => {
-        setMessages((prev) => [...prev, msg]);
-      });
-
-      socket.on('user:joined', ({ userId }: { userId: string }) => {
-        setOnlineUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
-      });
-
-      socket.on('user:left', ({ userId }: { userId: string }) => {
-        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-      });
-
-      socket.on('typing:update', ({ userId, typing }: { userId: string; typing: boolean }) => {
-        setTypingUsers((prev) =>
-          typing
-            ? prev.includes(userId) ? prev : [...prev, userId]
-            : prev.filter((id) => id !== userId),
-        );
-      });
-
-      socket.on('error', ({ message }: { message: string }) => {
-        console.error('Socket error:', message);
-      });
+    const socket = getSocket(tokenGetter);
+    if (cancelled) {
+      // Component unmounted between getSocket() and here — release immediately
+      disconnectSocket();
+      return;
     }
 
-    connect();
+    socketAcquired.current = true;
+    socketRef.current = socket;
+
+    socket.on('connect', () => setIsConnected(true));
+    socket.on('disconnect', () => setIsConnected(false));
+    socket.emit('join:room', { roomId });
+    socket.emit('presence:update', { status: presence });
+
+    socket.on('message:received', (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    socket.on('user:joined', ({ userId }: { userId: string }) => {
+      setOnlineUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
+    });
+
+    socket.on('user:left', ({ userId }: { userId: string }) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+    });
+
+    socket.on('typing:update', ({ userId, isTyping }: { userId: string; isTyping: boolean }) => {
+      setTypingUsers((prev) => {
+        if (isTyping) {
+          return prev.includes(userId) ? prev : [...prev, userId];
+        } else {
+          return prev.filter((id) => id !== userId);
+        }
+      });
+    });
+
+    socket.on('connect_error', (err: Error) => {
+      console.error('Socket connection error:', err.message);
+      setIsConnected(false);
+    });
+
+    socket.on('error', (err: { message: string }) => {
+      console.error('Room error:', err.message);
+    });
 
     return () => {
       cancelled = true;
-      const s = socketRef.current;
-      if (s) {
-        s.emit('leave:room', { roomId });
-        s.off('message:received');
-        s.off('user:joined');
-        s.off('user:left');
-        s.off('typing:update');
-        s.off('error');
+      socket.emit('leave:room', { roomId });
+      socket.off('message:received');
+      socket.off('user:joined');
+      socket.off('user:left');
+      socket.off('typing:update');
+      socket.off('error');
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('connect_error');
+      socketRef.current = null;
+      // FIX BUG-27: Only release the socket if we successfully acquired it.
+      // Without this guard, a rapid unmount before the async token fetch
+      // finishes would decrement refCount without a matching increment.
+      if (socketAcquired.current) {
         disconnectSocket();
-        socketRef.current = null;
+        socketAcquired.current = false;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, getToken]);
 
-  const sendMessage = useCallback((content: string) => {
-    socketRef.current?.emit('message:send', { roomId, content });
-  }, [roomId]);
+  // Sync presence changes
+  useEffect(() => {
+    if (socketRef.current && isConnected) {
+      socketRef.current.emit('presence:update', { status: presence });
+    }
+  }, [presence, isConnected]);
 
-  const handleTyping = useCallback((typing: boolean) => {
+  const sendMessage = (content: string) => {
+    socketRef.current?.emit('message:send', { roomId, content });
+  };
+
+  const handleTyping = (typing: boolean) => {
     if (typing) {
       socketRef.current?.emit('typing:start', { roomId });
     } else {
       socketRef.current?.emit('typing:stop', { roomId });
     }
-  }, [roomId]);
+  };
 
-  const handleInputChange = useCallback(() => {
+  const handleInputChange = () => {
     handleTyping(true);
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => handleTyping(false), 2000);
-  }, [handleTyping]);
+  };
 
   return {
     messages,

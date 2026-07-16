@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 interface Question {
   id: string;
   question: string;
+  options: string[];
   correctAnswer: string;
   order: number;
 }
@@ -18,6 +19,7 @@ export interface ScoreResult {
     correct: boolean;
     userAnswer: string;
     correctAnswer: string;
+    options: string[];
   }>;
   weakTopics: string[];
 }
@@ -40,6 +42,7 @@ export class QuizScorerService {
         correct: isCorrect,
         userAnswer,
         correctAnswer: q.correctAnswer,
+        options: q.options,
       });
     }
 

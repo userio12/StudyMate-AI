@@ -7,14 +7,20 @@ export function useRooms() {
   const api = useApiClient();
 
   const { data, error, isLoading, mutate } = useSWR('/rooms', (url) =>
-    api.get<Array<{ id: string; name: string; inviteCode: string; createdAt: string }>>(url),
+    api.get<Array<{ id: string; name: string; inviteCode: string; createdAt: string; isOwner?: boolean }>>(url),
   );
+
+  const deleteRoom = async (id: string) => {
+    await api.delete(`/rooms/${id}`);
+    await mutate();
+  };
 
   return {
     rooms: data ?? [],
     isLoading,
     error,
     mutate,
+    deleteRoom,
   };
 }
 

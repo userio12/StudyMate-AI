@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, integer, pgEnum } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp, integer, pgEnum, boolean } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 
 export const documentStatusEnum = pgEnum('document_status', ['pending', 'processing', 'ready', 'error']);
@@ -17,6 +17,8 @@ export const documents = pgTable(
     s3Key: text('s3_key').notNull(),
     status: documentStatusEnum('status').default('pending').notNull(),
     pageCount: integer('page_count'),
+    progress: integer('progress').default(0),
+    isPinned: boolean('is_pinned').default(false).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { useApiClient } from '@/lib/api-client';
 import { useChatStore } from '@/store/chat-store';
@@ -9,16 +10,30 @@ export function useConversations() {
   const setConversations = useChatStore((s) => s.setConversations);
 
   const { data, error, isLoading, mutate } = useSWR('/chat/conversations', (url) =>
-    api.get<Array<{ id: string; title: string; lastMessageAt: string | null }>>(url),
+    api.get<Array<{ id: string; title: string; lastMessageAt: string | null; isPinned: boolean }>>(url),
   );
 
-  if (data) setConversations(data);
+  const deleteConversation = async (id: string) => {
+    await api.delete(`/chat/conversations/${id}`);
+    await mutate();
+  };
+
+  const updateConversation = async (id: string, updates: { title?: string; isPinned?: boolean }) => {
+    await api.patch(`/chat/conversations/${id}`, updates);
+    await mutate();
+  };
+
+  useEffect(() => {
+    if (data) setConversations(data);
+  }, [data, setConversations]);
 
   return {
     conversations: data ?? [],
     isLoading,
     error,
     mutate,
+    deleteConversation,
+    updateConversation,
   };
 }
 

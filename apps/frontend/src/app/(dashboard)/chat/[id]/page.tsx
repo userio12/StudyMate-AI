@@ -4,7 +4,8 @@ import { use, useEffect } from 'react';
 import { ChatInterface } from '@/components/chat/chat-interface';
 import { useConversation } from '@/hooks/use-chat';
 import { useTrustLevel } from '@/hooks/use-trust-level';
-import { Loader2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import type { ContinuityContext } from '@studymate/shared';
 
 export default function ChatConversationPage({
@@ -23,7 +24,7 @@ export default function ChatConversationPage({
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-terracotta-500" />
+        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-brand-500 dark:text-brand-300 w-6 h-6" />
       </div>
     );
   }
@@ -31,7 +32,7 @@ export default function ChatConversationPage({
   if (!conversation) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-navy-600 dark:text-parchment-400">
+        <p className="text-sm text-ink-400 dark:text-ink-200">
           Conversation not found
         </p>
       </div>

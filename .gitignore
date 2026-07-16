@@ -5,9 +5,10 @@ turbo/
 .turbo/
 *.tsbuildinfo
 .env*
-!.env.example
+
 coverage/
 .DS_Store
 *.log
 playwright-report/
 test-results/
+docs/

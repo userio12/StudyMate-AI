@@ -5,6 +5,8 @@ import { PdfProcessorService } from './pdf-processor.service.js';
 import { documents } from '@studymate/db';
 import { eq } from 'drizzle-orm';
 import type { CreateUploadUrlDto } from './dto/create-upload-url.dto.js';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class DocumentsService {
@@ -12,9 +14,17 @@ export class DocumentsService {
     private db: DatabaseService,
     private storage: StorageService,
     private pdfProcessor: PdfProcessorService,
+    @InjectQueue('document-processing') private documentQueue: Queue,
   ) {}
 
   async createUploadUrl(body: CreateUploadUrlDto, userId: string) {
+    if (body.mimeType !== 'application/pdf') {
+      throw new ForbiddenException('Only PDF files are allowed');
+    }
+    if (body.fileSize > 10 * 1024 * 1024) { // 10MB
+      throw new ForbiddenException('File size exceeds the maximum limit of 10MB');
+    }
+
     const id = crypto.randomUUID();
     const s3Key = `uploads/${userId}/${id}.pdf`;
 
@@ -34,7 +44,7 @@ export class DocumentsService {
     return { id, uploadUrl, s3Key };
   }
 
-  async processDocument(id: string, userId: string) {
+  async processDocument(id: string, userId: string, pdfProvider?: string) {
     const doc = await this.db.db!.query.documents.findFirst({
       where: eq(documents.id, id),
     });
@@ -42,22 +52,18 @@ export class DocumentsService {
     if (!doc) throw new NotFoundException('Document not found');
     if (doc.userId !== userId) throw new ForbiddenException();
 
-    await this.db.db!
-      .update(documents)
-      .set({ status: 'processing' })
-      .where(eq(documents.id, id));
+    await this.documentQueue.add('process-pdf', {
+      id,
+      pdfProvider,
+    }, {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 5000,
+      }
+    });
 
-    try {
-      await this.pdfProcessor.processDocument(id);
-    } catch {
-      await this.db.db!
-        .update(documents)
-        .set({ status: 'error' })
-        .where(eq(documents.id, id));
-      throw new Error('Failed to process document');
-    }
-
-    return { id, status: 'ready' };
+    return { id, status: 'queued' };
   }
 
   async listDocuments(userId: string, limit = 20, offset = 0) {

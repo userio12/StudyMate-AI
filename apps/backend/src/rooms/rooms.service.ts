@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import { rooms, roomMembers, roomMessages } from '@studymate/db';
 import { eq, and, desc } from 'drizzle-orm';
@@ -51,10 +51,25 @@ export class RoomsService {
       },
     });
 
-    return memberships.map((m) => m.room);
+    return memberships.map((m) => ({
+      ...m.room,
+      isOwner: m.room.createdBy === userId,
+    }));
   }
 
-  async getRoom(id: string, userId: string) {
+  async deleteRoom(id: string, userId: string) {
+    const room = await this.db.db!.query.rooms.findFirst({
+      where: eq(rooms.id, id),
+    });
+
+    if (!room) throw new NotFoundException('Room not found');
+    if (room.createdBy !== userId) throw new ForbiddenException('Only the room creator can delete this room');
+
+    await this.db.db!.delete(rooms).where(eq(rooms.id, id));
+    return { success: true };
+  }
+
+  async getRoom(id: string, _userId: string) {
     const room = await this.db.db!.query.rooms.findFirst({
       where: eq(rooms.id, id),
     });
@@ -69,10 +84,16 @@ export class RoomsService {
   }
 
   async getMessages(roomId: string) {
-    return this.db.db!.query.roomMessages.findMany({
+    const messages = await this.db.db!.query.roomMessages.findMany({
       where: eq(roomMessages.roomId, roomId),
       orderBy: desc(roomMessages.createdAt),
       limit: 50,
     });
+    return messages.map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      content: m.content,
+      timestamp: m.createdAt,
+    }));
   }
 }

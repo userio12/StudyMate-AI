@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
 import { rooms } from './rooms.js';
 import { users } from './users.js';
 
@@ -20,5 +20,6 @@ export const roomMembers = pgTable(
   (table) => ({
     roomIdIdx: index('idx_room_members_room_id').on(table.roomId),
     userIdIdx: index('idx_room_members_user_id').on(table.userId),
+    roomUserUniqueIdx: uniqueIndex('idx_room_members_room_user_unique').on(table.roomId, table.userId),
   }),
 );

@@ -1,7 +1,9 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowTrendUp, faArrowTrendDown, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 interface StatsCardProps {
   label: string;
@@ -9,43 +11,84 @@ interface StatsCardProps {
   icon: ReactNode;
   trend?: { direction: 'up' | 'down'; value: string };
   isLoading?: boolean;
+  accentColor?: 'brand' | 'violet' | 'cyan' | 'success';
+  className?: string;
 }
 
-export function StatsCard({ label, value, icon, trend, isLoading }: StatsCardProps) {
+const accentMap = {
+  brand:   { icon: 'text-brand-300',   border: 'group-hover:border-brand-500/30',   iconBg: 'bg-brand-500/15' },
+  violet:  { icon: 'text-violet-300',  border: 'group-hover:border-violet-500/30', iconBg: 'bg-violet-500/15' },
+  cyan:    { icon: 'text-cyan-300',    border: 'group-hover:border-cyan-500/30',   iconBg: 'bg-cyan-500/15' },
+  success: { icon: 'text-emerald-300', border: 'group-hover:border-success/30',    iconBg: 'bg-success/15' },
+};
+
+function AnimatedNumber({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0);
+  const frameRef = useRef<number>(0);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof value !== 'number') return;
+    const duration = 800;
+    const startVal = 0;
+
+    const animate = (ts: number) => {
+      if (!startRef.current) startRef.current = ts;
+      const elapsed = ts - startRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(startVal + (value - startVal) * ease));
+      if (progress < 1) frameRef.current = requestAnimationFrame(animate);
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [value]);
+
+  return <>{display.toLocaleString()}</>;
+}
+
+export function StatsCard({ label, value, icon, trend, isLoading, accentColor = 'brand', className }: StatsCardProps) {
+  const accent = accentMap[accentColor];
+
   if (isLoading) {
     return (
-      <div className="animate-pulse rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-        <div className="h-10 w-10 rounded-lg bg-parchment-300 dark:bg-navy-700" />
-        <div className="mt-3 h-4 w-24 rounded bg-parchment-300 dark:bg-navy-700" />
-        <div className="mt-2 h-8 w-16 rounded bg-parchment-300 dark:bg-navy-700" />
+      <div className={cn("glass-card p-5 flex flex-col items-center justify-center h-full min-h-[120px] space-y-3", className)}>
+        <FontAwesomeIcon icon={faSpinner} className="w-6 h-6 text-brand-500 animate-spin" />
+        <span className="text-sm font-medium text-muted tracking-wide animate-pulse">Loading stats...</span>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-parchment-300 bg-parchment-50 p-5 dark:border-navy-700 dark:bg-navy-800">
-      <div className="flex items-center justify-between">
-        <div className="rounded-lg bg-terracotta-100 p-2.5 text-terracotta-600 dark:bg-navy-700 dark:text-terracotta-400">
-          {icon}
+    <div className={cn(
+      'group glass-card relative overflow-hidden p-5 cursor-default transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
+      accent.border,
+      className
+    )}>
+
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="label-caps text-muted">{label}</p>
+          <p className="text-3xl font-extrabold text-foreground leading-none tracking-tight mt-2 mb-2">
+            {typeof value === 'number' ? <AnimatedNumber value={value} /> : value}
+          </p>
+          {trend && (
+            <div className={cn(
+              'flex items-center gap-1 text-xs font-semibold mt-1',
+              trend.direction === 'up' ? 'text-emerald-400' : 'text-red-400',
+            )}>
+              {trend.direction === 'up'
+                ? <FontAwesomeIcon icon={faArrowTrendUp} className="w-3 h-3" />
+                : <FontAwesomeIcon icon={faArrowTrendDown} className="w-3 h-3" />}
+              {trend.value}
+            </div>
+          )}
         </div>
-        {trend && (
-          <span
-            className={cn(
-              'text-xs font-medium',
-              trend.direction === 'up'
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400',
-            )}
-          >
-            {trend.direction === 'up' ? '+' : '-'}
-            {trend.value}
-          </span>
-        )}
+        <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', accent.iconBg)}>
+          <span className={accent.icon}>{icon}</span>
+        </div>
       </div>
-      <p className="mt-3 text-sm text-navy-600 dark:text-parchment-400">{label}</p>
-      <p className="mt-1 font-heading text-2xl font-semibold text-navy-800 dark:text-parchment-100">
-        {value}
-      </p>
     </div>
   );
 }

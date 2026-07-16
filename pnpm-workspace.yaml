@@ -4,6 +4,11 @@ packages:
 allowBuilds:
   '@clerk/shared': true
   '@google/genai': true
+  '@scarf/scarf': set this to true or false
+  canvas: set this to true or false
+  core-js: set this to true or false
   esbuild: true
+  msgpackr-extract: set this to true or false
   protobufjs: true
   sharp: true
+  unrs-resolver: false

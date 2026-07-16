@@ -1,9 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { CreateRoomSchema } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { RoomsService } from './rooms.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('rooms')
+@ApiBearerAuth()
 @Controller('rooms')
 export class RoomsController {
   constructor(private roomsService: RoomsService) {}
@@ -31,14 +35,22 @@ export class RoomsController {
 
   @Get(':id')
   getRoom(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.roomsService.getRoom(id, user.userId);
   }
 
+  @Delete(':id')
+  deleteRoom(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.roomsService.deleteRoom(id, user.userId);
+  }
+
   @Get(':id/messages')
-  getMessages(@Param('id') id: string) {
+  getMessages(@Param('id', ParseUUIDPipe) id: string) {
     return this.roomsService.getMessages(id);
   }
 }

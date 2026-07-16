@@ -2,8 +2,9 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { DatabaseService } from '../database/database.service.js';
 import { QuizGeneratorService } from './quiz-generator.service.js';
 import { QuizScorerService } from './quiz-scorer.service.js';
-import { quizzes, quizQuestions, quizAttempts } from '@studymate/db';
+import { quizzes, quizQuestions, quizAttempts, users, quizDocuments } from '@studymate/db';
 import { eq, and } from 'drizzle-orm';
+import { DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
 
 @Injectable()
 export class QuizService {
@@ -13,8 +14,45 @@ export class QuizService {
     private scorer: QuizScorerService,
   ) {}
 
-  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = 5) {
-    const questions = await this.generator.generate(documentIds, difficulty, questionCount);
+  async generateQuiz(documentIds: string[], difficulty: string, userId: string, questionCount = DEFAULT_QUIZ_QUESTION_COUNT, customTopic?: string, quizProvider?: string, quizModel?: string) {
+    const userRecord = await this.db.db!.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+    const preferredModel = quizProvider || (userRecord?.metadata as any)?.preferredModel as string | undefined;
+
+    let resolvedDifficulty = difficulty;
+    let adaptiveContext: string | undefined = undefined;
+
+    if (difficulty === 'adaptive') {
+      const pastAttempts = await this.db.db!.query.quizAttempts.findMany({
+        where: eq(quizAttempts.userId, userId),
+        orderBy: (a, { desc }) => [desc(a.completedAt)],
+        limit: 5,
+      });
+
+      const completedAttempts = pastAttempts.filter(a => a.score !== null && a.score !== undefined);
+      
+      if (completedAttempts.length > 0) {
+        const avgScore = completedAttempts.reduce((acc, a) => acc + (a.score ?? 0), 0) / completedAttempts.length;
+        
+        if (avgScore >= 80) {
+          resolvedDifficulty = 'advanced';
+          adaptiveContext = "The user has shown high proficiency (average score > 80%). Focus on nuanced edge-cases, synthesis of multiple concepts, and complex application scenarios.";
+        } else if (avgScore >= 60) {
+          resolvedDifficulty = 'intermediate';
+          adaptiveContext = "The user has a solid grasp of the basics (average score ~70%). Provide a balanced mix of fundamental and applied questions.";
+        } else {
+          resolvedDifficulty = 'beginner';
+          adaptiveContext = "The user is currently building foundational knowledge (average score < 60%). Focus heavily on fundamental definitions, core concepts, and straightforward applications.";
+        }
+      } else {
+        // No past data, default to intermediate
+        resolvedDifficulty = 'intermediate';
+        adaptiveContext = "This is the user's first quiz. Provide a balanced, intermediate-level set of questions to establish a baseline.";
+      }
+    }
+
+    const quizData = await this.generator.generate(documentIds, userId, resolvedDifficulty, preferredModel, questionCount, adaptiveContext, customTopic, quizModel);
 
     const quizId = crypto.randomUUID();
 
@@ -22,29 +60,36 @@ export class QuizService {
       await tx.insert(quizzes).values({
         id: quizId,
         userId,
-        title: `Quiz on ${difficulty} difficulty`,
-        documentIds,
-        difficulty: difficulty as 'beginner' | 'intermediate' | 'advanced',
-        questionCount: questions.length,
+        title: customTopic || quizData.topic,
+        difficulty: resolvedDifficulty as 'beginner' | 'intermediate' | 'advanced',
+        questionCount: quizData.questions.length,
       });
 
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i]!;
+      if (documentIds && documentIds.length > 0) {
+        await tx.insert(quizDocuments).values(
+          documentIds.map((docId) => ({
+            quizId,
+            documentId: docId,
+          }))
+        );
+      }
+
+      for (let i = 0; i < quizData.questions.length; i++) {
+        const q = quizData.questions[i]!;
         await tx.insert(quizQuestions).values({
           id: crypto.randomUUID(),
           quizId,
-          questionType: q.questionType as 'multiple_choice' | 'true_false' | 'short_answer',
+          questionType: 'multiple_choice',
           question: q.question,
           options: q.options ?? [],
-          correctAnswer: q.correctAnswer,
+          correctAnswer: q.options[q.correctOptionIndex] ?? '',
           explanation: q.explanation,
-          sourceChunkId: q.sourceChunkId,
           order: i,
         });
       }
     });
 
-    return { id: quizId, questionCount: questions.length };
+    return { id: quizId, questionCount: quizData.questions.length };
   }
 
   async listQuizzes(userId: string, limit = 20, offset = 0) {
@@ -59,6 +104,9 @@ export class QuizService {
   async getQuiz(id: string, userId: string) {
     const quiz = await this.db.db!.query.quizzes.findFirst({
       where: eq(quizzes.id, id),
+      with: {
+        documents: true,
+      },
     });
     if (!quiz) throw new NotFoundException('Quiz not found');
     if (quiz.userId !== userId) throw new ForbiddenException();
@@ -68,7 +116,46 @@ export class QuizService {
       orderBy: (q, { asc }) => [asc(q.order)],
     });
 
-    return { ...quiz, questions };
+    const attempts = await this.db.db!.query.quizAttempts.findMany({
+      where: and(eq(quizAttempts.quizId, id), eq(quizAttempts.userId, userId)),
+      orderBy: (a, { desc }) => [desc(a.completedAt)],
+    });
+
+    const documentIds = quiz.documents?.map(d => d.documentId) || [];
+
+    const sanitizedQuestions = questions.map(({ correctAnswer, explanation, ...q }) => q);
+
+    return { ...quiz, documentIds, questions: sanitizedQuestions, attempts };
+  }
+
+  async updateQuiz(id: string, userId: string, data: { title?: string; isPinned?: boolean }) {
+    const quiz = await this.db.db!.query.quizzes.findFirst({
+      where: and(eq(quizzes.id, id), eq(quizzes.userId, userId)),
+    });
+    if (!quiz) throw new NotFoundException('Quiz not found');
+
+    const updateData: Partial<typeof quizzes.$inferInsert> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.isPinned !== undefined) updateData.isPinned = data.isPinned;
+
+    if (Object.keys(updateData).length > 0) {
+      await this.db.db!
+        .update(quizzes)
+        .set(updateData)
+        .where(eq(quizzes.id, id));
+    }
+
+    return { ...quiz, ...updateData };
+  }
+
+  async deleteQuiz(id: string, userId: string) {
+    const quiz = await this.db.db!.query.quizzes.findFirst({
+      where: and(eq(quizzes.id, id), eq(quizzes.userId, userId)),
+    });
+    if (!quiz) throw new NotFoundException('Quiz not found');
+
+    await this.db.db!.delete(quizzes).where(eq(quizzes.id, id));
+    return { success: true };
   }
 
   async startAttempt(quizId: string, userId: string) {
@@ -99,7 +186,10 @@ export class QuizService {
       where: eq(quizQuestions.quizId, quizId),
     });
 
-    const result = this.scorer.score(questions, answers);
+    const result = this.scorer.score(
+      questions.map(q => ({ ...q, options: (q.options as string[]) ?? [] })),
+      answers
+    );
 
     await this.db.db!
       .update(quizAttempts)

@@ -4,6 +4,9 @@ import { DatabaseService } from './database/database.service.js';
 import { StorageService } from './storage/storage.service.js';
 import { AiService } from './ai/ai.service.js';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('health')
 @Controller()
 export class HealthController {
   constructor(
@@ -41,7 +44,7 @@ export class HealthController {
       checks.storage = 'error';
     }
 
-    checks.gemini = this.ai.client ? 'ok' : 'error';
+    checks.gemini = this.ai.geminiClient ? 'ok' : 'error';
 
     const allOk = Object.values(checks).every((s) => s === 'ok');
 

@@ -14,13 +14,14 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     const url = this.configService.get<string>('DATABASE_URL')!;
+    const ssl = this.configService.get<string>('DB_SSL');
 
     this.client = postgres(url, {
       prepare: false,
       max: this.configService.get<number>('DB_POOL_MAX'),
       idle_timeout: this.configService.get<number>('DB_POOL_IDLE_TIMEOUT'),
       max_lifetime: this.configService.get<number>('DB_POOL_MAX_LIFETIME'),
-      ssl: url.includes('supabase') ? 'require' : undefined,
+      ssl: ssl === 'true' || ssl === 'require' ? 'require' : undefined,
     });
     this.db = drizzle(this.client, { schema });
 

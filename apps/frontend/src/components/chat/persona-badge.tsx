@@ -3,26 +3,23 @@
 import type { Persona } from '@studymate/shared';
 import { cn } from '@/lib/utils';
 
-const personaStyles: Record<Persona, { bg: string; text: string; ring: string }> = {
+const personaStyles: Record<Persona, { bg: string; text: string }> = {
   guide: {
-    bg: 'bg-terracotta-100 dark:bg-terracotta-900/30',
-    text: 'text-terracotta-700 dark:text-terracotta-300',
-    ring: 'ring-terracotta-300 dark:ring-terracotta-700',
+    bg: 'bg-brand-500/10',
+    text: 'text-brand-600 dark:text-brand-300',
   },
   tutor: {
-    bg: 'bg-navy-100 dark:bg-navy-800',
-    text: 'text-navy-600 dark:text-navy-300',
-    ring: 'ring-navy-300 dark:ring-navy-600',
+    bg: 'bg-surface-2',
+    text: 'text-foreground',
   },
   partner: {
-    bg: 'bg-green-100 dark:bg-green-900/30',
-    text: 'text-green-700 dark:text-green-300',
-    ring: 'ring-green-300 dark:ring-green-700',
+    bg: 'bg-success/10',
+    text: 'text-success dark:text-success',
   },
 };
 
 const personaIcons: Record<Persona, string> = {
-  guide: '?',
+  guide: '\u2726',
   tutor: '\u25B3',
   partner: '\u2606',
 };
@@ -43,10 +40,9 @@ export function PersonaBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
         style.bg,
         style.text,
-        style.ring,
         className,
       )}
       title={description}

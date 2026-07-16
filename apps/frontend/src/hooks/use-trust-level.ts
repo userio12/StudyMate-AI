@@ -2,10 +2,11 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useMemo } from 'react';
+import { useMounted } from '@/hooks/use-mounted';
 import type { TrustLevel as TrustLevelType, Persona } from '@studymate/shared';
-import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS, TrustLevel } from '@studymate/shared';
+import { SESSION_COUNT_THRESHOLDS, TRUST_DECAY_DAYS } from '@studymate/shared';
 
-const STORAGE_KEY = 'studymate-trust';
+const STORAGE_KEY = 'studymate-trust:v1';
 
 interface TrustStorage {
   lastActiveAt: string;
@@ -40,11 +41,11 @@ function computeTrustLevel(sessionCount: number, lastActiveAt: string | null): {
   let baseLevel: TrustLevelType = 'stranger';
 
   const sorted = Object.entries(SESSION_COUNT_THRESHOLDS).sort(
-    (a, b) => b[1].min - a[1].min,
+    (a, b) => (b[1] as any).min - (a[1] as any).min,
   );
 
-  for (const [level, { min }] of sorted) {
-    if (sessionCount >= min) {
+  for (const [level, config] of sorted) {
+    if (sessionCount >= (config as any).min) {
       baseLevel = level as TrustLevelType;
       break;
     }
@@ -68,32 +69,32 @@ function computeTrustLevel(sessionCount: number, lastActiveAt: string | null): {
     }
   }
 
-  const persona = SESSION_COUNT_THRESHOLDS[effectiveLevel].persona;
+  const persona = (SESSION_COUNT_THRESHOLDS as any)[effectiveLevel].persona;
 
   return { trustLevel: effectiveLevel, persona };
 }
 
 export function useTrustLevel() {
   const { user } = useUser();
+  const mounted = useMounted();
 
-  return useMemo(() => {
-    const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;
-    const lastActiveAt = getLastActive();
+  const sessionCount = (user?.publicMetadata?.sessionCount as number) ?? 0;
+  // During hydration/SSR, assume no lastActiveAt to match server
+  const lastActiveAt = mounted ? getLastActive() : null;
 
-    const { trustLevel, persona } = computeTrustLevel(sessionCount, lastActiveAt);
+  const { trustLevel, persona } = computeTrustLevel(sessionCount, lastActiveAt);
 
-    const showOnboarding = trustLevel === 'stranger' || trustLevel === 'acquaintance';
-    const showAdvancedFeatures = trustLevel !== 'stranger';
-    const showBetaFeatures = trustLevel === 'mentor';
+  const showOnboarding = trustLevel === 'stranger' || trustLevel === 'acquaintance';
+  const showAdvancedFeatures = trustLevel !== 'stranger';
+  const showBetaFeatures = trustLevel === 'mentor';
 
-    return {
-      sessionCount,
-      trustLevel,
-      persona,
-      showOnboarding,
-      showAdvancedFeatures,
-      showBetaFeatures,
-      persistActivity,
-    } as const;
-  }, [user]);
+  return {
+    sessionCount,
+    trustLevel,
+    persona,
+    showOnboarding,
+    showAdvancedFeatures,
+    showBetaFeatures,
+    persistActivity,
+  } as const;
 }

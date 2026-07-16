@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { AiService } from '../ai/ai.service.js';
 import { DatabaseService } from '../database/database.service.js';
+import { RagService } from '../chat/rag.service.js';
 import { CHAT_MODEL, DEFAULT_QUIZ_QUESTION_COUNT } from '@studymate/shared';
-import { sql } from 'drizzle-orm';
 
 interface GeneratedQuestion {
   question: string;
-  questionType: string;
-  options?: string[];
-  correctAnswer: string;
-  explanation?: string;
-  sourceChunkId?: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
 }
 
 @Injectable()
@@ -18,109 +16,118 @@ export class QuizGeneratorService {
   constructor(
     private ai: AiService,
     private db: DatabaseService,
+    private rag: RagService,
   ) {}
 
   async generate(
     documentIds: string[],
-    difficulty: string,
-    questionCount = DEFAULT_QUIZ_QUESTION_COUNT as number,
-  ): Promise<GeneratedQuestion[]> {
-    const chunks = await this.db.db!.execute<{
-      content: string;
-      heading: string | null;
-      id: string;
-    }>(sql`
-      SELECT content, heading, id FROM chunks
-      WHERE document_id IN (${sql.join(documentIds.map((id) => sql`${id}`), sql`, `)})
-      ORDER BY random()
-      LIMIT 15
-    `);
-
-    if (chunks.length === 0) {
-      throw new Error('No content available to generate quiz');
+    userId: string,
+    difficulty: string = 'intermediate',
+    preferredModel: string = CHAT_MODEL,
+    count: number = DEFAULT_QUIZ_QUESTION_COUNT,
+    adaptiveContext?: string,
+    customTopic?: string,
+    quizModel?: string,
+  ) {
+    if (documentIds.length === 0) {
+      throw new Error('At least one document ID is required to generate a quiz.');
     }
 
-    const context = chunks.map((c) => `[${c.heading ?? 'General'}] ${c.content}`).join('\n\n---\n\n');
+    let chunksResult;
+    if (customTopic) {
+      chunksResult = await this.rag.search(customTopic, userId, documentIds);
+    } else {
+      chunksResult = await this.rag.search('main concepts, definitions, and important topics', userId, documentIds);
+    }
 
-    const prompt = `You are a quiz generator. Generate exactly ${questionCount} questions based on the provided study material.
+    if (chunksResult.length === 0) {
+      throw new Error('No content found in the specified documents.');
+    }
 
-Difficulty level: ${difficulty}
+    const context = chunksResult.map((c) => c.content).join('\n\n');
+
+    const prompt = `You are an expert tutor creating a quiz to test a student's comprehension.
+Using ONLY the following context from the user's documents, generate ${count} multiple-choice questions.
+The difficulty level should be: ${difficulty.toUpperCase()}.
+${difficulty === 'advanced' ? 'CRITICAL: Since this is an ADVANCED quiz, questions must be highly challenging, focusing on deep synthesis, edge cases, and complex applications of the material. Do not ask simple definitional questions.' : ''}
+${adaptiveContext ? `\nADAPTIVE INSTRUCTION based on user's past performance:\n${adaptiveContext}\n` : ''}
+${customTopic ? `\nSPECIAL INSTRUCTION: Generate questions STRICTLY focusing on the following specific topic requested by the user: "${customTopic}". If the context provided does not cover this topic, use your general knowledge to generate the quiz on this specific topic anyway.\n` : ''}
+Context:
+${context}
 
 Rules:
-- Questions must be answerable from the provided material
-- Include a mix of multiple choice, true/false, and short answer questions
-- Each question must have a clear correct answer
-- Provide a brief explanation for each answer
-- Mark which chunk each question refers to using its heading
+1. Questions must be strictly based on the provided context.
+2. Each question must have exactly 4 options.
+3. Only one option can be correct.
+4. Provide a brief explanation for why the answer is correct based on the text.
+5. STRICTLY NO REPETITION: Every single question MUST cover a completely different topic, concept, or section of the text. Do not ask about the same fact twice. If you cannot find ${count} unique topics, combine concepts.
+6. You MUST return ONLY a valid JSON object matching the format below, with no markdown formatting, no code blocks, and no extra text.
+7. If the provided context does NOT contain information about the requested topic, you MUST still generate questions about the requested topic using your general knowledge.
 
-Return valid JSON only with this structure:
+Format:
 {
+  "topic": "Machine Learning Fundamentals",
   "questions": [
     {
-      "question": "string",
-      "questionType": "multiple_choice | true_false | short_answer",
-      "options": ["string"] (only for multiple_choice),
-      "correctAnswer": "string",
-      "explanation": "string",
-      "sourceHeading": "string"
+      "question": "What is the main concept?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctOptionIndex": 1,
+      "explanation": "Option B is correct because the text states..."
     }
   ]
-}
+}`;
 
-Study material:
-${context}`;
+    let retries = 2;
 
-    let lastError: Error | null = null;
-
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) {
-        await new Promise((r) => setTimeout(r, 1000 * attempt));
-      }
-
+    while (retries >= 0) {
       try {
-        const result = await this.ai.client.models.generateContent({
-          model: CHAT_MODEL,
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        });
+        const text = await this.ai.executeWithFallback(async (client, providerName) => {
+          let modelToUse: string = CHAT_MODEL;
+          if (providerName === 'OpenRouter') {
+            modelToUse = quizModel || CHAT_MODEL;
+          } else if (providerName === 'Gemini') {
+            modelToUse = 'gemini-2.5-flash';
+          } else if (providerName === 'NVIDIA') {
+            modelToUse = 'meta/llama-3.1-8b-instruct';
+          }
 
-        const text = result.text;
+          console.log(`[QuizGeneratorService] Requesting quiz from ${providerName} using model ${modelToUse}`);
+          const response = await client.chat.completions.create({
+            model: modelToUse,
+            messages: [{ role: 'user', content: prompt }],
+          });
+          return response.choices[0]?.message?.content;
+        }, 'Generate Quiz', (preferredModel as "OpenRouter" | "Gemini" | "NVIDIA" | undefined) || 'Gemini');
+
         if (!text) {
-          lastError = new Error('No response from Gemini');
-          continue;
+          throw new Error('No response from AI');
         }
 
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          lastError = new Error('Failed to extract JSON from Gemini response');
-          continue;
+        console.log(`[QuizGeneratorService] Received response from Gemini. Parsing JSON...`);
+        const cleanedText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleanedText) as { topic: string; questions: GeneratedQuestion[] };
+        
+        if (!parsed.topic || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+          throw new Error('AI returned empty or invalid response');
         }
 
-        let parsed: { questions: Record<string, unknown>[] };
-        try {
-          parsed = JSON.parse(jsonMatch[0]);
-        } catch {
-          lastError = new Error('Gemini returned malformed JSON');
-          continue;
+        for (const q of parsed.questions) {
+          if (!q.question || !Array.isArray(q.options) || q.options.length !== 4 || 
+              typeof q.correctOptionIndex !== 'number' || !q.explanation) {
+            throw new Error('Invalid question format returned by AI');
+          }
         }
 
-        if (!Array.isArray(parsed?.questions)) {
-          lastError = new Error('Gemini response missing questions array');
-          continue;
-        }
+        return { topic: parsed.topic, questions: parsed.questions.slice(0, count) };
 
-        return parsed.questions.map((q: Record<string, unknown>) => ({
-          question: q.question as string,
-          questionType: q.questionType as string,
-          options: q.options as string[] | undefined,
-          correctAnswer: q.correctAnswer as string,
-          explanation: q.explanation as string | undefined,
-          sourceChunkId: undefined,
-        }));
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error('Unknown error during quiz generation');
+      } catch (error: any) {
+        retries--;
+        if (retries < 0) {
+          throw new Error(`Failed to generate valid quiz questions: ${error.message}`, { cause: error });
+        }
       }
     }
-
-    throw lastError ?? new Error('Quiz generation failed after 3 attempts');
+    
+    return { topic: 'Unknown Topic', questions: [] };
   }
 }

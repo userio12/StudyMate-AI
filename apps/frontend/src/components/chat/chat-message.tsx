@@ -1,8 +1,12 @@
 'use client';
 
+import React from 'react';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { CitationBadge } from './citation-badge';
-import { User, Bot } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
 
 interface Citation {
   chunkId: string;
@@ -17,50 +21,53 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
+
 export function ChatMessage({ role, content, citations, isStreaming }: ChatMessageProps) {
   const isUser = role === 'user';
 
   return (
-    <div className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}>
+    <div className={cn('flex gap-3 animate-message-appear', isUser ? 'justify-end' : 'justify-start')}>
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-terracotta-100 text-terracotta-600 dark:bg-navy-700 dark:text-terracotta-400">
-          <Bot size={18} />
+        <div className="flex h-7 w-7 mt-0.5 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
+          <FontAwesomeIcon icon={faRobot} className="w-3.5 h-3.5" />
         </div>
       )}
 
       <div className={cn('max-w-[75%]', isUser && 'order-first')}>
         <div
           className={cn(
-            'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+            'rounded-2xl px-3.5 py-2.5 text-[14px] leading-snug shadow-sm',
             isUser
-              ? 'bg-terracotta-500 text-white'
-              : 'bg-parchment-200 text-navy-800 dark:bg-navy-700 dark:text-parchment-100',
+              ? 'bg-brand-500 text-white rounded-tr-sm'
+              : 'bg-surface-2 border border-border/40 text-foreground',
           )}
         >
-          <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
-
-          {citations && citations.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-parchment-300 pt-2 dark:border-navy-600">
-              {citations.map((c, i) => (
-                <CitationBadge
-                  key={c.chunkId}
-                  number={i + 1}
-                  title={c.documentTitle}
-                  snippet={c.snippet}
-                />
-              ))}
+          {isStreaming && !content ? (
+            <div className="flex items-center gap-1.5 h-6 px-1">
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="h-2 w-2 rounded-full bg-brand-500/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          ) : (
+            <div className={cn(
+              "prose prose-sm max-w-none break-words",
+              isUser ? "prose-p:text-white prose-a:text-white prose-strong:text-white prose-ul:text-white prose-li:text-white text-white" : "dark:prose-invert prose-p:leading-relaxed"
+            )}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content}
+              </ReactMarkdown>
             </div>
           )}
 
-          {isStreaming && (
-            <span className="ml-0.5 inline-block h-4 w-2 animate-pulse bg-current" />
+          {isStreaming && content && (
+            <span className="ml-1 inline-block h-4 w-2 animate-pulse rounded-sm bg-brand-500 dark:bg-brand-300 align-middle" />
           )}
         </div>
       </div>
 
       {isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy-100 text-navy-600 dark:bg-navy-700 dark:text-parchment-300">
-          <User size={18} />
+        <div className="flex h-7 w-7 mt-0.5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-foreground">
+          <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" />
         </div>
       )}
     </div>

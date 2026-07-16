@@ -1,33 +1,53 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { GenerateQuizSchema, SubmitAttemptSchema } from '@studymate/shared';
+import { Body, Controller, Get, Param, Post, Query, ParseUUIDPipe, Patch, Delete } from '@nestjs/common';
+import { GenerateQuizSchema, SubmitAttemptSchema, PaginationSchema, type Pagination } from '@studymate/shared';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { QuizService } from './quiz.service.js';
 import { CurrentUser, type CurrentUserPayload } from '../auth/decorators/current-user.decorator.js';
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('quiz')
+@ApiBearerAuth()
 @Controller('quiz')
 export class QuizController {
   constructor(private quizService: QuizService) {}
 
   @Post('generate')
   generateQuiz(
-    @Body(new ZodValidationPipe(GenerateQuizSchema)) body: { documentIds: string[]; difficulty: string; questionCount?: number },
+    @Body(new ZodValidationPipe(GenerateQuizSchema)) body: { documentIds: string[]; difficulty: string; questionCount?: number; topic?: string; quizProvider?: string; quizModel?: string },
     @CurrentUser() user: CurrentUserPayload,
   ) {
-    return this.quizService.generateQuiz(body.documentIds, body.difficulty, user.userId, body.questionCount);
+    return this.quizService.generateQuiz(body.documentIds, body.difficulty, user.userId, body.questionCount, body.topic, body.quizProvider, body.quizModel);
   }
 
   @Get('list')
   listQuizzes(
     @CurrentUser() user: CurrentUserPayload,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
+    @Query(new ZodValidationPipe(PaginationSchema)) query: Pagination,
   ) {
-    return this.quizService.listQuizzes(user.userId, Number(limit) || 20, Number(offset) || 0);
+    return this.quizService.listQuizzes(user.userId, query.limit, query.offset);
+  }
+
+  @Patch(':id')
+  updateQuiz(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: { title?: string; isPinned?: boolean },
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.quizService.updateQuiz(id, user.userId, body);
+  }
+
+  @Delete(':id')
+  deleteQuiz(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.quizService.deleteQuiz(id, user.userId);
   }
 
   @Get(':id')
   getQuiz(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.quizService.getQuiz(id, user.userId);
@@ -35,7 +55,7 @@ export class QuizController {
 
   @Post(':id/attempt')
   startAttempt(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.quizService.startAttempt(id, user.userId);
@@ -43,8 +63,8 @@ export class QuizController {
 
   @Post(':id/attempt/:attemptId/submit')
   submitAttempt(
-    @Param('id') id: string,
-    @Param('attemptId') attemptId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('attemptId', ParseUUIDPipe) attemptId: string,
     @Body(new ZodValidationPipe(SubmitAttemptSchema)) body: { answers: Record<string, string> },
     @CurrentUser() user: CurrentUserPayload,
   ) {

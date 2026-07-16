@@ -22,7 +22,8 @@ describe('HealthController (e2e)', () => {
   }, 30000);
 
   it('GET /api/health returns ok', async () => {
-    const res = await request(app.getHttpServer()).get('/api/health');
+    const server = app.getHttpServer() as unknown as import('http').Server;
+    const res = await request(server).get('/api/health');
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
@@ -32,7 +33,8 @@ describe('HealthController (e2e)', () => {
   });
 
   it('GET /api/ready returns status with checks', async () => {
-    const res = await request(app.getHttpServer()).get('/api/ready');
+    const server = app.getHttpServer() as unknown as import('http').Server;
+    const res = await request(server).get('/api/ready');
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({

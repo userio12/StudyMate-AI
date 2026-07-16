@@ -16,10 +16,26 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ApiResponse<T
       return next.handle().pipe(map(() => undefined as unknown as ApiResponse<T>));
     }
     return next.handle().pipe(
-      map((data) => ({
-        data,
-        timestamp: new Date().toISOString(),
-      })),
+      map((data) => {
+        if (Array.isArray(data)) {
+          const req = context.switchToHttp().getRequest();
+          const limit = parseInt(req.query.limit as string) || 20;
+          const offset = parseInt(req.query.offset as string) || 0;
+          const page = Math.floor(offset / limit) + 1;
+          const hasMore = data.length === limit;
+          
+          return {
+            data,
+            meta: { page, limit, hasMore },
+            timestamp: new Date().toISOString(),
+          } as any;
+        }
+        
+        return {
+          data,
+          timestamp: new Date().toISOString(),
+        };
+      }),
     );
   }
 }

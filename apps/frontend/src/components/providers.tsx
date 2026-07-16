@@ -8,6 +8,7 @@ import { type ReactNode } from 'react';
 import { SkipLink } from './skip-link';
 import { handleApiError } from '@/lib/error-handler';
 import { toast } from 'sonner';
+import { SessionManager } from './session-manager';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -22,21 +23,28 @@ export function Providers({ children }: { children: ReactNode }) {
         }}
       >
         <ThemeProvider
-          attribute="class"
+          attribute="data-theme"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
         >
           <SkipLink />
           {children}
           <Toaster
             position="bottom-right"
             toastOptions={{
-              className: 'font-ui text-sm',
+              className: 'text-sm',
+              style: {
+                background: 'rgba(255,255,255,0.85)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255,255,255,0.8)',
+                borderRadius: '12px',
+                color: '#1a1a2e',
+              },
             }}
           />
         </ThemeProvider>
       </SWRConfig>
+      <SessionManager />
     </ClerkProvider>
   );
 }

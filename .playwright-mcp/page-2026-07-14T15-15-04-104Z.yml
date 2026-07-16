@@ -1,0 +1,44 @@
+- generic [active] [ref=f12e1]:
+  - link "Skip to main content" [ref=f12e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f12e4]:
+    - main [ref=f12e6]:
+      - complementary [ref=f12e7]:
+        - generic [ref=f12e8]:
+          - link [ref=f12e10] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=f12e15]:
+            - paragraph [ref=f12e16]: Your Chats
+            - button "New chat" [ref=f12e18]
+      - generic [ref=f12e23]:
+        - generic [ref=f12e24]:
+          - generic "Explains concepts step by step, checks understanding frequently" [ref=f12e25]:
+            - generic [ref=f12e26]: ✦
+            - text: StudyMate AI
+          - button "Action" [ref=f12e27]
+        - generic [ref=f12e30]:
+          - generic [ref=f12e31]: StudyMate AI
+          - heading "Upload a PDF to get started." [level=2] [ref=f12e34]
+          - generic [ref=f12e35]:
+            - button [ref=f12e36]:
+              - generic [ref=f12e40]:
+                - heading "Summarize Document" [level=3] [ref=f12e41]
+                - paragraph [ref=f12e42]: Can you summarize the key points from my most recently uploaded document?
+            - button [ref=f12e43]:
+              - generic [ref=f12e47]:
+                - heading "Explain Concept" [level=3] [ref=f12e48]
+                - paragraph [ref=f12e49]: Explain the core concepts from my study materials as if I were a beginner.
+            - button [ref=f12e50]:
+              - generic [ref=f12e54]:
+                - heading "Practice Questions" [level=3] [ref=f12e55]
+                - paragraph [ref=f12e56]: Generate 3 difficult practice questions based on the current context.
+            - button [ref=f12e57]:
+              - generic [ref=f12e61]:
+                - heading "Brainstorm Ideas" [level=3] [ref=f12e62]
+                - paragraph [ref=f12e63]: Help me brainstorm some ideas for an upcoming essay based on my materials.
+        - generic [ref=f12e65]:
+          - textbox "Chat input" [ref=f12e66]:
+            - /placeholder: Message StudyMate-AI...
+          - button "Send message" [disabled] [ref=f12e67]
+    - button [ref=f12e70]
+  - region "Notifications alt+T"

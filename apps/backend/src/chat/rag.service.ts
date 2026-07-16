@@ -23,13 +23,13 @@ export class RagService {
     private embeddings: EmbeddingsService,
   ) {}
 
-  async search(query: string, documentIds?: string[]): Promise<ChunkResult[]> {
+  async search(query: string, userId: string, documentIds?: string[]): Promise<ChunkResult[]> {
     const queryVector = await this.embeddings.embed(query);
     const vectorLiteral = sql.raw(`'[${queryVector.join(',')}]'::vector`);
 
     const docFilter = documentIds?.length
-      ? sql`AND document_id IN (${sql.join(documentIds.map((id) => sql`${id}`), sql`, `)})`
-      : sql``;
+      ? sql`AND document_id IN (${sql.join(documentIds.map((id) => sql`${id}`), sql`, `)}) AND document_id IN (SELECT id FROM documents WHERE user_id = ${userId})`
+      : sql`AND document_id IN (SELECT id FROM documents WHERE user_id = ${userId})`;
 
     const vectorResults = await this.db.db!.execute<{
       id: string;

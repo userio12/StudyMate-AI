@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { DatabaseService } from '../database/database.service.js';
 import { ChatLlmService } from '../ai/chat-llm.service.js';
 import { RagService } from './rag.service.js';
-import { conversations, messages } from '@studymate/db';
-import { eq, desc } from 'drizzle-orm';
+import { conversations, messages, conversationDocuments } from '@studymate/db';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class ChatService {
@@ -15,11 +15,21 @@ export class ChatService {
 
   async createConversation(title: string, userId: string, documentIds?: string[]) {
     const id = crypto.randomUUID();
-    await this.db.db!.insert(conversations).values({
-      id,
-      userId,
-      title,
-      documentIds: documentIds ?? [],
+    await this.db.db!.transaction(async (tx) => {
+      await tx.insert(conversations).values({
+        id,
+        userId,
+        title,
+      });
+
+      if (documentIds && documentIds.length > 0) {
+        await tx.insert(conversationDocuments).values(
+          documentIds.map((docId) => ({
+            conversationId: id,
+            documentId: docId,
+          })),
+        );
+      }
     });
     return { id, title };
   }
@@ -36,6 +46,9 @@ export class ChatService {
   async getConversation(id: string, userId: string) {
     const conv = await this.db.db!.query.conversations.findFirst({
       where: eq(conversations.id, id),
+      with: {
+        documents: true,
+      },
     });
     if (!conv) throw new NotFoundException('Conversation not found');
     if (conv.userId !== userId) throw new ForbiddenException();
@@ -45,7 +58,9 @@ export class ChatService {
       orderBy: (m, { asc }) => [asc(m.createdAt)],
     });
 
-    return { ...conv, messages: msgs };
+    const documentIds = conv.documents?.map(d => d.documentId) || [];
+
+    return { ...conv, documentIds, messages: msgs };
   }
 
   async deleteConversation(id: string, userId: string) {
@@ -63,13 +78,16 @@ export class ChatService {
     conversationId: string,
     content: string,
     userId: string,
-    onToken: (token: string) => void,
+    searchProvider: 'duckduckgo' | 'tavily' | 'off' | undefined,
+    chatProvider: string | undefined,
+    chatModel: string | undefined,
+    onToken: (payload: any) => void,
     signal?: AbortSignal,
   ): Promise<string> {
     const conv = await this.getConversation(conversationId, userId);
     const docIds = conv.documentIds as string[] | undefined;
 
-    const contextChunks = await this.rag.search(content, docIds);
+    const contextChunks = await this.rag.search(content, userId, docIds);
 
     const recentMessages = await this.db.db!.query.messages.findMany({
       where: eq(messages.conversationId, conversationId),
@@ -82,6 +100,10 @@ export class ChatService {
       content: m.content,
     }));
 
+    // Add current user message to history so the LLM actually sees it!
+    // We wrap it in <user_query> tags to prevent prompt injection breaking out of the persona.
+    history.push({ role: 'user', content: `<user_query>\n${content}\n</user_query>` });
+
     const sources = contextChunks.map((c) => ({
       chunkId: c.id,
       documentId: c.documentId,
@@ -90,14 +112,34 @@ export class ChatService {
     }));
 
     const fullResponse: string[] = [];
+    let buffer = '';
+    const citationRegex = /\[citation:(\d+)\]/g;
+    const emittedCitations = new Set<string>();
 
     for await (const token of this.llm.streamChat(
       history,
       contextChunks.map((c) => c.content),
+      searchProvider,
+      chatProvider,
+      chatModel,
       signal,
     )) {
       fullResponse.push(token);
-      onToken(token);
+      onToken({ type: 'token', data: token });
+      
+      buffer += token;
+      let match;
+      while ((match = citationRegex.exec(buffer)) !== null) {
+        const indexStr = match[1];
+        if (indexStr && !emittedCitations.has(indexStr)) {
+          emittedCitations.add(indexStr);
+          const index = parseInt(indexStr) - 1;
+          const source = sources[index];
+          if (source) {
+            onToken({ type: 'citation', chunk: source });
+          }
+        }
+      }
     }
 
     if (signal?.aborted) return '';
