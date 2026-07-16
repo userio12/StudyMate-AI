@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Map the Tailwind 'dark:' variant to the next-themes data attribute */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ─────────────────────────────────────────────────────────────
    DESIGN TOKENS  —  Deep Space Dark-First
    These are the DEFAULT (dark) values. Light mode overrides are
